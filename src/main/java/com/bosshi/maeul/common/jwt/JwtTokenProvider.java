@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,7 @@ import java.util.Date;
  * JWT 토큰 생성, 파싱, 검증을 담당하는 컴포넌트.
  * application.yml의 jwt.secret(Base64 인코딩)과 jwt.expiration(ms)을 사용한다.
  */
+@NamedInterface
 @Component
 public class JwtTokenProvider {
     @Value("${jwt.secret}")

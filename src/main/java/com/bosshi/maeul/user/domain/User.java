@@ -4,9 +4,11 @@ import com.bosshi.maeul.user.type.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.modulith.NamedInterface;
 
 import java.time.LocalDateTime;
 
+@NamedInterface
 @Entity
 @Table(name = "users")
 @Getter

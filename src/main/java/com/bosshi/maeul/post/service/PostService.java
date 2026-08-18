@@ -1,7 +1,7 @@
 package com.bosshi.maeul.post.service;
 
 import com.bosshi.maeul.post.request.PostCreateRequest;
-import com.bosshi.maeul.post.controller.PostResponse;
+import com.bosshi.maeul.post.response.PostResponse;
 import com.bosshi.maeul.post.request.PostUpdateRequest;
 import com.bosshi.maeul.post.domain.Post;
 import com.bosshi.maeul.post.type.PostCategory;
