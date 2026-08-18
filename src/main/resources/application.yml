@@ -24,3 +24,10 @@ server:
 jwt:
   secret: ${JWT_SECRET_KEY:secret-key}
   expiration: 3600000
+
+open-api:
+  base-url: ${OPEN_API_BASE_URL:https://apis.data.go.kr/B551011/KorService2}
+  service-key: ${OPEN_API_SECRET_KEY:}
+  mobile-os: ${OPEN_API_MOBILE_OS:ETC}
+  mobile-app: ${OPEN_API_MOBILE_APP:Maeul-Api}
+  response-type: ${OPEN_API_RESPONSE_TYPE:json}
