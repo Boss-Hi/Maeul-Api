@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Spring Security 필터 체인 설정.
  * - CSRF 비활성화 (JWT Stateless 방식)
  * - 세션 생성 안 함 (STATELESS)
- * - 루트 페이지와 인증 API는 인증 없이 허용, 나머지는 인증 필요
+ * - 루트 페이지, 인증 API, Open API 프록시 API는 인증 없이 허용, 나머지는 인증 필요
  * - JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
  */
 @Configuration
@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/favicon.ico", "/error", "/api/auth/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/favicon.ico", "/error", "/api/auth/**", "/api/open/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
