@@ -1,4 +1,4 @@
-package com.bosshi.maeul.user.enums;
+package com.bosshi.maeul.user.type;
 
 public enum UserRole {
     USER,

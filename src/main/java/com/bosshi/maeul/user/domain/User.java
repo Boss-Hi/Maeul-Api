@@ -1,6 +1,6 @@
-package com.bosshi.maeul.user.domains;
+package com.bosshi.maeul.user.domain;
 
-import com.bosshi.maeul.user.enums.UserRole;
+import com.bosshi.maeul.user.type.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.user.controllers;
+package com.bosshi.maeul.user.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

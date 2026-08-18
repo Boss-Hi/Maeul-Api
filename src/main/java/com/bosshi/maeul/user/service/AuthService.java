@@ -1,11 +1,11 @@
-package com.bosshi.maeul.user.services;
+package com.bosshi.maeul.user.service;
 
-import com.bosshi.maeul.user.requests.LoginRequest;
-import com.bosshi.maeul.user.requests.RegisterRequest;
+import com.bosshi.maeul.user.request.LoginRequest;
+import com.bosshi.maeul.user.request.RegisterRequest;
 import com.bosshi.maeul.common.jwt.JwtTokenProvider;
-import com.bosshi.maeul.user.domains.Profile;
-import com.bosshi.maeul.user.domains.User;
-import com.bosshi.maeul.user.repositories.UserRepository;
+import com.bosshi.maeul.user.domain.Profile;
+import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.post.repositories;
+package com.bosshi.maeul.post.repository;
 
 import com.bosshi.maeul.post.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;

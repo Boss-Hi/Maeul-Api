@@ -1,4 +1,4 @@
-package com.bosshi.maeul.user.requests;
+package com.bosshi.maeul.user.request;
 
 public record LoginRequest(
         String email,

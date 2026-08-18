@@ -1,6 +1,6 @@
-package com.bosshi.maeul.user.repositories;
+package com.bosshi.maeul.user.repository;
 
-import com.bosshi.maeul.user.domains.User;
+import com.bosshi.maeul.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
