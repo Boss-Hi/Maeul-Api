@@ -2,6 +2,7 @@ services:
   app:
     build:
       context: ${APP_BUILD_CONTEXT:-.}
+      dockerfile: Dockerfile
     depends_on:
       mysql:
         condition: service_healthy
@@ -14,6 +15,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-maeul}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-maeul}
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-secret-key}
       SPRING_DATA_REDIS_HOST: ${REDIS_HOST:-redis}
       SPRING_DATA_REDIS_PORT: ${REDIS_INTERNAL_PORT:-6379}
       TZ: ${TZ:-Asia/Seoul}
