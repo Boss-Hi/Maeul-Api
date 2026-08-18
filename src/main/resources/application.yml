@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: Maeul-Api
   docker:
@@ -29,5 +31,5 @@ open-api:
   base-url: ${OPEN_API_BASE_URL:https://apis.data.go.kr/B551011/KorService2}
   service-key: ${OPEN_API_SECRET_KEY:}
   mobile-os: ${OPEN_API_MOBILE_OS:ETC}
-  mobile-app: ${OPEN_API_MOBILE_APP:Maeul-Api}
+  mobile-app: ${OPEN_API_MOBILE_APP:Maeu}
   response-type: ${OPEN_API_RESPONSE_TYPE:json}
