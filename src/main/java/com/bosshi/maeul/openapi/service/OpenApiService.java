@@ -22,14 +22,26 @@ public class OpenApiService {
     private final RestClient.Builder restClientBuilder;
     private final OpenApiProperties openApiProperties;
 
+    /**
+     * 행사정보조회 API를 호출하고 DTO로 변환해 반환한다.
+     * 요청 객체에 들어 있는 필드들을 query param으로 바꿔 외부 API에 전달한다.
+     */
     public SearchFestivalResponse searchFestival(SearchFestivalRequest request) {
         return call(TourApiEndpoint.SEARCH_FESTIVAL, request.toQueryParams(), SearchFestivalResponse.class);
     }
 
+    /**
+     * 문자열 응답이 필요한 단순 조회용 호출 메서드.
+     * 보통 디버깅 또는 테스트 용도로 사용한다.
+     */
     public String call(TourApiEndpoint endpoint, MultiValueMap<String, String> requestParams) {
         return call(endpoint, requestParams, String.class);
     }
 
+    /**
+     * 지정된 관광 API 엔드포인트를 호출해 원하는 응답 타입으로 매핑한다.
+     * serviceKey, MobileOS, MobileApp, _type은 필수 파라미터이므로 누락 시 자동 보완한다.
+     */
     public <T> T call(TourApiEndpoint endpoint, MultiValueMap<String, String> requestParams, Class<T> responseType) {
         validateServiceKey();
 
@@ -58,6 +70,7 @@ public class OpenApiService {
                 .body(responseType);
     }
 
+    /** 파라미터가 비어 있지 않을 때만 기본값을 추가한다. */
     private void putIfMissing(MultiValueMap<String, String> params, String key, String value) {
         List<String> values = params.get(key);
         if ((values == null || values.isEmpty()) && StringUtils.hasText(value)) {
@@ -65,6 +78,7 @@ public class OpenApiService {
         }
     }
 
+    /** 서비스 키가 비어 있으면 로컬 개발/테스트 환경에서 명확한 오류를 남긴다. */
     private void validateServiceKey() {
         if (!StringUtils.hasText(openApiProperties.getServiceKey())) {
             throw new IllegalStateException("OPEN_API_SECRET_KEY environment variable is required.");
