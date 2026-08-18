@@ -1,6 +1,8 @@
-package com.bosshi.maeul.user.api;
+package com.bosshi.maeul.user.controllers;
 
-import com.bosshi.maeul.user.application.AuthService;
+import com.bosshi.maeul.user.requests.LoginRequest;
+import com.bosshi.maeul.user.requests.RegisterRequest;
+import com.bosshi.maeul.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

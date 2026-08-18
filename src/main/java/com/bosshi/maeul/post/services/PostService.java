@@ -1,13 +1,13 @@
-package com.bosshi.maeul.post.application;
+package com.bosshi.maeul.post.services;
 
-import com.bosshi.maeul.post.api.PostCreateRequest;
-import com.bosshi.maeul.post.api.PostResponse;
-import com.bosshi.maeul.post.api.PostUpdateRequest;
+import com.bosshi.maeul.post.requests.PostCreateRequest;
+import com.bosshi.maeul.post.controllers.PostResponse;
+import com.bosshi.maeul.post.requests.PostUpdateRequest;
 import com.bosshi.maeul.post.domain.Post;
-import com.bosshi.maeul.post.domain.PostCategory;
-import com.bosshi.maeul.post.domain.PostRepository;
-import com.bosshi.maeul.user.domain.User;
-import com.bosshi.maeul.user.domain.UserRepository;
+import com.bosshi.maeul.post.enums.PostCategory;
+import com.bosshi.maeul.post.repositories.PostRepository;
+import com.bosshi.maeul.user.domains.User;
+import com.bosshi.maeul.user.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.post.api;
+package com.bosshi.maeul.post.controllers;
 
 import java.time.LocalDateTime;
 

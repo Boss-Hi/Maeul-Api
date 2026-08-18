@@ -1,4 +1,4 @@
-package com.bosshi.maeul.post.api;
+package com.bosshi.maeul.post.requests;
 
 public record PostUpdateRequest(
         String title,
