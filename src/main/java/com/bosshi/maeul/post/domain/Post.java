@@ -1,6 +1,5 @@
 package com.bosshi.maeul.post.domain;
 
-import com.bosshi.maeul.neighborhood.domain.Neighborhood;
 import com.bosshi.maeul.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,10 +21,6 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "neighborhood_id", nullable = false)
-    private Neighborhood neighborhood;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

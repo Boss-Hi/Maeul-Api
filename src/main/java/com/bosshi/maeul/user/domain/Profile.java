@@ -1,6 +1,5 @@
 package com.bosshi.maeul.user.domain;
 
-import com.bosshi.maeul.neighborhood.domain.Neighborhood;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +24,4 @@ public class Profile {
     private String bio;
 
     private String avatarUrl;
-
-    @ManyToOne
-    @JoinColumn(name = "neighborhood_id")
-    private Neighborhood neighborhood;
 }

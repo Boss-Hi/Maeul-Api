@@ -1,6 +1,6 @@
-package com.bosshi.maeul.api.post;
+package com.bosshi.maeul.post.api;
 
-import com.bosshi.maeul.application.post.PostService;
+import com.bosshi.maeul.post.application.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

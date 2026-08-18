@@ -1,4 +1,4 @@
-package com.bosshi.maeul.api.auth;
+package com.bosshi.maeul.user.api;
 
 public record RegisterRequest(
         String email,

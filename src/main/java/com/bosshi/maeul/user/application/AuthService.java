@@ -1,7 +1,7 @@
-package com.bosshi.maeul.application.auth;
+package com.bosshi.maeul.user.application;
 
-import com.bosshi.maeul.api.auth.LoginRequest;
-import com.bosshi.maeul.api.auth.RegisterRequest;
+import com.bosshi.maeul.user.api.LoginRequest;
+import com.bosshi.maeul.user.api.RegisterRequest;
 import com.bosshi.maeul.common.jwt.JwtTokenProvider;
 import com.bosshi.maeul.user.domain.Profile;
 import com.bosshi.maeul.user.domain.User;

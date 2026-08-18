@@ -1,7 +1,6 @@
-package com.bosshi.maeul.api.post;
+package com.bosshi.maeul.post.api;
 
 public record PostCreateRequest(
-        Long neighborhoodId,
         String category,
         String title,
         String content

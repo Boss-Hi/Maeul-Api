@@ -1,10 +1,8 @@
-package com.bosshi.maeul.application.post;
+package com.bosshi.maeul.post.application;
 
-import com.bosshi.maeul.api.post.PostCreateRequest;
-import com.bosshi.maeul.api.post.PostResponse;
-import com.bosshi.maeul.api.post.PostUpdateRequest;
-import com.bosshi.maeul.neighborhood.domain.Neighborhood;
-import com.bosshi.maeul.neighborhood.domain.NeighborhoodRepository;
+import com.bosshi.maeul.post.api.PostCreateRequest;
+import com.bosshi.maeul.post.api.PostResponse;
+import com.bosshi.maeul.post.api.PostUpdateRequest;
 import com.bosshi.maeul.post.domain.Post;
 import com.bosshi.maeul.post.domain.PostCategory;
 import com.bosshi.maeul.post.domain.PostRepository;
@@ -21,18 +19,13 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final NeighborhoodRepository neighborhoodRepository;
 
     public PostResponse createPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        Neighborhood neighborhood = neighborhoodRepository.findById(request.neighborhoodId())
-                .orElseThrow(() -> new IllegalArgumentException("동네를 찾을 수 없습니다."));
-
         Post post = new Post();
         post.setUser(user);
-        post.setNeighborhood(neighborhood);
         post.setCategory(PostCategory.valueOf(request.category().toUpperCase()));
         post.setTitle(request.title());
         post.setContent(request.content());
@@ -75,7 +68,6 @@ public class PostService {
         return new PostResponse(
                 post.getId(),
                 post.getUser().getId(),
-                post.getNeighborhood().getId(),
                 post.getCategory().name(),
                 post.getTitle(),
                 post.getContent(),

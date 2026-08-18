@@ -1,11 +1,10 @@
-package com.bosshi.maeul.api.post;
+package com.bosshi.maeul.post.api;
 
 import java.time.LocalDateTime;
 
 public record PostResponse(
         Long id,
         Long userId,
-        Long neighborhoodId,
         String category,
         String title,
         String content,
