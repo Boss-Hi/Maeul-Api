@@ -1,5 +1,53 @@
 services:
-  redis:
-    image: 'redis:latest'
+  app:
+    build:
+      context: ${APP_BUILD_CONTEXT:-.}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: ${SPRING_DOCKER_COMPOSE_ENABLED:-false}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      SPRING_DATASOURCE_URL: jdbc:mysql://${MYSQL_HOST:-mysql}:${MYSQL_INTERNAL_PORT:-3306}/${MYSQL_DATABASE:-maeul}?createDatabaseIfNotExist=${MYSQL_CREATE_DATABASE_IF_NOT_EXIST:-true}&useSSL=${MYSQL_USE_SSL:-false}&allowPublicKeyRetrieval=${MYSQL_ALLOW_PUBLIC_KEY_RETRIEVAL:-true}&serverTimezone=${TZ:-Asia/Seoul}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-maeul}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-maeul}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_DATA_REDIS_HOST: ${REDIS_HOST:-redis}
+      SPRING_DATA_REDIS_PORT: ${REDIS_INTERNAL_PORT:-6379}
+      TZ: ${TZ:-Asia/Seoul}
     ports:
-      - '6379'
+      - '${APP_PORT:-8080}:${SERVER_PORT:-8080}'
+  mysql:
+    image: '${MYSQL_IMAGE:-mysql:8.4}'
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-maeul}
+      MYSQL_USER: ${MYSQL_USER:-maeul}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-maeul}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      TZ: ${TZ:-Asia/Seoul}
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -uroot -p"$${MYSQL_ROOT_PASSWORD}"']
+      interval: ${MYSQL_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${MYSQL_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${MYSQL_HEALTHCHECK_RETRIES:-10}
+      start_period: ${MYSQL_HEALTHCHECK_START_PERIOD:-20s}
+    ports:
+      - '${MYSQL_PORT:-3306}:${MYSQL_INTERNAL_PORT:-3306}'
+    volumes:
+      - ${MYSQL_VOLUME_NAME:-mysql-data}:/var/lib/mysql
+  redis:
+    image: '${REDIS_IMAGE:-redis:7.4-alpine}'
+    environment:
+      TZ: ${TZ:-Asia/Seoul}
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: ${REDIS_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${REDIS_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${REDIS_HEALTHCHECK_RETRIES:-10}
+    ports:
+      - '${REDIS_PORT:-6379}:${REDIS_INTERNAL_PORT:-6379}'
+volumes:
+  mysql-data:
+    name: ${MYSQL_VOLUME_NAME:-mysql-data}
