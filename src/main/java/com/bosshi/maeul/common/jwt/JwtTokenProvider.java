@@ -35,7 +35,7 @@ public class JwtTokenProvider {
                 .subject(email)
                 .issuedAt(now)
                 .expiration(expiry)
-                .signWith(this.getSigningKey())
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -44,7 +44,7 @@ public class JwtTokenProvider {
      */
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(this.getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -58,7 +58,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(this.getSigningKey())
+                    .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token);
             return true;
