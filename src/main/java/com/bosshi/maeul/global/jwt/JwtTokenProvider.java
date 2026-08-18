@@ -22,7 +22,9 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long expirationMs;
 
-    /** 이메일을 subject로 담은 서명된 JWT를 생성한다. */
+    /**
+     * 이메일을 subject로 담은 서명된 JWT를 생성한다.
+     */
     public String generateToken(String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
@@ -31,14 +33,16 @@ public class JwtTokenProvider {
                 .subject(email)
                 .issuedAt(now)
                 .expiration(expiry)
-                .signWith(getSigningKey())
+                .signWith(this.getSigningKey())
                 .compact();
     }
 
-    /** 토큰의 payload에서 이메일(subject)을 추출한다. */
+    /**
+     * 토큰의 payload에서 이메일(subject)을 추출한다.
+     */
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(this.getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -46,11 +50,13 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    /** 서명 및 만료 여부를 검증한다. 유효하면 true, 아니면 false. */
+    /**
+     * 서명 및 만료 여부를 검증한다. 유효하면 true, 아니면 false.
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(getSigningKey())
+                    .verifyWith(this.getSigningKey())
                     .build()
                     .parseSignedClaims(token);
             return true;
@@ -59,7 +65,9 @@ public class JwtTokenProvider {
         }
     }
 
-    /** Base64 디코딩된 secret으로 HMAC-SHA 서명 키를 생성한다. */
+    /**
+     * Base64 디코딩된 secret으로 HMAC-SHA 서명 키를 생성한다.
+     */
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

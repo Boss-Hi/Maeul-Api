@@ -8,7 +8,7 @@ plugins {
 
 group = 'com.bosshi'
 version = '0.0.1-SNAPSHOT'
-description = 'Maeul'
+description = 'Maeul-Api'
 
 java {
     toolchain {

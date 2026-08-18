@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Maeul
+    name: Maeul-Api
   docker:
     compose:
       enabled: ${SPRING_DOCKER_COMPOSE_ENABLED:true}
