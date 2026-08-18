@@ -3,7 +3,7 @@ spring:
     name: Maeul
   docker:
     compose:
-      enabled: ${SPRING_DOCKER_COMPOSE_ENABLED:false}
+      enabled: ${SPRING_DOCKER_COMPOSE_ENABLED:true}
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:maeul;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
     username: ${SPRING_DATASOURCE_USERNAME:sa}
