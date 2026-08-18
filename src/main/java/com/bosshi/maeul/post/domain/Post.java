@@ -1,6 +1,7 @@
 package com.bosshi.maeul.post.domain;
 
-import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.post.enums.PostCategory;
+import com.bosshi.maeul.user.domains.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
