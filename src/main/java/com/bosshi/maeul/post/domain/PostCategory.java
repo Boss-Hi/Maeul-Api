@@ -1,4 +1,4 @@
-package com.bosshi.maeul.domain.post;
+package com.bosshi.maeul.post.domain;
 
 public enum PostCategory {
     NEWS,

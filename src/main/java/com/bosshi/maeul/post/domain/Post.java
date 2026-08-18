@@ -1,7 +1,7 @@
-package com.bosshi.maeul.domain.post;
+package com.bosshi.maeul.post.domain;
 
-import com.bosshi.maeul.domain.neighborhood.Neighborhood;
-import com.bosshi.maeul.domain.user.User;
+import com.bosshi.maeul.neighborhood.domain.Neighborhood;
+import com.bosshi.maeul.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.global.security;
+package com.bosshi.maeul.common.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

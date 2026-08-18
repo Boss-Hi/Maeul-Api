@@ -1,4 +1,4 @@
-package com.bosshi.maeul.domain.neighborhood;
+package com.bosshi.maeul.neighborhood.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,15 +13,6 @@ public class Neighborhood {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String city;
-
-    @Column(nullable = false)
-    private String district;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
-
-    private Double latitude;
-    private Double longitude;
 }

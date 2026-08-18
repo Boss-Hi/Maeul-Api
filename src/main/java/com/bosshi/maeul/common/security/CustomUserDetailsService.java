@@ -1,7 +1,7 @@
-package com.bosshi.maeul.global.security;
+package com.bosshi.maeul.common.security;
 
-import com.bosshi.maeul.domain.user.User;
-import com.bosshi.maeul.domain.user.UserRepository;
+import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

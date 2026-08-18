@@ -1,4 +1,4 @@
-package com.bosshi.maeul.domain.user;
+package com.bosshi.maeul.user.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

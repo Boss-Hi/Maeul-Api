@@ -1,6 +1,6 @@
-package com.bosshi.maeul.global.security;
+package com.bosshi.maeul.common.security;
 
-import com.bosshi.maeul.global.jwt.JwtTokenProvider;
+import com.bosshi.maeul.common.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

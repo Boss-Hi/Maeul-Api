@@ -1,4 +1,4 @@
-package com.bosshi.maeul.domain.neighborhood;
+package com.bosshi.maeul.neighborhood.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
