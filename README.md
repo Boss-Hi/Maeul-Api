@@ -82,3 +82,4 @@ docker compose up --build
 
 - `/api/auth/**`와 `/api/open/**`는 인증 없이 접근할 수 있습니다.
 - 그 외 API는 JWT 인증이 필요합니다.
+
