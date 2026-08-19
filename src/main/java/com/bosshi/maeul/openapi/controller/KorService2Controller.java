@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.WebDataBinder;
@@ -76,7 +77,7 @@ public class KorService2Controller {
 
     @GetMapping("/area-based-sync-list")
     public ResponseEntity<?> getAreaBasedSyncList(
-            @ModelAttribute("areaBasedSyncListRequest") AreaBasedSyncListRequest request,
+            @Validated @ModelAttribute("areaBasedSyncListRequest") AreaBasedSyncListRequest request,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
