@@ -68,19 +68,9 @@ public class KorService2Controller {
         return ResponseEntity.ok(openApiService.call(TourApiEndpoint.AREA_BASED_SYNC_LIST, params));
     }
 
-    @GetMapping("/area-code")
-    public ResponseEntity<String> getAreaCode(@RequestParam MultiValueMap<String, String> params) {
-        return ResponseEntity.ok(openApiService.call(TourApiEndpoint.AREA_CODE, params));
-    }
-
     @GetMapping("/detail-pet-tour")
     public ResponseEntity<String> getDetailPetTour(@RequestParam MultiValueMap<String, String> params) {
         return ResponseEntity.ok(openApiService.call(TourApiEndpoint.DETAIL_PET_TOUR, params));
-    }
-
-    @GetMapping("/category-code")
-    public ResponseEntity<String> getCategoryCode(@RequestParam MultiValueMap<String, String> params) {
-        return ResponseEntity.ok(openApiService.call(TourApiEndpoint.CATEGORY_CODE, params));
     }
 
     @GetMapping("/area-based-list")
