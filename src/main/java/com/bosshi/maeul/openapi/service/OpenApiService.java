@@ -7,17 +7,20 @@ import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpenApiService {
@@ -64,19 +67,30 @@ public class OpenApiService {
         putIfMissing(queryParams, "MobileApp", openApiProperties.getMobileApp());
         putIfMissing(queryParams, "_type", openApiProperties.getResponseType());
 
+        String baseUrl = openApiProperties.getBaseUrl();
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+
         URI uri = UriComponentsBuilder
-                .fromUriString(openApiProperties.getBaseUrl())
+                .fromUriString(baseUrl)
                 .path(endpoint.getPath())
                 .queryParams(queryParams)
                 .build(true)
                 .toUri();
 
-        return restClientBuilder
-                .build()
-                .get()
-                .uri(uri)
-                .retrieve()
-                .body(responseType);
+        try {
+            return restClientBuilder
+                    .build()
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(responseType);
+        } catch (RestClientResponseException e) {
+            log.error("OpenAPI 호출 실패 - HTTP Status: {}, Request URI: {}, Response Body: {}",
+                    e.getStatusCode(), uri, e.getResponseBodyAsString());
+            throw e;
+        }
     }
 
     /** 파라미터가 비어 있지 않을 때만 기본값을 추가한다. */
