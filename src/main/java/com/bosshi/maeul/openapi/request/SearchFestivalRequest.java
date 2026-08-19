@@ -39,6 +39,4 @@ public class SearchFestivalRequest extends OpenApiBaseRequest {
     private String lclsSystm2;
     /** 3단계 분류 체계 */
     private String lclsSystm3;
-    /** 수정일 기준 필터 */
-    private String modifiedtime;
 }
