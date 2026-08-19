@@ -12,11 +12,7 @@ import org.springframework.util.StringUtils;
  */
 @Getter
 @Setter
-public class SearchFestivalRequest {
-    /** 기본 페이지 크기: 10건 */
-    private Integer numOfRows = 10;
-    /** 기본 페이지 번호: 1페이지 */
-    private Integer pageNo = 1;
+public class SearchFestivalRequest extends OpenApiBaseRequest {
     /** 정렬 기준: C = 수정일순 */
     private String arrange = "C";
     /** 행사 시작일 (YYYYMMDD) */
@@ -45,36 +41,4 @@ public class SearchFestivalRequest {
     private String lclsSystm3;
     /** 수정일 기준 필터 */
     private String modifiedtime;
-
-    /**
-     * API 호출용 query parameter로 변환한다.
-     * null 또는 빈 값은 제외해 불필요한 파라미터 전송을 방지한다.
-     */
-    public MultiValueMap<String, String> toQueryParams() {
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("numOfRows", String.valueOf(numOfRows));
-        params.add("pageNo", String.valueOf(pageNo));
-        params.add("arrange", arrange);
-        addIfHasText(params, "eventStartDate", eventStartDate);
-        addIfHasText(params, "eventEndDate", eventEndDate);
-        addIfHasText(params, "areaCode", areaCode);
-        addIfHasText(params, "sigunguCode", sigunguCode);
-        addIfHasText(params, "cat1", cat1);
-        addIfHasText(params, "cat2", cat2);
-        addIfHasText(params, "cat3", cat3);
-        addIfHasText(params, "lDongRegnCd", lDongRegnCd);
-        addIfHasText(params, "lDongSigunguCd", lDongSigunguCd);
-        addIfHasText(params, "lclsSystm1", lclsSystm1);
-        addIfHasText(params, "lclsSystm2", lclsSystm2);
-        addIfHasText(params, "lclsSystm3", lclsSystm3);
-        addIfHasText(params, "modifiedtime", modifiedtime);
-        return params;
-    }
-
-    /** 값이 존재할 때만 query parameter에 추가한다. */
-    private void addIfHasText(MultiValueMap<String, String> params, String key, String value) {
-        if (StringUtils.hasText(value)) {
-            params.add(key, value);
-        }
-    }
 }

@@ -13,8 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.logging.Logger;
-
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -35,7 +33,7 @@ class OpenApiControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new OpenApiController(openApiService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new KorService2Controller(openApiService)).build();
     }
 
     @Test

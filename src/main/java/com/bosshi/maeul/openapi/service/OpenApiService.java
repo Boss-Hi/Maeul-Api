@@ -1,7 +1,9 @@
 package com.bosshi.maeul.openapi.service;
 
 import com.bosshi.maeul.openapi.config.OpenApiProperties;
+import com.bosshi.maeul.openapi.request.AreaTarSvcDemListRequest;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
+import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,13 @@ public class OpenApiService {
     }
 
     /**
+     * 지역별 관광 서비스 수요 정보 목록 조회 API를 호출하고 DTO로 변환해 반환한다.
+     */
+    public AreaTarSvcDemListResponse getAreaTarSvcDemList(AreaTarSvcDemListRequest request) {
+        return call(TourApiEndpoint.AREA_TAR_SVC_DEM_LIST, request.toQueryParams(), AreaTarSvcDemListResponse.class);
+    }
+
+    /**
      * 문자열 응답이 필요한 단순 조회용 호출 메서드.
      * 보통 디버깅 또는 테스트 용도로 사용한다.
      */
@@ -57,7 +66,7 @@ public class OpenApiService {
 
         URI uri = UriComponentsBuilder
                 .fromUriString(openApiProperties.getBaseUrl())
-                .pathSegment(endpoint.getPath())
+                .path(endpoint.getPath())
                 .queryParams(queryParams)
                 .build(true)
                 .toUri();

@@ -1,7 +1,6 @@
 package com.bosshi.maeul.openapi.controller;
 
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
-import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/open")
 @RequiredArgsConstructor
-public class OpenApiController {
+public class KorService2Controller {
     private final OpenApiService openApiService;
 
     @GetMapping("/location-based-list")
