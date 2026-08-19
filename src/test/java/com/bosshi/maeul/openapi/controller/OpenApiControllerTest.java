@@ -1,8 +1,10 @@
 package com.bosshi.maeul.openapi.controller;
 
+import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.service.OpenApiService;
+import com.bosshi.maeul.openapi.validation.AreaBasedSyncListRequestValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,9 @@ class OpenApiControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new KorService2Controller(openApiService)).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new KorService2Controller(openApiService, new AreaBasedSyncListRequestValidator()))
+                .build();
     }
 
     @Test
@@ -88,6 +92,49 @@ class OpenApiControllerTest {
         then(openApiService).should(never()).searchFestival(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    void areaBasedSyncListReturnsOpenApiResponse() throws Exception {
+        given(openApiService.getAreaBasedSyncList(argThat(matchesAreaBasedSyncListRequest())))
+                .willReturn("{\"result\":\"ok\"}");
+
+        mockMvc.perform(get("/api/open/area-based-sync-list")
+                        .queryParam("pageNo", "2")
+                        .queryParam("numOfRows", "20")
+                        .queryParam("arrange", "A")
+                        .queryParam("contentTypeId", "12")
+                        .queryParam("lDongRegnCd", "26")
+                        .queryParam("lDongSignguCd", "380")
+                        .queryParam("lclsSystm1", "NA")
+                        .queryParam("lclsSystm2", "NA04")
+                        .queryParam("lclsSystm3", "NA040500")
+                        .queryParam("modifiedtime", "20260801"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("{\"result\":\"ok\"}"));
+
+        then(openApiService).should().getAreaBasedSyncList(argThat(matchesAreaBasedSyncListRequest()));
+    }
+
+    @Test
+    void areaBasedSyncListReturnsBadRequestWhenLDongSignguCdProvidedWithoutRegionCode() throws Exception {
+        mockMvc.perform(get("/api/open/area-based-sync-list")
+                        .queryParam("lDongSignguCd", "380"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("lDongRegnCd is required when lDongSignguCd is provided."));
+
+        then(openApiService).should(never()).getAreaBasedSyncList(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void areaBasedSyncListReturnsBadRequestWhenLclsSystm3ProvidedWithoutParents() throws Exception {
+        mockMvc.perform(get("/api/open/area-based-sync-list")
+                        .queryParam("lclsSystm1", "NA")
+                        .queryParam("lclsSystm3", "NA040500"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("lclsSystm1 and lclsSystm2 are required when lclsSystm3 is provided."));
+
+        then(openApiService).should(never()).getAreaBasedSyncList(org.mockito.ArgumentMatchers.any());
+    }
+
     private ArgumentMatcher<SearchFestivalRequest> matchesFestivalRequest() {
         return request ->
                 "20260101".equals(request.getEventStartDate()) &&
@@ -97,6 +144,20 @@ class OpenApiControllerTest {
                 "A".equals(request.getArrange()) &&
                 "11".equals(request.getLDongRegnCd()) &&
                 "470".equals(request.getLDongSigunguCd());
+    }
+
+    private ArgumentMatcher<AreaBasedSyncListRequest> matchesAreaBasedSyncListRequest() {
+        return request ->
+                Integer.valueOf(2).equals(request.getPageNo()) &&
+                Integer.valueOf(20).equals(request.getNumOfRows()) &&
+                "A".equals(request.getArrange()) &&
+                "12".equals(request.getContentTypeId()) &&
+                "26".equals(request.getLDongRegnCd()) &&
+                "380".equals(request.getLDongSignguCd()) &&
+                "NA".equals(request.getLclsSystm1()) &&
+                "NA04".equals(request.getLclsSystm2()) &&
+                "NA040500".equals(request.getLclsSystm3()) &&
+                "20260801".equals(request.getModifiedtime());
     }
 
     private SearchFestivalResponse createFestivalResponse() {

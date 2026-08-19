@@ -1,13 +1,18 @@
 package com.bosshi.maeul.openapi.controller;
 
+import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
+import com.bosshi.maeul.openapi.validation.AreaBasedSyncListRequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class KorService2Controller {
     private final OpenApiService openApiService;
+    private final AreaBasedSyncListRequestValidator areaBasedSyncListRequestValidator;
+
+    @InitBinder("areaBasedSyncListRequest")
+    protected void initAreaBasedSyncListBinder(WebDataBinder binder) {
+        binder.addValidators(areaBasedSyncListRequestValidator);
+    }
 
     @GetMapping("/location-based-list")
     public ResponseEntity<String> getLocationBasedList(@RequestParam MultiValueMap<String, String> params) {
@@ -64,8 +75,15 @@ public class KorService2Controller {
     }
 
     @GetMapping("/area-based-sync-list")
-    public ResponseEntity<String> getAreaBasedSyncList(@RequestParam MultiValueMap<String, String> params) {
-        return ResponseEntity.ok(openApiService.call(TourApiEndpoint.AREA_BASED_SYNC_LIST, params));
+    public ResponseEntity<?> getAreaBasedSyncList(
+            @ModelAttribute("areaBasedSyncListRequest") AreaBasedSyncListRequest request,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors().get(0).getDefaultMessage());
+        }
+
+        return ResponseEntity.ok(openApiService.getAreaBasedSyncList(request));
     }
 
     @GetMapping("/detail-pet-tour")

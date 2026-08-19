@@ -1,6 +1,7 @@
 package com.bosshi.maeul.openapi.service;
 
 import com.bosshi.maeul.openapi.config.OpenApiProperties;
+import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.request.AreaTarSvcDemListRequest;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
@@ -18,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -33,6 +33,13 @@ public class OpenApiService {
      */
     public SearchFestivalResponse searchFestival(SearchFestivalRequest request) {
         return call(TourApiEndpoint.SEARCH_FESTIVAL, request.toQueryParams(), SearchFestivalResponse.class);
+    }
+
+    /**
+     * 지역기반 관광정보조회(areaBasedSyncList2) API를 호출한다.
+     */
+    public String getAreaBasedSyncList(AreaBasedSyncListRequest request) {
+        return call(TourApiEndpoint.AREA_BASED_SYNC_LIST, request.toQueryParams(), String.class);
     }
 
     /**
