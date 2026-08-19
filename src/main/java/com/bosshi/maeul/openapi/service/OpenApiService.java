@@ -9,6 +9,7 @@ import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -20,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@NamedInterface
 @Slf4j
 @Service
 @RequiredArgsConstructor
