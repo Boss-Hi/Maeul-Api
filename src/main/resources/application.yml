@@ -32,11 +32,23 @@ jwt:
   expiration: 3600000
 
 open-api:
+  korea-tourism:
+    key: ${OPENAPI_KOREA_TOURISM_KEY:}
+    base-url: ${OPENAPI_KOREA_TOURISM_BASE_URL:https://apis.data.go.kr/B551011}
+    timeout-seconds: ${OPENAPI_KOREA_TOURISM_TIMEOUT_SECONDS:5}
+    retry-count: ${OPENAPI_KOREA_TOURISM_RETRY_COUNT:1}
   base-url: ${OPEN_API_BASE_URL:https://apis.data.go.kr}
   service-key: ${OPEN_API_SECRET_KEY:}
   mobile-os: ${OPEN_API_MOBILE_OS:ETC}
   mobile-app: ${OPEN_API_MOBILE_APP:Maeul}
-  response-type: ${OPEN_API_RESPONSE_TYPE:json}z
+  response-type: ${OPEN_API_RESPONSE_TYPE:json}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.0-flash}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+    timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:30}
 
 ai:
   gemini:

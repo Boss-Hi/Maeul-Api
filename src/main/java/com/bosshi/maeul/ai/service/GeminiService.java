@@ -1,6 +1,6 @@
 package com.bosshi.maeul.ai.service;
 
-import com.bosshi.maeul.ai.config.GeminiProperties;
+import com.bosshi.maeul.ai.config.GeminiConfig;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class GeminiService {
     private final RestClient.Builder restClientBuilder;
-    private final GeminiProperties geminiProperties;
+    private final GeminiConfig config;
 
     public GeminiGenerateResponse generateText(String prompt) {
         if (!StringUtils.hasText(prompt)) {
@@ -29,8 +29,8 @@ public class GeminiService {
 
         GeminiGenerateRequest request = GeminiGenerateRequest.ofPrompt(
                 prompt,
-                geminiProperties.getTemperature(),
-                geminiProperties.getMaxOutputTokens()
+                config.getTemperature(),
+                config.getMaxOutputTokens()
         );
 
         return generate(request);
@@ -57,7 +57,7 @@ public class GeminiService {
     }
 
     private URI buildGenerateUri() {
-        String baseUrl = geminiProperties.getBaseUrl();
+        String baseUrl = config.getBaseUrl();
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
@@ -65,13 +65,13 @@ public class GeminiService {
         return UriComponentsBuilder
                 .fromUriString(baseUrl)
                 .path("/v1beta/models/{model}:generateContent")
-                .queryParam("key", geminiProperties.getApiKey())
-                .buildAndExpand(geminiProperties.getModel())
+                .queryParam("key", config.getApiKey())
+                .buildAndExpand(config.getModel())
                 .toUri();
     }
 
     private void validateApiKey() {
-        if (!StringUtils.hasText(geminiProperties.getApiKey())) {
+        if (!StringUtils.hasText(config.getApiKey())) {
             throw new IllegalStateException("GEMINI_API_KEY environment variable is required.");
         }
     }

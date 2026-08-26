@@ -1,6 +1,6 @@
 package com.bosshi.maeul.ai.batch;
 
-import com.bosshi.maeul.ai.config.GeminiProperties;
+import com.bosshi.maeul.ai.config.GeminiConfig;
 import com.bosshi.maeul.ai.json.GeminiJsonMetrics;
 import com.bosshi.maeul.ai.json.GeminiJsonQuantifier;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
@@ -16,21 +16,21 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class GeminiHealthBatch {
     private final GeminiService geminiService;
-    private final GeminiProperties geminiProperties;
+    private final GeminiConfig config;
     private final GeminiJsonQuantifier geminiJsonQuantifier;
 
     @Scheduled(cron = "${ai.gemini.batch-cron:0 0/30 * * * *}")
     public void runHealthCheck() {
-        if (!geminiProperties.isBatchEnabled()) {
+        if (!config.isBatchEnabled()) {
             return;
         }
 
-        if (!StringUtils.hasText(geminiProperties.getBatchPrompt())) {
+        if (!StringUtils.hasText(config.getBatchPrompt())) {
             log.warn("Gemini batch skipped: batchPrompt is blank.");
             return;
         }
 
-        GeminiGenerateResponse response = geminiService.generateText(geminiProperties.getBatchPrompt());
+        GeminiGenerateResponse response = geminiService.generateText(config.getBatchPrompt());
         GeminiJsonMetrics metrics = geminiJsonQuantifier.quantify(response);
 
         log.info(

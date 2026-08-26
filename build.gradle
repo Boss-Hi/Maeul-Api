@@ -37,6 +37,10 @@ dependencies {
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
+
+    // JSON parsing
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     // Security & JWT
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
