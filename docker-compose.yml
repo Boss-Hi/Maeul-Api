@@ -1,4 +1,31 @@
 services:
+  app:
+    build: .
+    env_file:
+      - .env
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_INTERNAL_PORT:-8080}"
+    # DB 및 Redis가 완전 준비된 후 app 실행
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    develop:
+      watch:
+        # build.gradle 변경 시 컨테이너 재빌드
+        - action: rebuild
+          path: ./build.gradle
+
+        # bootRun 실행 환경에서는 target을 /app/build로 단순화
+        - action: sync
+          path: ./build/classes/java/main
+          target: /app/build/classes/java/main
+        - action: sync
+          path: ./build/resources/main
+          target: /app/build/resources/main
   mysql:
     image: '${MYSQL_IMAGE:-mysql:8.4}'
     environment:
@@ -16,7 +43,8 @@ services:
     ports:
       - '${MYSQL_PORT:-3306}:${MYSQL_INTERNAL_PORT:-3306}'
     volumes:
-      - ${MYSQL_VOLUME_NAME:-mysql-data}:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+
   redis:
     image: '${REDIS_IMAGE:-redis:7.4-alpine}'
     environment:
@@ -28,6 +56,7 @@ services:
       retries: ${REDIS_HEALTHCHECK_RETRIES:-10}
     ports:
       - '${REDIS_PORT:-6379}:${REDIS_INTERNAL_PORT:-6379}'
+
+# 볼륨 구조 간소화
 volumes:
   mysql-data:
-    name: ${MYSQL_VOLUME_NAME:-mysql-data}
