@@ -53,8 +53,7 @@ management:
   endpoints:
     web:
       exposure:
-        # prometheus 엔드포인트(/actuator/prometheus) 노출
-        include: health, info, prometheus
+        include: "*"
   metrics:
     tags:
       application: ${spring.application.name:maeul-api} # 메트릭 태그 지정
