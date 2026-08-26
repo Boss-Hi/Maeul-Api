@@ -3,6 +3,10 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: Maeul-Api
+  web:
+    resources:
+      cache:
+        period: ${SPRING_WEB_RESOURCES_CACHE_PERIOD:0} # 정적 자원 캐시 끌기
   docker:
     compose:
       enabled: false

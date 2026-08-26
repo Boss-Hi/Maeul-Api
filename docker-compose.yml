@@ -26,6 +26,10 @@ services:
         - action: sync
           path: ./build/resources/main
           target: /app/build/resources/main
+        # HTML/정적 파일 수정 시 즉시 빌드 디렉터리로 복사하고 싶다면 추가
+        - action: sync
+          path: ./src/main/resources/static
+          target: /app/build/resources/main/static
   mysql:
     image: '${MYSQL_IMAGE:-mysql:8.4}'
     environment:
