@@ -48,3 +48,13 @@ ai:
     batch-enabled: ${GEMINI_BATCH_ENABLED:false}
     batch-prompt: ${GEMINI_BATCH_PROMPT:Hello from Maeul batch.}
     batch-cron: "${GEMINI_BATCH_CRON:0 0/30 * * * *}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # prometheus 엔드포인트(/actuator/prometheus) 노출
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name:maeul-api} # 메트릭 태그 지정

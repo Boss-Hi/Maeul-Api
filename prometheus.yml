@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 5s # 5초마다 메트릭 수집
+
+scrape_configs:
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      # Docker Compose 내부 네트워크를 통해 app 컨테이너의 8080 포트 접근
+      - targets: ['app:8080']
