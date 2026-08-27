@@ -1,8 +1,14 @@
-package com.bosshi.maeul.plan.domain;
+package com.bosshi.maeul.plan.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +24,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItineraryDay extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class ItineraryDay extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,6 +56,12 @@ public class ItineraryDay extends com.bosshi.maeul.common.domain.BaseEntity {
      */
     @Column(length = 100)
     private String theme;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     /**
      * 해당 일의 추천 장소들

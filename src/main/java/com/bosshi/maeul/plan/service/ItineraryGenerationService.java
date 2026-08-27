@@ -1,8 +1,8 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.plan.domain.Itinerary;
-import com.bosshi.maeul.plan.domain.ItineraryDay;
-import com.bosshi.maeul.plan.domain.Trip;
+import com.bosshi.maeul.plan.entity.Itinerary;
+import com.bosshi.maeul.plan.entity.ItineraryDay;
+import com.bosshi.maeul.plan.entity.Trip;
 import com.bosshi.maeul.plan.repository.ItineraryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

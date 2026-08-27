@@ -1,11 +1,11 @@
 package com.bosshi.maeul.post.service;
 
-import com.bosshi.maeul.post.request.PostCreateRequest;
-import com.bosshi.maeul.post.response.PostResponse;
-import com.bosshi.maeul.post.request.PostUpdateRequest;
-import com.bosshi.maeul.post.domain.Post;
-import com.bosshi.maeul.post.type.PostCategory;
+import com.bosshi.maeul.post.entity.Post;
 import com.bosshi.maeul.post.repository.PostRepository;
+import com.bosshi.maeul.post.request.PostCreateRequest;
+import com.bosshi.maeul.post.request.PostUpdateRequest;
+import com.bosshi.maeul.post.response.PostResponse;
+import com.bosshi.maeul.post.type.PostCategory;
 import com.bosshi.maeul.user.domain.User;
 import com.bosshi.maeul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

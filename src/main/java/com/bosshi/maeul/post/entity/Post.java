@@ -1,11 +1,16 @@
-package com.bosshi.maeul.post.domain;
+package com.bosshi.maeul.post.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.post.type.PostCategory;
 import com.bosshi.maeul.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +18,8 @@ import java.util.List;
 @Table(name = "posts")
 @Getter
 @Setter
-public class Post extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +42,11 @@ public class Post extends com.bosshi.maeul.common.domain.BaseEntity {
     @Column(nullable = false)
     private Long viewCount = 0L;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

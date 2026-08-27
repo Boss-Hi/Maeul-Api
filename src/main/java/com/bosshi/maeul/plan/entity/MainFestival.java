@@ -1,8 +1,14 @@
-package com.bosshi.maeul.plan.domain;
+package com.bosshi.maeul.plan.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 여행의 중심이 되는 축제/공연을 나타내는 도메인 모델
@@ -16,7 +22,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MainFestival extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class MainFestival extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -94,6 +101,11 @@ public class MainFestival extends com.bosshi.maeul.common.domain.BaseEntity {
     @Column(length = 10)
     private String areaCode;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     /**
      * 두 지점 사이의 거리를 Haversine 공식으로 계산합니다.

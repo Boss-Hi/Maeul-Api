@@ -1,7 +1,13 @@
-package com.bosshi.maeul.plan.domain;
+package com.bosshi.maeul.plan.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 /**
  * 일정에 포함된 개별 장소를 나타내는 도메인 모델
@@ -15,7 +21,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItineraryVenue extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class ItineraryVenue extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -85,5 +92,10 @@ public class ItineraryVenue extends com.bosshi.maeul.common.domain.BaseEntity {
     @Column(nullable = false)
     private Integer sequence;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }
 

@@ -1,11 +1,10 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.category.domain.TourCategory;
+import com.bosshi.maeul.category.entity.TourCategory;
 import com.bosshi.maeul.category.repository.TourCategoryRepository;
-import com.bosshi.maeul.common.utils.GeoUtils;
 import com.bosshi.maeul.openapi.service.OpenApiService;
-import com.bosshi.maeul.plan.domain.MainFestival;
-import com.bosshi.maeul.plan.domain.Trip;
+import com.bosshi.maeul.plan.entity.MainFestival;
+import com.bosshi.maeul.plan.entity.Trip;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,6 @@
 package com.bosshi.maeul.user.domain;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.user.type.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import org.springframework.modulith.NamedInterface;
 @Table(name = "users")
 @Getter
 @Setter
-public class User extends com.bosshi.maeul.common.domain.BaseEntity {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

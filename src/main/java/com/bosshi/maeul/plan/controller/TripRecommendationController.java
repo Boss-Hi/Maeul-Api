@@ -1,7 +1,7 @@
 package com.bosshi.maeul.plan.controller;
 
-import com.bosshi.maeul.plan.domain.Itinerary;
-import com.bosshi.maeul.plan.domain.ItineraryDay;
+import com.bosshi.maeul.plan.entity.Itinerary;
+import com.bosshi.maeul.plan.entity.ItineraryDay;
 import com.bosshi.maeul.plan.request.MainFestivalSelectRequest;
 import com.bosshi.maeul.plan.request.TripCreateRequest;
 import com.bosshi.maeul.plan.response.FestivalListResponse;

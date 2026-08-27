@@ -1,5 +1,6 @@
-package com.bosshi.maeul.category.domain;
+package com.bosshi.maeul.category.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.modulith.NamedInterface;
@@ -12,7 +13,7 @@ import org.springframework.modulith.NamedInterface;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TourCategory extends com.bosshi.maeul.common.domain.BaseEntity {
+public class TourCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

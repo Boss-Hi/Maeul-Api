@@ -1,9 +1,14 @@
-package com.bosshi.maeul.category.domain;
+package com.bosshi.maeul.category.entity;
 
-import com.bosshi.maeul.common.domain.BaseEntity;
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.modulith.NamedInterface;
+
+import java.time.LocalDateTime;
 
 @NamedInterface
 @Entity
@@ -13,6 +18,7 @@ import org.springframework.modulith.NamedInterface;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class TourContentType extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,4 +52,9 @@ public class TourContentType extends BaseEntity {
     @Builder.Default
     private Boolean active = true;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }

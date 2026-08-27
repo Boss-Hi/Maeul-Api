@@ -1,16 +1,23 @@
-package com.bosshi.maeul.post.domain;
+package com.bosshi.maeul.post.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "comments")
 @Getter
 @Setter
-public class Comment extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,4 +37,9 @@ public class Comment extends com.bosshi.maeul.common.domain.BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }

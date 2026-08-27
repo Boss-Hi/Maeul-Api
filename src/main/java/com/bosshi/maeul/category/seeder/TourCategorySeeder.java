@@ -1,6 +1,6 @@
 package com.bosshi.maeul.category.seeder;
 
-import com.bosshi.maeul.category.domain.TourCategory;
+import com.bosshi.maeul.category.entity.TourCategory;
 import com.bosshi.maeul.category.repository.TourCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

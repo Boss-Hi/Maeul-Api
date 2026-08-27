@@ -1,7 +1,13 @@
-package com.bosshi.maeul.plan.domain;
+package com.bosshi.maeul.plan.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 /**
  * 여행 일정 생성 시 적용되는 필터 조건을 나타내는 도메인 모델
@@ -15,7 +21,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FilterSettings extends com.bosshi.maeul.common.domain.BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class FilterSettings extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -52,5 +59,10 @@ public class FilterSettings extends com.bosshi.maeul.common.domain.BaseEntity {
     @Builder.Default
     private Boolean isGlobal = true;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }
 
