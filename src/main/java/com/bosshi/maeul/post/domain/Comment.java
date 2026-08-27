@@ -5,13 +5,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @Setter
-public class Comment {
+public class Comment extends com.bosshi.maeul.common.domain.BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,6 +30,4 @@ public class Comment {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 }

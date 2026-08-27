@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Trip {
+public class Trip extends com.bosshi.maeul.common.domain.BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -81,28 +81,6 @@ public class Trip {
     @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Itinerary itinerary;
 
-    /**
-     * 생성 시간
-     */
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    /**
-     * 수정 시간
-     */
-    @Column(nullable = false)
-    private java.time.LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
-        this.updatedAt = java.time.LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = java.time.LocalDateTime.now();
-    }
 
     /**
      * 선택한 카테고리 목록을 반환합니다.

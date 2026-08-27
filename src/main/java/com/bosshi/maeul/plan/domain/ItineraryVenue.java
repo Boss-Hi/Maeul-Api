@@ -15,7 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItineraryVenue {
+public class ItineraryVenue extends com.bosshi.maeul.common.domain.BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -85,15 +85,5 @@ public class ItineraryVenue {
     @Column(nullable = false)
     private Integer sequence;
 
-    /**
-     * 생성 시간
-     */
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
-    }
 }
 

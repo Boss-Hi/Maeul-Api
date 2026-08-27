@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MainFestival {
+public class MainFestival extends com.bosshi.maeul.common.domain.BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -94,16 +94,6 @@ public class MainFestival {
     @Column(length = 10)
     private String areaCode;
 
-    /**
-     * 생성 시간
-     */
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
-    }
 
     /**
      * 두 지점 사이의 거리를 Haversine 공식으로 계산합니다.

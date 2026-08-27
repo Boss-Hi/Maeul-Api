@@ -6,14 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.modulith.NamedInterface;
 
-import java.time.LocalDateTime;
 
 @NamedInterface
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class User extends com.bosshi.maeul.common.domain.BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,10 +27,7 @@ public class User {
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime deletedAt;
+    private java.time.LocalDateTime deletedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile;

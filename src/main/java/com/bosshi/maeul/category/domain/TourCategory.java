@@ -12,7 +12,7 @@ import org.springframework.modulith.NamedInterface;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TourCategory {
+public class TourCategory extends com.bosshi.maeul.common.domain.BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -72,26 +72,4 @@ public class TourCategory {
     @Builder.Default
     private Boolean active = true;
 
-    /**
-     * 생성 시간
-     */
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    /**
-     * 수정 시간
-     */
-    @Column(nullable = false)
-    private java.time.LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
-        this.updatedAt = java.time.LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = java.time.LocalDateTime.now();
-    }
 }

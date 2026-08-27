@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItineraryDay {
+public class ItineraryDay extends com.bosshi.maeul.common.domain.BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -58,16 +58,6 @@ public class ItineraryDay {
     @Builder.Default
     private List<ItineraryVenue> venues = new ArrayList<>();
 
-    /**
-     * 생성 시간
-     */
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = java.time.LocalDateTime.now();
-    }
 
     /**
      * 해당 일의 장소 수를 반환합니다.
