@@ -55,6 +55,7 @@ public class ItineraryDay {
      */
     @OneToMany(mappedBy = "itineraryDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OrderBy("sequence ASC")
+    @Builder.Default
     private List<ItineraryVenue> venues = new ArrayList<>();
 
     /**

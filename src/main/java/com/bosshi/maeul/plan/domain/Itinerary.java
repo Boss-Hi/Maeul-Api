@@ -2,7 +2,7 @@ package com.bosshi.maeul.plan.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +42,7 @@ public class Itinerary {
      */
     @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OrderBy("dayNumber ASC")
+    @Builder.Default
     private List<ItineraryDay> days = new ArrayList<>();
 
     /**
