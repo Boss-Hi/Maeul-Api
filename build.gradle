@@ -37,6 +37,7 @@ dependencies {
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
+    implementation 'org.hibernate:hibernate-validator:5.2.4.Final' // Spring 4 권장 버전
 
     // JSON parsing
     implementation 'com.google.code.gson:gson:2.10.1'
