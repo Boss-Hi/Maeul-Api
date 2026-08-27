@@ -18,7 +18,11 @@ spring:
     password: ${MYSQL_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED:false}
+    baseline-on-migrate:  ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:false} # 기존 운영 DB에 처음 도입할 때 필요
+    locations: classpath:db/migration # SQL 스크립트 위치
   data:
     redis:
       host: ${REDIS_HOST}
