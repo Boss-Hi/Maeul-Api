@@ -1,9 +1,7 @@
 package com.bosshi.maeul.plan.controller;
 
-import com.bosshi.maeul.openapi.domain.Venue;
 import com.bosshi.maeul.plan.domain.Itinerary;
 import com.bosshi.maeul.plan.domain.ItineraryDay;
-import com.bosshi.maeul.plan.domain.ItineraryVenue;
 import com.bosshi.maeul.plan.request.MainFestivalSelectRequest;
 import com.bosshi.maeul.plan.request.TripCreateRequest;
 import com.bosshi.maeul.plan.response.FestivalListResponse;
@@ -14,12 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * 여행 추천 REST API 컨트롤러
- *
+ * <p>
  * 여행 일정 추천 시스템의 API 엔드포인트를 제공합니다.
  */
 @RestController
@@ -32,7 +31,7 @@ public class TripRecommendationController {
 
     /**
      * Step 1: Trip 생성
-     *
+     * <p>
      * POST /api/v1/trips
      * 사용자의 기본 정보로 여행을 생성합니다.
      *
@@ -63,7 +62,7 @@ public class TripRecommendationController {
 
     /**
      * Step 2: 축제 목록 조회
-     *
+     * <p>
      * GET /api/v1/trips/{tripId}/festivals
      * 지정된 지역의 축제 목록을 조회합니다.
      *
@@ -72,11 +71,12 @@ public class TripRecommendationController {
      */
     @GetMapping("/festivals")
     public ResponseEntity<?> getFestivalsByDestination(
-            @RequestParam String destination) {
+            @RequestParam String destination
+    ) {
         log.info("축제 목록 조회: {}", destination);
 
         try {
-            List<Venue> festivals = tripRecommendationService.getFestivalsByDestination(destination);
+            /*List<Venue> festivals = tripRecommendationService.getFestivalsByDestination(destination);
 
             List<FestivalListResponse.FestivalInfo> festivalInfos = festivals.stream()
                     .map(venue -> FestivalListResponse.FestivalInfo.builder()
@@ -99,7 +99,8 @@ public class TripRecommendationController {
                     .totalCount(festivalInfos.size())
                     .build();
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);*/
+            return ResponseEntity.ok(new FestivalListResponse(List.of(), 0)); // 임시로 빈 리스트 반환
         } catch (Exception e) {
             log.error("축제 조회 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
@@ -110,7 +111,7 @@ public class TripRecommendationController {
 
     /**
      * Step 3: MainFestival 선택 및 일정 생성
-     *
+     * <p>
      * POST /api/v1/trips/{tripId}/generate-itinerary
      * 축제를 선택하고 AI 기반 일정을 생성합니다.
      *
@@ -120,7 +121,8 @@ public class TripRecommendationController {
     @PostMapping("/{tripId}/generate-itinerary")
     public ResponseEntity<?> generateItinerary(
             @PathVariable String tripId,
-            @RequestBody MainFestivalSelectRequest request) {
+            @RequestBody MainFestivalSelectRequest request
+    ) {
         log.info("일정 생성 요청: Trip ID={}", tripId);
 
         try {
@@ -147,7 +149,7 @@ public class TripRecommendationController {
 
     /**
      * Step 4: 생성된 일정 조회
-     *
+     * <p>
      * GET /api/v1/trips/{tripId}/itinerary
      * 생성된 여행 일정을 조회합니다.
      *

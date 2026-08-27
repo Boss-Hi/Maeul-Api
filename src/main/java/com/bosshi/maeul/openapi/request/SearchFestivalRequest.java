@@ -2,6 +2,7 @@ package com.bosshi.maeul.openapi.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.modulith.NamedInterface;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
  * 공공데이터포털 행사정보조회 API 요청 파라미터를 담는 DTO.
  * REST API 요청 시 Spring이 바인딩하고, 최종적으로 MultiValueMap으로 변환해 호출한다.
  */
+@NamedInterface
 @Getter
 @Setter
 public class SearchFestivalRequest extends OpenApiBaseRequest {

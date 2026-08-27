@@ -3,11 +3,13 @@ package com.bosshi.maeul.openapi.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.modulith.NamedInterface;
 
 /**
  * 공공데이터포털 행사정보조회 API 응답 DTO.
  * JSON 구조는 response.header / response.body / response.body.items.item 형태로 내려온다.
  */
+@NamedInterface
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)

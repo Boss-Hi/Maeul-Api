@@ -1,17 +1,16 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.ai.config.GeminiConfig;
-import com.bosshi.maeul.openapi.domain.Venue;
-import com.bosshi.maeul.plan.domain.*;
+import com.bosshi.maeul.plan.domain.Itinerary;
+import com.bosshi.maeul.plan.domain.ItineraryDay;
+import com.bosshi.maeul.plan.domain.Trip;
 import com.bosshi.maeul.plan.repository.ItineraryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 일정 생성 서비스
@@ -27,7 +26,6 @@ import java.util.List;
 @Slf4j
 public class ItineraryGenerationService {
 
-    private final GeminiConfig geminiConfig;
     private final ItineraryRepository itineraryRepository;
     private final RestClient restClient = RestClient.create();
 
@@ -39,7 +37,7 @@ public class ItineraryGenerationService {
      * @param filteredVenues 필터링된 관광지 목록
      * @return 생성된 Itinerary 객체
      */
-    public Itinerary generateItinerary(Trip trip, MainFestival mainFestival, List<Venue> filteredVenues) {
+    /*public Itinerary generateItinerary(Trip trip, MainFestival mainFestival, List<Venue> filteredVenues) {
         log.info("일정 생성 시작: Trip ID={}", trip.getId());
 
         try {
@@ -65,9 +63,9 @@ public class ItineraryGenerationService {
         }
     }
 
-    /**
+    *//**
      * Gemini API를 위한 프롬프트를 구성합니다.
-     */
+     *//*
     private String buildItineraryPrompt(Trip trip, MainFestival mainFestival, List<Venue> filteredVenues) {
         StringBuilder prompt = new StringBuilder();
 
@@ -126,12 +124,12 @@ public class ItineraryGenerationService {
         prompt.append("}\n");
 
         return prompt.toString();
-    }
+    }*/
 
     /**
      * Gemini API를 호출합니다.
      */
-    private String callGeminiApi(String prompt) {
+    /*private String callGeminiApi(String prompt) {
         log.info("Gemini API 호출 시작");
 
         if (!geminiConfig.isConfigured()) {
@@ -158,7 +156,7 @@ public class ItineraryGenerationService {
             log.error("Gemini API 호출 실패, Mock 응답 반환", e);
             return getMockItineraryResponse();
         }
-    }
+    }*/
 
     /**
      * Gemini 응답을 Itinerary 객체로 파싱합니다.

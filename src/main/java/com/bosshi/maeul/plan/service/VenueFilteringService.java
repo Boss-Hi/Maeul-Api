@@ -3,8 +3,7 @@ package com.bosshi.maeul.plan.service;
 import com.bosshi.maeul.category.domain.TourCategory;
 import com.bosshi.maeul.category.repository.TourCategoryRepository;
 import com.bosshi.maeul.common.utils.GeoUtils;
-import com.bosshi.maeul.openapi.domain.Venue;
-import com.bosshi.maeul.openapi.repository.VenueRepository;
+import com.bosshi.maeul.openapi.service.OpenApiService;
 import com.bosshi.maeul.plan.domain.MainFestival;
 import com.bosshi.maeul.plan.domain.Trip;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class VenueFilteringService {
-
-    private final VenueRepository venueRepository;
     private final TourCategoryRepository categoryRepository;
-    private final KoreaOpenApiService koreaOpenApiService;
+    private final OpenApiService openApiService;
 
     /**
      * Trip과 MainFestival 정보를 기반으로 필터링된 관광지 목록을 반환합니다.
@@ -35,7 +32,7 @@ public class VenueFilteringService {
      * @param mainFestival 주축제 정보
      * @return 필터링된 관광지 목록
      */
-    public List<Venue> filterVenuesByTripAndFestival(Trip trip, MainFestival mainFestival) {
+    public void filterVenuesByTripAndFestival(Trip trip, MainFestival mainFestival) {
         log.info("필터링 시작: Trip ID={}, Festival ID={}", trip.getId(), mainFestival.getId());
 
         // 1. 사용자가 선택한 카테고리 목록 가져오기
@@ -50,8 +47,8 @@ public class VenueFilteringService {
 
         log.info("매핑된 카테고리 수: {}", categories.size());
 
-        // 3. API에서 실시간으로 데이터 조회 (향후 캐싱 추가)
-        List<Venue> allVenues = koreaOpenApiService.searchVenuesByAreaAndCategories(
+        /*// 3. API에서 실시간으로 데이터 조회 (향후 캐싱 추가)
+        List<Venue> allVenues = openApiService.searchFestival(
                 trip.getDestination(),
                 categories
         );
@@ -86,7 +83,7 @@ public class VenueFilteringService {
 
         log.info("중복 제거 후: {} 개", uniqueVenues.size());
 
-        return uniqueVenues;
+        return uniqueVenues;*/
     }
 
     /**
@@ -96,14 +93,14 @@ public class VenueFilteringService {
      * @param categoryName 카테고리명
      * @return 해당 카테고리의 관광지 목록
      */
-    public List<Venue> filterVenuesByCategory(List<Venue> venues, String categoryName) {
+    /*public List<Venue> filterVenuesByCategory(List<Venue> venues, String categoryName) {
         Category category = categoryRepository.findByName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다: " + categoryName));
 
         return venues.stream()
                 .filter(v -> v.getCategory().equals(categoryName))
                 .collect(Collectors.toList());
-    }
+    }*/
 
     /**
      * 관광지 목록을 거리순으로 정렬합니다.
@@ -113,7 +110,7 @@ public class VenueFilteringService {
      * @param baseLon 기준 경도
      * @return 거리순으로 정렬된 관광지 목록
      */
-    public List<Venue> sortVenuesByDistance(List<Venue> venues, Double baseLat, Double baseLon) {
+    /*public List<Venue> sortVenuesByDistance(List<Venue> venues, Double baseLat, Double baseLon) {
         return venues.stream()
                 .sorted((v1, v2) -> {
                     Double distance1 = GeoUtils.calculateDistance(baseLat, baseLon, v1.getMapy(), v1.getMapx());
@@ -121,6 +118,6 @@ public class VenueFilteringService {
                     return distance1.compareTo(distance2);
                 })
                 .collect(Collectors.toList());
-    }
+    }*/
 }
 

@@ -1,7 +1,11 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.openapi.domain.Venue;
-import com.bosshi.maeul.plan.domain.*;
+import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
+import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
+import com.bosshi.maeul.openapi.service.OpenApiService;
+import com.bosshi.maeul.plan.domain.FilterSettings;
+import com.bosshi.maeul.plan.domain.Itinerary;
+import com.bosshi.maeul.plan.domain.Trip;
 import com.bosshi.maeul.plan.repository.TripRepository;
 import com.bosshi.maeul.plan.request.MainFestivalSelectRequest;
 import com.bosshi.maeul.plan.request.TripCreateRequest;
@@ -10,11 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 /**
  * 여행 추천 시스템의 핵심 조율 서비스
- *
+ * <p>
  * 전체 여행 일정 추천 프로세스를 관리합니다:
  * 1. Trip 생성
  * 2. MainFestival 선택
@@ -28,12 +31,12 @@ import java.util.List;
 public class TripRecommendationService {
 
     private final TripRepository tripRepository;
-    private final KoreaOpenApiService koreaOpenApiService;
+    private final OpenApiService openApiService;
     private final VenueFilteringService venueFilteringService;
     private final ItineraryGenerationService itineraryGenerationService;
 
     /**
-     * Step 1: 사용자의 기본 정보로 Trip을 생성합니다.
+     * 사용자의 기본 정보로 Trip을 생성합니다.
      *
      * @param request 여행 생성 요청
      * @return 생성된 Trip의 ID
@@ -83,24 +86,19 @@ public class TripRecommendationService {
     }
 
     /**
-     * Step 2: 축제 목록을 조회합니다.
+     * 축제 목록을 조회합니다.
      *
      * @param destination 목적지
      * @return 축제 목록
      */
-    public List<Venue> getFestivalsByDestination(String destination) {
+    public SearchFestivalResponse getFestivalsByDestination(SearchFestivalRequest destination) {
         log.info("축제 목록 조회: {}", destination);
 
-        try {
-            return koreaOpenApiService.searchFestivalsByArea(destination);
-        } catch (Exception e) {
-            log.error("축제 조회 실패", e);
-            return List.of();
-        }
+        return openApiService.searchFestival(destination);
     }
 
     /**
-     * Step 3: 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
+     * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
      *
      * @param request MainFestival 선택 요청
      */
@@ -116,12 +114,12 @@ public class TripRecommendationService {
     }
 
     /**
-     * Step 3 (동기): 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
+     * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
      *
      * @param request MainFestival 선택 요청
      */
     public void generateItinerary(MainFestivalSelectRequest request) {
-        log.info("일정 생성 시작: Trip ID={}, Festival={}", request.getTripId(), request.getTitle());
+        /*log.info("일정 생성 시작: Trip ID={}, Festival={}", request.getTripId(), request.getTitle());
 
         if (!request.isValid()) {
             throw new IllegalArgumentException("입력 값이 유효하지 않습니다");
@@ -157,7 +155,7 @@ public class TripRecommendationService {
         log.info("AI 일정 생성 시작");
         itineraryGenerationService.generateItinerary(trip, mainFestival, filteredVenues);
 
-        log.info("일정 생성 완료: Trip ID={}", trip.getId());
+        log.info("일정 생성 완료: Trip ID={}", trip.getId());*/
     }
 
     /**

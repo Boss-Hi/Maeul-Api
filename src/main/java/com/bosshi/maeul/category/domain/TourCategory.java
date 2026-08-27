@@ -1,11 +1,7 @@
 package com.bosshi.maeul.category.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.modulith.NamedInterface;
 
 @NamedInterface
@@ -34,6 +30,20 @@ public class TourCategory {
      */
     @Column(nullable = false, length = 100)
     private String name;
+
+    /**
+     * 카테고리 깊이
+     * 예: 1 (대분류), 2 (중분류),
+     */
+    @Column(name = "depth", nullable = false)
+    private Integer depth;
+
+    /**
+     * 부모 코드
+     * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
+     */
+    @Column(name = "parent_code", length = 10)
+    private String parentCode;
 
     /**
      * 한국관광공사 API의 contenttypeid
