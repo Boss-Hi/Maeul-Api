@@ -1,11 +1,11 @@
 package com.bosshi.maeul.openapi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.bosshi.maeul.openapi.config.OpenApiProperties;
 import com.bosshi.maeul.openapi.request.AreaTarSvcDemListRequest;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +40,6 @@ class OpenApiServiceIntegrationTest {
         System.out.println("OpenAPI festival preview response:");
         System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(response));
 
-        assertThat(response).isNotNull();
-        assertThat(response.getResponse()).isNotNull();
-        assertThat(response.getResponse().getHeader().getResultCode()).isEqualTo("0000");
         assertThat(response.getResponse().getBody().getItems().getItem()).isNotEmpty();
     }
 

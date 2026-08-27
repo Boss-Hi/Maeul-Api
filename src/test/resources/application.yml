@@ -1,71 +1,25 @@
 spring:
   config:
     import: optional:file:.env[.properties]
-  application:
-    name: Maeul-Api
-  web:
-    resources:
-      cache:
-        period: ${SPRING_WEB_RESOURCES_CACHE_PERIOD:0} # 정적 자원 캐시 끌기
   docker:
     compose:
       enabled: false
-      file: ./docker-compose.yml
-      lifecycle-management: start-and-stop
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:mysql}:${MYSQL_INTERNAL_PORT:3306}/${MYSQL_DATABASE:maeul}?useSSL=${MYSQL_USE_SSL:false}&allowPublicKeyRetrieval=${MYSQL_ALLOW_PUBLIC_KEY_RETRIEVAL:true}&serverTimezone=${TZ:Asia/Seoul}&createDatabaseIfNotExist=${MYSQL_CREATE_DATABASE_IF_NOT_EXIST:true}
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    url: ${TEST_SPRING_DATASOURCE_URL:jdbc:h2:mem:maeul-test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${TEST_SPRING_DATASOURCE_USERNAME:sa}
+    password: ${TEST_SPRING_DATASOURCE_PASSWORD:}
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_INTERNAL_PORT}
-
-server:
-  port: ${SERVER_PORT:8080}
+      host: ${TEST_SPRING_DATA_REDIS_HOST:localhost}
+      port: ${TEST_SPRING_DATA_REDIS_PORT:6379}
 
 jwt:
   secret: ${JWT_SECRET_KEY:secret-key}
-  expiration: 3600000
+  expiration: ${JWT_EXPIRATION:3600000}
 
 open-api:
-  korea-tourism:
-    key: ${OPENAPI_KOREA_TOURISM_KEY:}
-    base-url: ${OPENAPI_KOREA_TOURISM_BASE_URL:https://apis.data.go.kr/B551011}
-    timeout-seconds: ${OPENAPI_KOREA_TOURISM_TIMEOUT_SECONDS:5}
-    retry-count: ${OPENAPI_KOREA_TOURISM_RETRY_COUNT:1}
   base-url: ${OPEN_API_BASE_URL:https://apis.data.go.kr}
   service-key: ${OPEN_API_SECRET_KEY:}
   mobile-os: ${OPEN_API_MOBILE_OS:ETC}
-  mobile-app: ${OPEN_API_MOBILE_APP:Maeul}
+  mobile-app: ${OPEN_API_MOBILE_APP:Maeul-Api-Test}
   response-type: ${OPEN_API_RESPONSE_TYPE:json}
-
-gemini:
-  api:
-    key: ${GEMINI_API_KEY:}
-    model: ${GEMINI_MODEL:gemini-2.0-flash}
-    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
-    timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:30}
-
-ai:
-  gemini:
-    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
-    api-key: ${GEMINI_API_KEY:}
-    model: ${GEMINI_MODEL:gemini-1.5-flash}
-    temperature: ${GEMINI_TEMPERATURE:0.7}
-    max-output-tokens: ${GEMINI_MAX_OUTPUT_TOKENS:512}
-    batch-enabled: ${GEMINI_BATCH_ENABLED:false}
-    batch-prompt: ${GEMINI_BATCH_PROMPT:Hello from Maeul batch.}
-    batch-cron: "${GEMINI_BATCH_CRON:0 0/30 * * * *}"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  metrics:
-    tags:
-      application: ${spring.application.name:maeul-api} # 메트릭 태그 지정

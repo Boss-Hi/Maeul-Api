@@ -14,8 +14,8 @@ import org.springframework.modulith.NamedInterface;
 @AllArgsConstructor
 public class TourCategory {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * 카테고리 코드
@@ -46,11 +46,18 @@ public class TourCategory {
     private String parentCode;
 
     /**
-     * 한국관광공사 API의 contenttypeid
+     * 한국관광공사 API의 contenttypeid 국문코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
     @Column(nullable = false, length = 10)
     private String contentTypeId;
+
+    /**
+     * 한국관광공사 API의 contenttypeid 다국어 코드
+     * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
+     */
+    @Column(nullable = false, length = 10)
+    private String contentTypeIdMultiLang;
 
     /**
      * 카테고리 설명
