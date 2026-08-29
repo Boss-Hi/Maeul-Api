@@ -18,11 +18,25 @@ jobs:
           java-version: '26'
           distribution: 'temurin'
 
-      # Gradle 빌드 (테스트 제외 시 -x test 추가)
+      # Gradle 빌드
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 빌드된 JAR 파일을 서버로 전송 (SCP)
+      # 1. 서버에서 소스코드 정리 및 Git Pull 먼저 수행
+      - name: Prepare Repository on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ${{secrets.PROJECT_PATH}}
+            git restore .
+            git clean -fd
+            git pull origin master
+
+      # 2. 소스 정리가 끝난 후 JAR 파일 전송 (SCP)
       - name: Transfer JAR via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -34,8 +48,8 @@ jobs:
           target: ${{secrets.PROJECT_PATH}}
           strip_components: 2
 
-      # 서버에서 애플리케이션 배포 (이미지 재빌드 후 up)
-      - name: Deploy on Server
+      # 3. JAR 파일이 존재하는 상태에서 Docker 이미지 빌드 및 실행
+      - name: Deploy Docker Container
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -44,14 +58,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
-            
-            # 1. 서버 local의 수정 사항을 깨끗하게 정리 (폐기)
-            git restore .
-            git clean -fd
-            
-            # 2. 최신 master 브랜치 반영 테스트
-            git pull origin master
-            
             docker compose -f docker-compose.prod.yml build --no-cache app
             docker compose -f docker-compose.prod.yml up -d app
             docker image prune -f || true
