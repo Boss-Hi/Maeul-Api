@@ -88,13 +88,7 @@ public class Trip extends BaseEntity {
     @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Itinerary itinerary;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    /**
+            /**
      * 선택한 카테고리 목록을 반환합니다.
      */
     public List<String> getSelectedCategoriesList() {

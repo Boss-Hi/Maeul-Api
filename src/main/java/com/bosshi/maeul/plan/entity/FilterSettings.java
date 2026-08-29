@@ -59,10 +59,5 @@ public class FilterSettings extends BaseEntity {
     @Builder.Default
     private Boolean isGlobal = true;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-}
+        }
 

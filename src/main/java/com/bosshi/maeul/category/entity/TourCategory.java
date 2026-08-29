@@ -3,6 +3,7 @@ package com.bosshi.maeul.category.entity;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.modulith.NamedInterface;
 
 @NamedInterface
@@ -13,6 +14,7 @@ import org.springframework.modulith.NamedInterface;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EnableJpaAuditing
 public class TourCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +24,7 @@ public class TourCategory extends BaseEntity {
      * 카테고리 코드
      * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
      */
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 4)
     private String code;
 
     /**
@@ -43,21 +45,21 @@ public class TourCategory extends BaseEntity {
      * 부모 코드
      * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
      */
-    @Column(name = "parent_code", length = 10)
+    @Column(name = "parent_code", length = 4)
     private String parentCode;
 
     /**
      * 한국관광공사 API의 contenttypeid 국문코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(nullable = false, length = 10)
+    @Column(length = 4)
     private String contentTypeId;
 
     /**
      * 한국관광공사 API의 contenttypeid 다국어 코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(nullable = false, length = 10)
+    @Column(length = 4)
     private String contentTypeIdMultiLang;
 
     /**
@@ -72,5 +74,4 @@ public class TourCategory extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
-
 }

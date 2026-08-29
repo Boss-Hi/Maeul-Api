@@ -3,12 +3,8 @@ package com.bosshi.maeul.category.entity;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.modulith.NamedInterface;
-
-import java.time.LocalDateTime;
 
 @NamedInterface
 @Entity
@@ -51,10 +47,4 @@ public class TourContentType extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }

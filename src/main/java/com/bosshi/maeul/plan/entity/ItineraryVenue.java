@@ -92,10 +92,5 @@ public class ItineraryVenue extends BaseEntity {
     @Column(nullable = false)
     private Integer sequence;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-}
+        }
 

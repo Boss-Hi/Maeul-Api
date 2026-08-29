@@ -16,6 +16,10 @@ java {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 repositories {
     mavenCentral()
 }
@@ -51,6 +55,11 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     // Database
+    // Flyway Core
+    implementation 'org.flywaydb:flyway-core'
+
+    // MySQL / MariaDB를 사용하는 경우 필수 추가 (Flyway 8.x 이상)
+    implementation 'org.flywaydb:flyway-mysql'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 

@@ -37,9 +37,4 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-}
+        }

@@ -101,13 +101,7 @@ public class MainFestival extends BaseEntity {
     @Column(length = 10)
     private String areaCode;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    /**
+            /**
      * 두 지점 사이의 거리를 Haversine 공식으로 계산합니다.
      *
      * @param lat 목표 위도

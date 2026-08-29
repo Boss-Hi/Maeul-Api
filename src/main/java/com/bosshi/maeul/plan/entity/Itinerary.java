@@ -43,13 +43,7 @@ public class Itinerary extends BaseEntity {
     @Column(length = 1000)
     private String summary;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    /**
+            /**
      * 일별 일정 리스트
      */
     @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

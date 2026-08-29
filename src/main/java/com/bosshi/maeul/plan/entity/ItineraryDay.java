@@ -57,13 +57,7 @@ public class ItineraryDay extends BaseEntity {
     @Column(length = 100)
     private String theme;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    /**
+            /**
      * 해당 일의 추천 장소들
      */
     @OneToMany(mappedBy = "itineraryDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
