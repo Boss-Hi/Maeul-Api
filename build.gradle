@@ -90,6 +90,11 @@ dependencyManagement {
     }
 }
 
+// build.gradle 하단에 추가 (Spring Boot 실행 가능한 단일 JAR만 생성되도록 설정)
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
