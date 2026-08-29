@@ -6,7 +6,7 @@ services:
     environment:
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
     ports:
-      - "${SERVER_PORT:-8080}:${SERVER_INTERNAL_PORT:-8080}"
+      - "127.0.0.1:${SERVER_PORT:-8080}:${SERVER_INTERNAL_PORT:-8080}"
     # DB 및 Redis가 완전 준비된 후 app 실행
     depends_on:
       mysql:
@@ -45,7 +45,7 @@ services:
       retries: ${MYSQL_HEALTHCHECK_RETRIES:-10}
       start_period: ${MYSQL_HEALTHCHECK_START_PERIOD:-20s}
     ports:
-      - '${MYSQL_PORT:-3306}:${MYSQL_INTERNAL_PORT:-3306}'
+      - '127.0.0.1:${MYSQL_PORT:-3306}:${MYSQL_INTERNAL_PORT:-3306}'
     volumes:
       - mysql-data:/var/lib/mysql
 
@@ -59,7 +59,7 @@ services:
       timeout: ${REDIS_HEALTHCHECK_TIMEOUT:-5s}
       retries: ${REDIS_HEALTHCHECK_RETRIES:-10}
     ports:
-      - '${REDIS_PORT:-6379}:${REDIS_INTERNAL_PORT:-6379}'
+      - '127.0.0.1:${REDIS_PORT:-6379}:${REDIS_INTERNAL_PORT:-6379}'
 
   # Prometheus 컨테이너
   prometheus:
@@ -68,7 +68,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     depends_on:
       - app
 
@@ -77,7 +77,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin # 초기 비밀번호 설정
     depends_on:
