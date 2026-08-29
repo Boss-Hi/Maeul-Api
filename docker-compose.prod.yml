@@ -72,6 +72,8 @@ services:
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql:ro
     restart: "no"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   grafana-data:
