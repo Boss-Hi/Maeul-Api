@@ -30,7 +30,7 @@ services:
 
         # 2. Java 코드 및 리소스 수정 시 /app/src 로 sync 후 컨테이너 재시작
         # bootRun 은 /app/build/classes 를 기준으로 실행되므로 source sync 만으로는 반영되지 않는다.
-        - action: sync+restart
+        - action: sync
           path: ./src
           target: /app/src
 
