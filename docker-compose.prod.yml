@@ -13,6 +13,9 @@ services:
       redis:
         condition: service_healthy
     restart: always
+    extra_hosts:
+      # host.docker.internal 이 호스트 OS(Ubuntu)를 가리키도록 설정
+      - "host.docker.internal:host-gateway"
 
   redis:
     image: '${REDIS_IMAGE:-redis:7.4-alpine}'
