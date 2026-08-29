@@ -1,0 +1,11 @@
+FROM eclipse-temurin:26-jdk
+
+WORKDIR /app
+
+# SCP로 전송되어 PROJECT_PATH에 위치한 JAR 파일 복사
+COPY *.jar app.jar
+
+EXPOSE 8080
+
+# bootRun이 아닌 빌드된 JAR 직접 실행 (가장 빠르고 확실함)
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -12,6 +12,7 @@ public class MainController {
 
     @GetMapping("/")
     public String index() {
-        return "Welcome to the Maeul API!";
+        log.info("Accessed the index endpoint");
+        return "Welcome to the Maeul API V0.0.1";
     }
 }
