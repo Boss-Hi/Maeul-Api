@@ -44,6 +44,14 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
+            
+            # 1. 서버 local의 수정 사항을 깨끗하게 정리 (폐기)
+            git restore .
+            git clean -fd
+            
+            # 2. 최신 master 브랜치 반영 테스트
+            git pull origin master
+            
             docker compose -f docker-compose.prod.yml build --no-cache app
             docker compose -f docker-compose.prod.yml up -d app
             docker image prune -f || true
