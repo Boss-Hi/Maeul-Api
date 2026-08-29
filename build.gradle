@@ -16,10 +16,6 @@ java {
     }
 }
 
-test {
-    useJUnitPlatform()
-}
-
 repositories {
     mavenCentral()
 }
@@ -41,7 +37,7 @@ dependencies {
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
-    implementation 'org.hibernate:hibernate-validator:5.2.4.Final' // Spring 4 권장 버전
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // JSON parsing
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -49,7 +45,6 @@ dependencies {
     // Security & JWT
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
