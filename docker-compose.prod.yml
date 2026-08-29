@@ -12,6 +12,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     restart: always
     extra_hosts:
       # host.docker.internal 이 호스트 OS(Ubuntu)를 가리키도록 설정
