@@ -24,7 +24,7 @@ public class TourCategory extends BaseEntity {
      * 카테고리 코드
      * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
      */
-    @Column(nullable = false, unique = true, length = 4)
+    @Column(nullable = false, unique = true, length = 16)
     private String code;
 
     /**
@@ -45,21 +45,21 @@ public class TourCategory extends BaseEntity {
      * 부모 코드
      * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
      */
-    @Column(name = "parent_code", length = 4)
+    @Column(name = "parent_code", length = 16)
     private String parentCode;
 
     /**
      * 한국관광공사 API의 contenttypeid 국문코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(length = 4)
+    @Column(length = 16)
     private String contentTypeId;
 
     /**
      * 한국관광공사 API의 contenttypeid 다국어 코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(length = 4)
+    @Column(length = 16)
     private String contentTypeIdMultiLang;
 
     /**

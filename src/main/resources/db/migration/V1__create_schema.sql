@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS `profiles` (
 
 CREATE TABLE IF NOT EXISTS `tour_content_types` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `code` VARCHAR(4) NOT NULL UNIQUE,
-  `code_multi_lang` VARCHAR(4) NOT NULL,
+  `code` VARCHAR(16) NOT NULL UNIQUE,
+  `code_multi_lang` VARCHAR(16) NOT NULL,
   `name` VARCHAR(32) NOT NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` DATETIME(6),
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS `tour_content_types` (
 
 CREATE TABLE IF NOT EXISTS `tour_categories` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `code` VARCHAR(4) NOT NULL UNIQUE,
+  `code` VARCHAR(16) NOT NULL UNIQUE,
   `name` VARCHAR(100) NOT NULL,
   `depth` INT NOT NULL,
-  `parent_code` VARCHAR(4),
-  `content_type_id` VARCHAR(4),
-  `content_type_id_multi_lang` VARCHAR(4),
+  `parent_code` VARCHAR(16),
+  `content_type_id` VARCHAR(16),
+  `content_type_id_multi_lang` VARCHAR(16),
   `description` VARCHAR(500),
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` DATETIME(6),
