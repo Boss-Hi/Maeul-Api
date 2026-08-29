@@ -34,7 +34,7 @@ jobs:
           target: ${{secrets.PROJECT_PATH}}
           strip_components: 2
 
-      # 서버에서 애플리케이션 재시작
+      # 서버에서 애플리케이션 배포 (이미지 재빌드 후 up)
       - name: Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -44,4 +44,9 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
-            docker compose up -d --build app
+            # Pull remote images if available, ignore errors
+            docker compose pull || true
+            # Rebuild images from updated source and start containers
+            docker compose up -d --build --remove-orphans
+            # Optional: remove unused images to free space
+            docker image prune -f || true
