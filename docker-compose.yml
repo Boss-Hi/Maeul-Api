@@ -1,13 +1,14 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
     environment:
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
     ports:
       - "127.0.0.1:${SERVER_PORT:-8080}:${SERVER_INTERNAL_PORT:-8080}"
-    # DB 및 Redis가 완전 준비된 후 app 실행
     depends_on:
       mysql:
         condition: service_healthy
@@ -15,21 +16,24 @@ services:
         condition: service_healthy
     develop:
       watch:
-        # build.gradle 변경 시 컨테이너 재빌드
+        # 1. 이미지/Gradle 실행 환경 변경 시 컨테이너 재빌드
+        - action: rebuild
+          path: ./Dockerfile
         - action: rebuild
           path: ./build.gradle
+        - action: rebuild
+          path: ./settings.gradle
+        - action: rebuild
+          path: ./gradlew
+        - action: rebuild
+          path: ./gradle
 
-        # bootRun 실행 환경에서는 target을 /app/build로 단순화
-        - action: sync
-          path: ./build/classes/java/main
-          target: /app/build/classes/java/main
-        - action: sync
-          path: ./build/resources/main
-          target: /app/build/resources/main
-        # HTML/정적 파일 수정 시 즉시 빌드 디렉터리로 복사하고 싶다면 추가
-        - action: sync
-          path: ./src/main/resources/static
-          target: /app/build/resources/main/static
+        # 2. Java 코드 및 리소스 수정 시 /app/src 로 sync 후 컨테이너 재시작
+        # bootRun 은 /app/build/classes 를 기준으로 실행되므로 source sync 만으로는 반영되지 않는다.
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+
   mysql:
     image: '${MYSQL_IMAGE:-mysql:8.4}'
     environment:
@@ -61,7 +65,6 @@ services:
     ports:
       - '${REDIS_PORT:-6379}:${REDIS_INTERNAL_PORT:-6379}'
 
-  # Prometheus 컨테이너
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -72,20 +75,18 @@ services:
     depends_on:
       - app
 
-  # Grafana 컨테이너
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin # 초기 비밀번호 설정
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
     volumes:
       - grafana-data:/var/lib/grafana
 
-# 볼륨 구조 간소화
 volumes:
   mysql-data:
-  grafana-data: # Grafana 대시보드 설정 저장용 볼륨
+  grafana-data:

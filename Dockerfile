@@ -1,18 +1,19 @@
-# Builder Stage
-FROM eclipse-temurin:26-jdk AS builder
+FROM eclipse-temurin:26-jdk
 
 WORKDIR /app
 
-# Gradle Wrapper 및 설정 파일 우선 복사 (의존성 캐싱)
+# Gradle Wrapper 및 설정 파일 우선 복사 (의존성 레이어 캐싱)
 COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle settings.gradle ./
+
+# Windows-Linux 간 실행 권한 이슈 방지 및 의존성 사전 다운로드
 RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
 
-# 소스코드 복사 및 빌드
+# 소스 코드 복사
 COPY src src
 
 EXPOSE 8080
 
-# bootRun으로 앱 실행 (Watch sync 시 DevTools가 즉시 변경 감지)
-CMD ["./gradlew", "bootRun", "--no-daemon"]
+# bootRun으로 앱 실행 (Spring DevTools가 내부 클래스 변경 시 즉시 재시작)
+CMD ["./gradlew", "bootRun", "--continuous", "--no-daemon"]
