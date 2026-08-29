@@ -21,18 +21,18 @@ public class TourContentType extends BaseEntity {
     private Long id;
 
     /**
-     * 카테고리 코드
-     * 예: "AC" (숙박), "EV" (축제/공연), "EX" (체험관광), "FD" (음식)
+     * 한국관광공사 API의 contenttypeid 국문 코드
+     * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(nullable = false, unique = true, length = 16)
-    private String code;
+    @Column(nullable = false, length = 16)
+    private String contentTypeId;
 
     /**
      * 한국관광공사 API의 contenttypeid 다국어 코드
      * 예: "15" (축제/공연), "12" (체험관광), "32" (숙박), "39" (음식)
      */
-    @Column(nullable = false, length = 16)
-    private String codeMultiLang;
+    @Column(length = 16)
+    private String contentTypeIdMultiLang;
 
     /**
      * 카테고리명
