@@ -61,5 +61,15 @@ services:
       - grafana-data:/var/lib/grafana
     restart: always
 
+  flyway:
+    image: flyway/flyway:9
+    env_file:
+      - .env
+    # Uses environment variables from .env to construct the JDBC URL and credentials
+    command: -url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_INTERNAL_PORT}/${MYSQL_DATABASE} -user=${MYSQL_USER} -password=${MYSQL_PASSWORD} migrate
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql:ro
+    restart: "no"
+
 volumes:
   grafana-data:
