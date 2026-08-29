@@ -58,6 +58,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
-            docker compose -f docker-compose.prod.yml build --no-cache app
-            docker compose -f docker-compose.prod.yml up -d app
+            # build와 up을 동시에 수행하여 빌드 중 기존 컨테이너 유지
+            docker compose -f docker-compose.prod.yml up -d --build app
             docker image prune -f || true

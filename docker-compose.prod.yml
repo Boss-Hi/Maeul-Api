@@ -16,6 +16,13 @@ services:
     extra_hosts:
       # host.docker.internal 이 호스트 OS(Ubuntu)를 가리키도록 설정
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      # Actuator의 health 엔드포인트 확인 (Actuator 사용 중인 경우)
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s # Spring Boot가 켜지는 동안 기다려주는 시간
 
   redis:
     image: '${REDIS_IMAGE:-redis:7.4-alpine}'
