@@ -14,25 +14,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    develop:
-      watch:
-        # 1. 이미지/Gradle 실행 환경 변경 시 컨테이너 재빌드
-        - action: rebuild
-          path: ./Dockerfile
-        - action: rebuild
-          path: ./build.gradle
-        - action: rebuild
-          path: ./settings.gradle
-        - action: rebuild
-          path: ./gradlew
-        - action: rebuild
-          path: ./gradle
-
-        # 2. Java 코드 및 리소스 수정 시 /app/src 로 sync 후 컨테이너 재시작
-        # bootRun 은 /app/build/classes 를 기준으로 실행되므로 source sync 만으로는 반영되지 않는다.
-        - action: sync
-          path: ./src
-          target: /app/src
+    volumes:
+      # Bind-mount project root into /app inside container. On macOS, use :delegated for perf.
+      - ./:/app:delegated
+      # Avoid mounting host build output into container to prevent file-lock and delete failures.
+      # Use a named volume for build outputs if persistence across restarts is desired.
+      - build-cache:/app/build:delegated
+      # Bind-mount host Gradle cache to the path used inside the image (/home/gradle/.gradle)
+      - ~/.gradle:/home/gradle/.gradle:delegated
+    command: [ "./gradlew", "bootRun", "--no-daemon" ]
 
   mysql:
     image: '${MYSQL_IMAGE:-mysql:8.4}'
@@ -90,3 +80,4 @@ services:
 volumes:
   mysql-data:
   grafana-data:
+  build-cache:
