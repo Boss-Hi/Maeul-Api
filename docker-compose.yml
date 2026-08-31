@@ -62,7 +62,7 @@ services:
     env_file:
       - .env
     # Run migrations against local mysql; reads SQL from project resources
-    command: -url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_INTERNAL_PORT}/${MYSQL_DATABASE} -user=${MYSQL_USER} -password=${MYSQL_PASSWORD} -cleanDisabled=false clean migrate
+    command: -url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_INTERNAL_PORT}/${MYSQL_DATABASE}?useSSL=${MYSQL_USE_SSL}&allowPublicKeyRetrieval=${MYSQL_ALLOW_PUBLIC_KEY_RETRIEVAL} -user=${MYSQL_USER} -password=${MYSQL_PASSWORD} -cleanDisabled=false clean migrate
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql:ro
     depends_on:
