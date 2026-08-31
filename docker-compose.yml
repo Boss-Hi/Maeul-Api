@@ -9,6 +9,8 @@ services:
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
     ports:
       - "127.0.0.1:${SERVER_PORT:-8080}:${SERVER_INTERNAL_PORT:-8080}"
+      # gradle debug port
+      - "5005:5005"
     depends_on:
       mysql:
         condition: service_healthy
@@ -24,7 +26,8 @@ services:
       - build-cache:/app/build:delegated
       # Bind-mount host Gradle cache to the path used inside the image (/home/gradle/.gradle)
       - ~/.gradle:/home/gradle/.gradle:delegated
-    command: [ "./gradlew", "bootRun", "--no-daemon" ]
+    # --debug-jvm 대신 suspend=n 옵션이 들어간 JVM 아규먼트 전달
+    command: [ "./gradlew", "bootRun", "--no-daemon", "-PjvmArgs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005" ]
 
   mysql:
     image: '${MYSQL_IMAGE:-mysql:8.4}'
