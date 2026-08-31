@@ -1,6 +1,6 @@
 package com.bosshi.maeul.openapi.controller;
 
-import com.bosshi.maeul.openapi.service.TourCategoryTypeService;
+import com.bosshi.maeul.openapi.service.TourCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/tour-category-types")
+@RequestMapping("/api/tour-categories")
 @RequiredArgsConstructor
-public class TourCategoryTypeController {
-    private final TourCategoryTypeService tourCategoryTypeService;
+public class TourCategoryController {
+    private final TourCategoryService tourCategoryService;
 
     @GetMapping
     public ResponseEntity<?> index() {
-        return ResponseEntity.ok(tourCategoryTypeService.all());
+        return ResponseEntity.ok(tourCategoryService.all());
     }
 }

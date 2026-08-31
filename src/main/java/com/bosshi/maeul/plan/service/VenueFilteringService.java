@@ -1,7 +1,7 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.category.repository.TourCategoryRepository;
 import com.bosshi.maeul.openapi.entity.TourCategory;
+import com.bosshi.maeul.openapi.repository.TourCategoryRepository;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import com.bosshi.maeul.plan.entity.MainFestival;
 import com.bosshi.maeul.plan.entity.Trip;

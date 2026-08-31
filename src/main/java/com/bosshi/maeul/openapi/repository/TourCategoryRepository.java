@@ -1,4 +1,4 @@
-package com.bosshi.maeul.category.repository;
+package com.bosshi.maeul.openapi.repository;
 
 import com.bosshi.maeul.openapi.entity.TourCategory;
 import org.springframework.data.jpa.repository.JpaRepository;

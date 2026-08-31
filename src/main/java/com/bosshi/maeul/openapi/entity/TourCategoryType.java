@@ -15,7 +15,7 @@ import org.springframework.modulith.NamedInterface;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class TourContentType extends BaseEntity {
+public class TourCategoryType extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.category.response;
+package com.bosshi.maeul.openapi.response;
 
 import com.bosshi.maeul.openapi.entity.TourCategory;
 
@@ -10,8 +10,7 @@ public record TourCategoryResponse(
         String parentCode,
         String contentTypeId,
         String contentTypeIdMultiLang,
-        String description,
-        Boolean active
+        String description
 ) {
     public static TourCategoryResponse from(TourCategory category) {
         return new TourCategoryResponse(
@@ -22,8 +21,7 @@ public record TourCategoryResponse(
                 category.getParentCode(),
                 category.getContentTypeId(),
                 category.getContentTypeIdMultiLang(),
-                category.getDescription(),
-                category.getActive()
+                category.getDescription()
         );
     }
 }
