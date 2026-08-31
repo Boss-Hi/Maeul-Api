@@ -349,7 +349,7 @@ public class TourCategorySeeder implements CommandLineRunner {
                 TourCategory.builder().code("C0116").name("캠핑코스").depth(2).parentCode("C01").build(),
                 TourCategory.builder().code("C0116001").name("캠핑코스").depth(3).parentCode("C0116").contentTypeId("25").build(),
                 TourCategory.builder().code("C0117").name("맛코스").depth(2).parentCode("C01").build(),
-                TourCategory.builder().code("C0117001").name("맛코스").depth(3).parentCode("C0117").contentTypeId("25").build(),
+                TourCategory.builder().code("C0117001").name("맛코스").depth(3).parentCode("C0117").contentTypeId("25").build()
         );
         repository.saveAll(categories);
     }
