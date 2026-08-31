@@ -1,4 +1,4 @@
-package com.bosshi.maeul.category.entity;
+package com.bosshi.maeul.openapi.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;

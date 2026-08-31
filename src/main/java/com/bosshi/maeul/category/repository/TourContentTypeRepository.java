@@ -1,6 +1,6 @@
 package com.bosshi.maeul.category.repository;
 
-import com.bosshi.maeul.category.entity.TourContentType;
+import com.bosshi.maeul.openapi.entity.TourContentType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.modulith.NamedInterface;
 

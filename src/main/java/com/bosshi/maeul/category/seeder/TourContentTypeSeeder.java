@@ -1,7 +1,7 @@
 package com.bosshi.maeul.category.seeder;
 
-import com.bosshi.maeul.category.entity.TourContentType;
 import com.bosshi.maeul.category.repository.TourContentTypeRepository;
+import com.bosshi.maeul.openapi.entity.TourContentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
