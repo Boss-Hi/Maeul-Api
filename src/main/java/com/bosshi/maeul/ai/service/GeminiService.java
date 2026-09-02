@@ -1,12 +1,15 @@
 package com.bosshi.maeul.ai.service;
 
 import com.bosshi.maeul.ai.config.GeminiConfig;
+import com.bosshi.maeul.ai.entity.GeminiApiKey;
+import com.bosshi.maeul.ai.repository.GeminiApiKeyRepository;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -14,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @NamedInterface
 @Slf4j
@@ -22,6 +26,7 @@ import java.util.List;
 public class GeminiService {
     private final RestClient.Builder restClientBuilder;
     private final GeminiConfig config;
+    private final GeminiApiKeyRepository geminiApiKeyRepository;
 
     public GeminiGenerateResponse generateText(String prompt) {
         if (!StringUtils.hasText(prompt)) {
@@ -31,15 +36,17 @@ public class GeminiService {
         return generate(prompt);
     }
 
+    @Transactional
     public GeminiGenerateResponse generate(String prompt) {
-        validateApiKey();
+        String apiKey = getApiKey();
+        validateApiKey(apiKey);
 
         GeminiGenerateRequest request = buildPrompt(
                 prompt,
                 config.getTemperature(),
                 config.getMaxOutputTokens()
         );
-        URI uri = buildGenerateUri();
+        URI uri = buildGenerateUri(apiKey);
 
         try {
             return restClientBuilder
@@ -55,7 +62,21 @@ public class GeminiService {
         }
     }
 
-    private URI buildGenerateUri() {
+    @Transactional
+    public String getApiKey() {
+        Optional<GeminiApiKey> keyOptional = geminiApiKeyRepository.findNextApiKey();
+        if (keyOptional.isPresent()) {
+            GeminiApiKey key = keyOptional.get();
+            key.setLastUsedAt(java.time.LocalDateTime.now());
+            geminiApiKeyRepository.save(key);
+            log.info("Gemini API key from database used: id={}", key.getId());
+            return key.getApiKey();
+        }
+        log.info("Gemini API key from configuration used.");
+        return config.getApiKey();
+    }
+
+    private URI buildGenerateUri(String apiKey) {
         String baseUrl = config.getBaseUrl();
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
@@ -64,14 +85,14 @@ public class GeminiService {
         return UriComponentsBuilder
                 .fromUriString(baseUrl)
                 .path("/v1/models/{model}:generateContent")
-                .queryParam("key", config.getApiKey())
+                .queryParam("key", apiKey)
                 .buildAndExpand(config.getModel())
                 .toUri();
     }
 
-    private void validateApiKey() {
-        if (!StringUtils.hasText(config.getApiKey())) {
-            throw new IllegalStateException("GEMINI_API_KEY environment variable is required.");
+    private void validateApiKey(String apiKey) {
+        if (!StringUtils.hasText(apiKey)) {
+            throw new IllegalStateException("GEMINI_API_KEY is required.");
         }
     }
 
