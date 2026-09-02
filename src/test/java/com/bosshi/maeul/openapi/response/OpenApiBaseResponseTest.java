@@ -1,5 +1,6 @@
 package com.bosshi.maeul.openapi.response;
 
+import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -73,6 +74,13 @@ class OpenApiBaseResponseTest {
         assertThat(response).isNotNull();
         assertThat(response.getResponse().getHeader().getResultCode()).isEqualTo("0000");
         assertThat(response.getResponse().getBody().getItems().getItem()).isEmpty();
+    }
+
+    @Test
+    void instantiatesSearchFestivalRequestWithNoArgsConstructor() {
+        SearchFestivalRequest request = new SearchFestivalRequest();
+        assertThat(request.getNumOfRows()).isEqualTo(10);
+        assertThat(request.getPageNo()).isEqualTo(1);
     }
 
     @Test

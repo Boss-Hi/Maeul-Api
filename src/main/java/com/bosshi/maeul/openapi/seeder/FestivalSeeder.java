@@ -28,7 +28,6 @@ public class FestivalSeeder implements CommandLineRunner {
         List<Festival> festivals = openApiService.searchFestival(
                         SearchFestivalRequest.builder()
                                 .numOfRows(1000)
-                                .lDongRegnCd("11")
                                 .lclsSystm1("EV")
                                 .eventStartDate("20260901")
                                 .build()

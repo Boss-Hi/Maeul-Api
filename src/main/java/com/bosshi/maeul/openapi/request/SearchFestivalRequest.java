@@ -1,7 +1,8 @@
 package com.bosshi.maeul.openapi.request;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -14,14 +15,11 @@ import org.springframework.modulith.NamedInterface;
 @NamedInterface
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
 @Accessors(chain = true)
 public class SearchFestivalRequest extends OpenApiBaseRequest {
-    /**
-     * 정렬 기준: C = 수정일순
-     */
-    @Builder.Default
-    private String arrange = "C";
     /**
      * 행사 시작일 (YYYYMMDD)
      */
