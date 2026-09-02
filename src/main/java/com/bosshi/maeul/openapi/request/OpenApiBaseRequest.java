@@ -1,7 +1,7 @@
 package com.bosshi.maeul.openapi.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -17,10 +17,15 @@ import java.util.List;
  */
 @Getter
 @Setter
-public abstract class OpenApiBaseRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class OpenApiBaseRequest {
     /** 한 페이지 결과 수 (기본: 10) */
+    @Builder.Default
     private Integer numOfRows = 10;
     /** 페이지 번호 (기본: 1) */
+    @Builder.Default
     private Integer pageNo = 1;
 
     /**

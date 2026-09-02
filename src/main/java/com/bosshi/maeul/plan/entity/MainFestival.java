@@ -3,12 +3,9 @@ package com.bosshi.maeul.plan.entity;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * 여행의 중심이 되는 축제/공연을 나타내는 도메인 모델

@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS `users`
     `deleted_at` DATETIME(6),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `profiles`
 (
@@ -30,23 +31,25 @@ CREATE TABLE IF NOT EXISTS `profiles`
     INDEX `idx_profiles_user_id` (`user_id`),
     CONSTRAINT `fk_profiles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `tour_content_types`
 (
-    `id`              BIGINT      NOT NULL AUTO_INCREMENT,
-    `content_type_id` VARCHAR(16) NOT NULL UNIQUE,
+    `id`                         BIGINT      NOT NULL AUTO_INCREMENT,
+    `content_type_id`            VARCHAR(16) NOT NULL UNIQUE,
     `content_type_id_multi_lang` VARCHAR(16),
-    `name`            VARCHAR(32) NOT NULL,
-    `active`          TINYINT(1)  NOT NULL DEFAULT 1,
-    `created_at`      DATETIME(6),
-    `updated_at`      DATETIME(6),
-    `deleted_at`      DATETIME(6),
+    `name`                       VARCHAR(32) NOT NULL,
+    `active`                     TINYINT(1)  NOT NULL DEFAULT 1,
+    `created_at`                 DATETIME(6),
+    `updated_at`                 DATETIME(6),
+    `deleted_at`                 DATETIME(6),
     INDEX `idx_tour_content_types_content_type_id` (`content_type_id`),
     INDEX `idx_tour_content_types_content_type_id_multi_lang` (`content_type_id_multi_lang`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `tour_categories`
 (
@@ -68,7 +71,49 @@ CREATE TABLE IF NOT EXISTS `tour_categories`
     CONSTRAINT `fk_tour_categories_parent_code` FOREIGN KEY (`parent_code`) REFERENCES `tour_categories` (`code`) ON UPDATE CASCADE,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `festivals`
+(
+    `content_id`       VARCHAR(20)  NOT NULL,
+    `content_type_id`  VARCHAR(10),
+    `title`            VARCHAR(255) NOT NULL,
+    `tel`              VARCHAR(50),
+    `addr1`            VARCHAR(255),
+    `addr2`            VARCHAR(255),
+    `zipcode`          VARCHAR(10),
+    `area_code`        VARCHAR(10),
+    `sigungu_code`     VARCHAR(10),
+    `cat1`             VARCHAR(10),
+    `cat2`             VARCHAR(10),
+    `cat3`             VARCHAR(10),
+    `event_start_date` VARCHAR(16),
+    `event_end_date`   VARCHAR(16),
+    `first_image`      VARCHAR(500),
+    `first_image2`     VARCHAR(500),
+    `cpyrht_div_cd`    VARCHAR(20),
+    `map_x`            DOUBLE,
+    `map_y`            DOUBLE,
+    `m_level`          VARCHAR(5),
+    `l_dong_regn_cd`   VARCHAR(10),
+    `l_dong_signgu_cd` VARCHAR(10),
+    `lcls_systm1`      VARCHAR(20),
+    `lcls_systm2`      VARCHAR(20),
+    `lcls_systm3`      VARCHAR(20),
+    `progress_type`    VARCHAR(20),
+    `festival_type`    VARCHAR(20),
+    `created_time`     VARCHAR(16),
+    `modified_time`    VARCHAR(16),
+    `created_at`       DATETIME(6),
+    `updated_at`       DATETIME(6),
+    `deleted_at`       DATETIME(6),
+    INDEX `idx_festivals_event_date` (`event_start_date`, `event_end_date`),
+    INDEX `idx_festivals_area` (`area_code`, `sigungu_code`),
+    PRIMARY KEY (`content_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `filter_settings`
 (
@@ -82,7 +127,8 @@ CREATE TABLE IF NOT EXISTS `filter_settings`
     `deleted_at`                 DATETIME(6),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `main_festivals`
 (
@@ -104,7 +150,8 @@ CREATE TABLE IF NOT EXISTS `main_festivals`
     `deleted_at` DATETIME(6),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `trips`
 (
@@ -126,7 +173,8 @@ CREATE TABLE IF NOT EXISTS `trips`
     CONSTRAINT `fk_trips_main_festival` FOREIGN KEY (`main_festival_id`) REFERENCES `main_festivals` (`id`) ON DELETE SET NULL,
     CONSTRAINT `fk_trips_filter_settings` FOREIGN KEY (`filter_settings_id`) REFERENCES `filter_settings` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `itineraries`
 (
@@ -140,7 +188,8 @@ CREATE TABLE IF NOT EXISTS `itineraries`
     INDEX `idx_itineraries_trip_id` (`trip_id`),
     CONSTRAINT `fk_itineraries_trip` FOREIGN KEY (`trip_id`) REFERENCES `trips` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `itinerary_days`
 (
@@ -156,7 +205,8 @@ CREATE TABLE IF NOT EXISTS `itinerary_days`
     INDEX `idx_itinerary_days_itinerary_id` (`itinerary_id`),
     CONSTRAINT `fk_itinerary_days_itinerary` FOREIGN KEY (`itinerary_id`) REFERENCES `itineraries` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `itinerary_venues`
 (
@@ -178,7 +228,8 @@ CREATE TABLE IF NOT EXISTS `itinerary_venues`
     INDEX `idx_itinerary_venues_day_id` (`itinerary_day_id`),
     CONSTRAINT `fk_itinerary_venues_day` FOREIGN KEY (`itinerary_day_id`) REFERENCES `itinerary_days` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `posts`
 (
@@ -195,7 +246,8 @@ CREATE TABLE IF NOT EXISTS `posts`
     INDEX `idx_posts_user_id` (`user_id`),
     CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `comments`
 (
@@ -215,6 +267,7 @@ CREATE TABLE IF NOT EXISTS `comments`
     CONSTRAINT `fk_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_comments_parent` FOREIGN KEY (`parent_comment_id`) REFERENCES `comments` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 SET @@foreign_key_checks = 1;
