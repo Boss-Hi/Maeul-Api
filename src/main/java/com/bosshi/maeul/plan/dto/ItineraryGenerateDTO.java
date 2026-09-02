@@ -1,9 +1,10 @@
 package com.bosshi.maeul.plan.dto;
 
-import com.bosshi.maeul.openapi.entity.Festival;
+import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -11,29 +12,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlanGenerateDTO {
-    @JsonProperty("festival_id")
-    private String festivalId;
+public class ItineraryGenerateDTO {
+    @JsonProperty("tour_id")
+    private String tourId;
 
-    @JsonProperty("festival")
-    private Festival festival;
+    @JsonProperty("tour")
+    private Tour tour;
 
-    @JsonProperty("recommendableFestivals")
-    private List<Festival> recommendableFestivals;
+    @JsonProperty("recommendableTours")
+    private List<Tour> recommendableTours;
 
     /**
      * 여행 시작일
      * 예: "2026-09-01"
      */
     @JsonProperty("startDate")
-    private String startDate;
+    private LocalDate startDate;
 
     /**
      * 여행 종료일
      * 예: "2026-09-10"
      */
     @JsonProperty("endDate")
-    private String endDate;
+    private LocalDate endDate;
 
     /**
      * 선택한 카테고리 목록
@@ -56,7 +57,7 @@ public class PlanGenerateDTO {
                 endDate != null &&
                 selectedCategories != null &&
                 !selectedCategories.isEmpty() &&
-                endDate.compareTo(startDate) > 0;
+                endDate.isAfter(startDate);
     }
 
     @Getter

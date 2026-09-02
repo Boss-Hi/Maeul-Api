@@ -6,14 +6,14 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "festivals")
+@Table(name = "tours")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Festival extends BaseEntity {
+public class Tour extends BaseEntity {
 
     @Id
     @Column(name = "content_id", nullable = false, length = 20)

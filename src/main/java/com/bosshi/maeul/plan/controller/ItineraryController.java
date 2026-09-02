@@ -1,8 +1,8 @@
 package com.bosshi.maeul.plan.controller;
 
-import com.bosshi.maeul.plan.dto.PlanGenerateDTO;
+import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.plan.request.PlanGenerateRequest;
-import com.bosshi.maeul.plan.service.PlanService;
+import com.bosshi.maeul.plan.service.ItineraryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ import java.util.List;
  * 여행 일정 추천 시스템의 API 엔드포인트를 제공합니다.
  */
 @RestController
-@RequestMapping("/api/plans")
+@RequestMapping("/api/itinerary")
 @RequiredArgsConstructor
 @Slf4j
-public class PlanController {
+public class ItineraryController {
 
-    private final PlanService tripRecommendationService;
+    private final ItineraryService tripRecommendationService;
 
     /**
      * Step 3: MainFestival 선택 및 일정 생성
@@ -39,12 +39,12 @@ public class PlanController {
     public ResponseEntity<?> generate(
             @RequestBody PlanGenerateRequest request
     ) {
-        PlanGenerateDTO dto = PlanGenerateDTO.builder()
+        ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .festivalId(request.getFestivalId())
+                .tourId(request.getTourId())
                 .selectedCategories(List.of("VE06", "EV02", "AC01"))
-                .filterSettings(new PlanGenerateDTO.FilterSettingsRequest(
+                .filterSettings(new ItineraryGenerateDTO.FilterSettingsRequest(
                         5,
                         25,
                         true

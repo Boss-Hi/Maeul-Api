@@ -1,7 +1,7 @@
 package com.bosshi.maeul.openapi.service;
 
-import com.bosshi.maeul.openapi.entity.Festival;
-import com.bosshi.maeul.openapi.repository.FestivalRepository;
+import com.bosshi.maeul.openapi.entity.Tour;
+import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +20,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FestivalService {
-    private final FestivalRepository festivalRepository;
+    private final TourRepository festivalRepository;
 
     /**
      * 모든 축제 목록을 조회합니다.
      */
-    public List<Festival> all() {
+    public List<Tour> all() {
         return festivalRepository.findAll();
     }
 
     /**
      * SearchFestivalRequest 조건에 맞춰 축제를 검색합니다.
      */
-    public List<Festival> search(SearchFestivalRequest request) {
-        Specification<Festival> spec = (root, query, cb) -> {
+    public List<Tour> search(SearchFestivalRequest request) {
+        Specification<Tour> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (request.getAreaCode() != null && !request.getAreaCode().isBlank()) {

@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 public class GeminiConfig {
     private String baseUrl = "https://generativelanguage.googleapis.com";
     private String apiKey;
-    private String model = "gemini-1.5-flash";
-    private Double temperature = 0.7;
-    private Integer maxOutputTokens = 512;
+    private String model = "gemini-3.5-flash";
+    private Double temperature = 0.5;
+    private Integer maxOutputTokens = 4096;
     private boolean batchEnabled = false;
     private String batchPrompt = "Hello from Maeul batch.";
 

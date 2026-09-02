@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @NamedInterface
 @Slf4j
@@ -27,18 +28,17 @@ public class GeminiService {
             throw new IllegalArgumentException("Prompt must not be blank.");
         }
 
-        GeminiGenerateRequest request = GeminiGenerateRequest.ofPrompt(
+        return generate(prompt);
+    }
+
+    public GeminiGenerateResponse generate(String prompt) {
+        validateApiKey();
+
+        GeminiGenerateRequest request = buildPrompt(
                 prompt,
                 config.getTemperature(),
                 config.getMaxOutputTokens()
         );
-
-        return generate(request);
-    }
-
-    public GeminiGenerateResponse generate(GeminiGenerateRequest request) {
-        validateApiKey();
-
         URI uri = buildGenerateUri();
 
         try {
@@ -50,8 +50,7 @@ public class GeminiService {
                     .retrieve()
                     .body(GeminiGenerateResponse.class);
         } catch (RestClientResponseException e) {
-            log.error("Gemini API 호출 실패 - HTTP Status: {}, Request URI: {}, Response Body: {}",
-                    e.getStatusCode(), uri, e.getResponseBodyAsString());
+            log.error("Gemini API 호출 실패 - HTTP Status: {}, Request URI: {}, Response Body: {}", e.getStatusCode(), uri, e.getResponseBodyAsString());
             throw e;
         }
     }
@@ -74,6 +73,17 @@ public class GeminiService {
         if (!StringUtils.hasText(config.getApiKey())) {
             throw new IllegalStateException("GEMINI_API_KEY environment variable is required.");
         }
+    }
+
+    public GeminiGenerateRequest buildPrompt(String prompt, Double temperature, Integer maxOutputTokens) {
+        if (prompt == null || prompt.isBlank()) {
+            throw new IllegalArgumentException("Can not create GeminiGenerateRequest with null or blank prompt");
+        }
+
+        GeminiGenerateRequest.Part part = new GeminiGenerateRequest.Part(prompt);
+        GeminiGenerateRequest.Content content = new GeminiGenerateRequest.Content("user", List.of(part));
+        GeminiGenerateRequest.GenerationConfig config = new GeminiGenerateRequest.GenerationConfig(temperature, maxOutputTokens, "application/json");
+        return new GeminiGenerateRequest(List.of(content), config);
     }
 }
 

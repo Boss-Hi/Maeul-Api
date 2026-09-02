@@ -1,8 +1,10 @@
 package com.bosshi.maeul.plan.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -17,22 +19,22 @@ import java.util.List;
 @Builder
 public class PlanGenerateRequest {
 
-    @JsonProperty("festival_id")
-    private String festivalId;
+    @JsonProperty("tour_id")
+    private String tourId;
 
     /**
      * 여행 시작일
      * 예: "2026-09-01"
      */
-    @JsonProperty("startDate")
-    private String startDate;
+    @JsonFormat(pattern = "yyyyMMdd")
+    private LocalDate startDate;
 
     /**
      * 여행 종료일
      * 예: "2026-09-10"
      */
-    @JsonProperty("endDate")
-    private String endDate;
+    @JsonFormat(pattern = "yyyyMMdd")
+    private LocalDate endDate;
 
     /**
      * 선택한 카테고리 목록

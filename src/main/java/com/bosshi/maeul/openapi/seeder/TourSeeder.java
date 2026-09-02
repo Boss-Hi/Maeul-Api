@@ -1,7 +1,7 @@
 package com.bosshi.maeul.openapi.seeder;
 
-import com.bosshi.maeul.openapi.entity.Festival;
-import com.bosshi.maeul.openapi.repository.FestivalRepository;
+import com.bosshi.maeul.openapi.entity.Tour;
+import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Order(3)
-public class FestivalSeeder implements CommandLineRunner {
+public class TourSeeder implements CommandLineRunner {
 
-    private final FestivalRepository repository;
+    private final TourRepository repository;
     private final OpenApiService openApiService;
 
     @Override
@@ -27,7 +27,7 @@ public class FestivalSeeder implements CommandLineRunner {
             return;
         }
 
-        List<Festival> festivals = openApiService.getAreaBasedSyncList(
+        List<Tour> tours = openApiService.getAreaBasedSyncList(
                         AreaBasedSyncListRequest.builder()
                                 .numOfRows(1000)
                                 .lDongRegnCd("11")
@@ -38,7 +38,7 @@ public class FestivalSeeder implements CommandLineRunner {
                 .getItems()
                 .getItem()
                 .stream()
-                .map(item -> Festival.builder()
+                .map(item -> Tour.builder()
                         .addr1(item.getAddr1())
                         .addr2(item.getAddr2())
                         .zipcode(item.getAreacode())
@@ -69,6 +69,6 @@ public class FestivalSeeder implements CommandLineRunner {
                         .festivalType(item.getFestivaltype())
                         .build())
                 .toList();
-        repository.saveAll(festivals);
+        repository.saveAll(tours);
     }
 }

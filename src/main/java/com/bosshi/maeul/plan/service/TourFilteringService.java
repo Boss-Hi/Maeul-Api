@@ -1,13 +1,11 @@
 package com.bosshi.maeul.plan.service;
 
 import com.bosshi.maeul.common.utils.GeoUtils;
-import com.bosshi.maeul.openapi.entity.Festival;
+import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.entity.TourCategory;
-import com.bosshi.maeul.openapi.repository.FestivalRepository;
 import com.bosshi.maeul.openapi.repository.TourCategoryRepository;
-import com.bosshi.maeul.plan.dto.PlanGenerateDTO;
-import com.bosshi.maeul.plan.entity.MainFestival;
-import com.bosshi.maeul.plan.entity.Trip;
+import com.bosshi.maeul.openapi.repository.TourRepository;
+import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,30 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TourFilteringService {
     private final TourCategoryRepository categoryRepository;
-    private final FestivalRepository festivalRepository;
-
-    /**
-     * Trip과 MainFestival 정보를 기반으로 필터링된 관광지 목록을 반환합니다.
-     *
-     * @param trip 여행 정보
-     * @param mainFestival 주축제 정보
-     * @return 필터링된 관광지 목록
-     */
-    public void filterVenuesByTripAndFestival(Trip trip, MainFestival mainFestival) {
-        log.info("필터링 시작: Trip ID={}, Festival ID={}", trip.getId(), mainFestival.getId());
-
-        // 1. 사용자가 선택한 카테고리 목록 가져오기
-        List<String> selectedCategories = trip.getSelectedCategoriesList();
-        log.info("선택된 카테고리: {}", selectedCategories);
-
-        // 2. 선택된 카테고리에 해당하는 contentTypeId 목록 가져오기
-        List<TourCategory> categories = selectedCategories.stream()
-                .flatMap(categoryName -> categoryRepository.findAll().stream()
-                        .filter(c -> c.getName().equals(categoryName)))
-                .collect(Collectors.toList());
-
-        log.info("매핑된 카테고리 수: {}", categories.size());
-    }
+    private final TourRepository festivalRepository;
 
     /**
      * 카테고리별로 필터링된 관광지를 반환합니다.
@@ -57,7 +32,7 @@ public class TourFilteringService {
      * @param dto 일정 생성 요청 DTO
      * @return 필터링된 관광지 목록
      */
-    public List<Festival> filterTourByCategories(PlanGenerateDTO dto) {
+    public List<Tour> filterTourByCategories(ItineraryGenerateDTO dto) {
         List<String> selected = dto.getSelectedCategories();
         if (selected == null || selected.isEmpty()) {
             return List.of();
@@ -72,26 +47,26 @@ public class TourFilteringService {
             return List.of();
         }
 
-        // 기준이 되는 메인 페스티벌 위치 및 필터 정보 가져오기
-        Festival mainFestival = dto.getFestival();
-        Double baseLat = mainFestival != null ? mainFestival.getMapY() : null;
-        Double baseLon = mainFestival != null ? mainFestival.getMapX() : null;
+        // 기준이 되는 메인 투어 위치 및 필터 정보 가져오기
+        Tour mainTour = dto.getTour();
+        Double baseLat = mainTour != null ? mainTour.getMapY() : null;
+        Double baseLon = mainTour != null ? mainTour.getMapX() : null;
 
-        Integer maxDistanceKm = 10; // 기본값 10km
+        Integer maxDistanceKm = 15; // 기본값 15km
         if (dto.getFilterSettings() != null && dto.getFilterSettings().getMaxDistanceKm() != null) {
             maxDistanceKm = dto.getFilterSettings().getMaxDistanceKm();
         }
 
         log.info("필터 반경: {} km, 기준 위치: ({}, {})", maxDistanceKm, baseLat, baseLon);
 
-        // 전체 페스티벌/관광지 목록 가져오기
-        List<Festival> allFestivals = festivalRepository.findAll();
+        // 전체 투어 목록 가져오기
+        List<Tour> allTours = festivalRepository.findAll();
 
         // 필터링 수행
         final Integer finalMaxDistanceKm = maxDistanceKm;
-        return allFestivals.stream()
-                // 메인 페스티벌 제외
-                .filter(f -> mainFestival == null || !f.getContentId().equals(mainFestival.getContentId()))
+        return allTours.stream()
+                // 메인 투어 제외
+                .filter(f -> mainTour == null || !f.getContentId().equals(mainTour.getContentId()))
                 // 카테고리 매칭
                 .filter(f -> matchesAnyCategory(f, tourCategories))
                 // 거리 필터링 (위경도가 모두 있을 때만)
@@ -106,7 +81,7 @@ public class TourFilteringService {
                 .collect(Collectors.toList());
     }
 
-    private boolean matchesAnyCategory(Festival f, List<TourCategory> categories) {
+    private boolean matchesAnyCategory(Tour f, List<TourCategory> categories) {
         for (TourCategory cat : categories) {
             String code = cat.getCode();
             Integer depth = cat.getDepth();
