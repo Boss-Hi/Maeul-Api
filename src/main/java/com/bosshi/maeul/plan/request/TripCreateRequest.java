@@ -1,13 +1,15 @@
 package com.bosshi.maeul.plan.request;
 
+import com.bosshi.maeul.plan.dto.FestivalDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
 /**
  * 여행 일정 추천 요청 DTO (Step 1: 기본 정보 입력)
- *
+ * <p>
  * 사용자가 기본 정보, 지역, 카테고리를 선택할 때 사용됩니다.
  */
 @Getter
@@ -16,27 +18,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TripCreateRequest {
-
-    /**
-     * 사용자의 성별
-     * 예: "man", "girl"
-     */
-    @JsonProperty("gender")
-    private String gender;
-
-    /**
-     * 사용자의 생년월일
-     * 예: "1999-01-01"
-     */
-    @JsonProperty("birthDate")
-    private LocalDate birthDate;
-
     /**
      * 목적지 (도시명)
      * 예: "광주", "부산", "대전"
      */
-    @JsonProperty("destination")
-    private String destination;
+    @JsonProperty("festival")
+    private FestivalDTO festivalDTO;
 
     /**
      * 여행 시작일
@@ -59,50 +46,5 @@ public class TripCreateRequest {
     @JsonProperty("selectedCategories")
     private List<String> selectedCategories;
 
-    /**
-     * 필터 설정 (선택사항)
-     */
-    @JsonProperty("filterSettings")
-    private FilterSettingsRequest filterSettings;
-
-    /**
-     * 입력 값 검증
-     */
-    public boolean isValid() {
-        return gender != null &&
-                birthDate != null &&
-                destination != null &&
-                startDate != null &&
-                endDate != null &&
-                selectedCategories != null &&
-                !selectedCategories.isEmpty() &&
-                endDate.isAfter(startDate);
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class FilterSettingsRequest {
-
-        /**
-         * 하루에 최대 추천 장소 수
-         */
-        @JsonProperty("maxVenuesPerDay")
-        private Integer maxVenuesPerDay;
-
-        /**
-         * MainFestival 주변 반경 (단위: km)
-         */
-        @JsonProperty("maxDistanceKm")
-        private Integer maxDistanceKm;
-
-        /**
-         * 하루에 여러 카테고리 혼합 여부
-         */
-        @JsonProperty("allowCategoryMixPerDay")
-        private Boolean allowCategoryMixPerDay;
-    }
 }
 

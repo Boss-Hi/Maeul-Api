@@ -1,8 +1,8 @@
 package com.bosshi.maeul.plan.controller;
 
+import com.bosshi.maeul.plan.dto.TripGenerateDTO;
 import com.bosshi.maeul.plan.entity.Itinerary;
 import com.bosshi.maeul.plan.entity.ItineraryDay;
-import com.bosshi.maeul.plan.request.MainFestivalSelectRequest;
 import com.bosshi.maeul.plan.request.TripCreateRequest;
 import com.bosshi.maeul.plan.response.FestivalListResponse;
 import com.bosshi.maeul.plan.response.ItineraryResponse;
@@ -22,43 +22,12 @@ import java.util.stream.Collectors;
  * 여행 일정 추천 시스템의 API 엔드포인트를 제공합니다.
  */
 @RestController
-@RequestMapping("/api/v1/trips")
+@RequestMapping("/api/plans")
 @RequiredArgsConstructor
 @Slf4j
 public class TripRecommendationController {
 
     private final TripRecommendationService tripRecommendationService;
-
-    /**
-     * Step 1: Trip 생성
-     * <p>
-     * POST /api/v1/trips
-     * 사용자의 기본 정보로 여행을 생성합니다.
-     *
-     * @param request 여행 생성 요청
-     * @return Trip ID
-     */
-    @PostMapping
-    public ResponseEntity<?> createTrip(@RequestBody TripCreateRequest request) {
-        log.info("Trip 생성 요청: {}", request.getDestination());
-
-        try {
-            String tripId = tripRecommendationService.createTrip(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new CreateTripResponse(tripId, request.getDestination())
-            );
-        } catch (IllegalArgumentException e) {
-            log.error("입력 값 검증 실패: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponse("INVALID_INPUT", e.getMessage())
-            );
-        } catch (Exception e) {
-            log.error("Trip 생성 실패", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponse("INTERNAL_ERROR", e.getMessage())
-            );
-        }
-    }
 
     /**
      * Step 2: 축제 목록 조회
@@ -118,22 +87,26 @@ public class TripRecommendationController {
      * @param request MainFestival 선택 요청
      * @return 생성 요청 결과
      */
-    @PostMapping("/{tripId}/generate-itinerary")
+    @PostMapping("/generate")
     public ResponseEntity<?> generateItinerary(
-            @PathVariable String tripId,
-            @RequestBody MainFestivalSelectRequest request
+            @RequestBody TripCreateRequest request
     ) {
-        log.info("일정 생성 요청: Trip ID={}", tripId);
+        TripGenerateDTO dto = TripGenerateDTO.builder()
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .selectedCategories(List.of("축제/공연", "체험관광/공예", "숙박/호텔"))
+                .filterSettings(new TripGenerateDTO.FilterSettingsRequest(
+                        5,
+                        15,
+                        true
+                ))
+                .build();
 
         try {
-            request.setTripId(tripId);
+            // 일정 생성
+            tripRecommendationService.generateItinerary(dto);
 
-            // 비동기로 일정 생성 (백그라운드 처리)
-            tripRecommendationService.generateItineraryAsync(request);
-
-            return ResponseEntity.accepted().body(
-                    new GenerateItineraryResponse(tripId, "일정 생성이 진행 중입니다. 잠시 후 다시 조회해주세요.")
-            );
+            return ResponseEntity.accepted().body(new GenerateItineraryResponse("", "일정 생성이 진행 중입니다. 잠시 후 다시 조회해주세요."));
         } catch (IllegalArgumentException e) {
             log.error("입력 값 검증 실패: {}", e.getMessage());
             return ResponseEntity.badRequest().body(

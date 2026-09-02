@@ -61,12 +61,12 @@ public class ItineraryGenerationService {
             log.error("일정 생성 중 오류 발생", e);
             throw new RuntimeException("일정 생성 실패: " + e.getMessage());
         }
-    }
+    }*/
 
-    *//**
+    /**
      * Gemini API를 위한 프롬프트를 구성합니다.
-     *//*
-    private String buildItineraryPrompt(Trip trip, MainFestival mainFestival, List<Venue> filteredVenues) {
+     */
+    /*private String buildItineraryPrompt(Trip trip, MainFestival mainFestival, List<Venue> filteredVenues) {
         StringBuilder prompt = new StringBuilder();
 
         prompt.append("당신은 한국 여행 일정 추천 전문가입니다.\n");
