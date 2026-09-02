@@ -144,8 +144,6 @@ public class ItineraryGenerationService {
      * Gemini 응답을 Itinerary 객체로 파싱합니다.
      */
     private Itinerary parseItineraryFromResponse(String response, PlanGenerateDTO dto) {
-        log.info("응답 파싱 시작");
-
         Trip trip = Trip.builder()
                 .destination("")
                 .startDate(dto.getStartDate())
@@ -159,15 +157,16 @@ public class ItineraryGenerationService {
                 .build();
 
         try {
-            // TODO: JSON 파싱 구현
-            // Gson, Jackson, JSON-B 등을 사용하여 응답 파싱
-            // 현재는 프로토타입이므로 스켈레톤만 작성
+            // yyyyMMdd 포맷터 적용 (20260901 형태 파싱)
+            DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
 
-            // 임시: 기본 구조만 생성
-            LocalDate currentDate = LocalDate.parse(dto.getStartDate());
+            LocalDate startDate = LocalDate.parse(dto.getStartDate(), formatter);
+            LocalDate endDate = LocalDate.parse(dto.getEndDate(), formatter);
+
+            LocalDate currentDate = startDate;
             int dayNumber = 1;
 
-            while (!currentDate.isAfter(LocalDate.parse(dto.getEndDate()))) {
+            while (!currentDate.isAfter(endDate)) {
                 ItineraryDay day = ItineraryDay.builder()
                         .itinerary(itinerary)
                         .date(currentDate)

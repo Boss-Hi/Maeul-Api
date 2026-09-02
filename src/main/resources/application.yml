@@ -47,13 +47,6 @@ open-api:
   mobile-app: ${OPEN_API_MOBILE_APP:Maeul}
   response-type: ${OPEN_API_RESPONSE_TYPE:json}
 
-gemini:
-  api:
-    key: ${GEMINI_API_KEY:}
-    model: ${GEMINI_MODEL:gemini-2.0-flash}
-    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
-    timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:30}
-
 ai:
   gemini:
     base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}

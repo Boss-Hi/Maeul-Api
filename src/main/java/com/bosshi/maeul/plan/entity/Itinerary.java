@@ -3,11 +3,8 @@ package com.bosshi.maeul.plan.entity;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +23,8 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Itinerary extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * 연결된 Trip
@@ -43,14 +39,9 @@ public class Itinerary extends BaseEntity {
     @Column(length = 1000)
     private String summary;
 
-            /**
-     * 일별 일정 리스트
-     */
-    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @OrderBy("dayNumber ASC")
-    @Builder.Default
+    // cascade = CascadeType.ALL 또는 PERSIST 추가
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItineraryDay> days = new ArrayList<>();
-
 
     /**
      * 일정 일수를 반환합니다.

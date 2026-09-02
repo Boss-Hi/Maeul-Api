@@ -64,7 +64,7 @@ public class GeminiService {
 
         return UriComponentsBuilder
                 .fromUriString(baseUrl)
-                .path("/v1beta/models/{model}:generateContent")
+                .path("/v1/models/{model}:generateContent")
                 .queryParam("key", config.getApiKey())
                 .buildAndExpand(config.getModel())
                 .toUri();
