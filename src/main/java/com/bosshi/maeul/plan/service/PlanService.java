@@ -1,7 +1,7 @@
 package com.bosshi.maeul.plan.service;
 
-import com.bosshi.maeul.openapi.service.OpenApiService;
-import com.bosshi.maeul.plan.dto.TripGenerateDTO;
+import com.bosshi.maeul.openapi.repository.FestivalRepository;
+import com.bosshi.maeul.plan.dto.PlanGenerateDTO;
 import com.bosshi.maeul.plan.entity.Itinerary;
 import com.bosshi.maeul.plan.entity.Trip;
 import com.bosshi.maeul.plan.repository.TripRepository;
@@ -23,11 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class TripRecommendationService {
+public class PlanService {
 
     private final TripRepository tripRepository;
-    private final OpenApiService openApiService;
-    private final VenueFilteringService venueFilteringService;
+    private final FestivalRepository festivalRepository;
+    private final TourFilteringService venueFilteringService;
     private final ItineraryGenerationService itineraryGenerationService;
 
     /**
@@ -35,19 +35,19 @@ public class TripRecommendationService {
      *
      * @param dto MainFestival 선택 요청
      */
-    public void generateItinerary(TripGenerateDTO dto) {
+    public void generateItinerary(PlanGenerateDTO dto) {
         if (!dto.isValid()) {
             throw new IllegalArgumentException("입력 값이 유효하지 않습니다");
         }
 
-        // 관광지 필터링
-        /*log.info("관광지 필터링 시작");
-        List<Venue> filteredVenues = venueFilteringService.filterVenuesByTripAndFestival(trip, mainFestival);
-        log.info("필터링된 관광지: {} 개", filteredVenues.size());*/
+        dto.setFestival(festivalRepository.findById(dto.getFestivalId())
+                .orElseThrow(() -> new IllegalArgumentException("Festival을 찾을 수 없습니다: " + dto.getFestivalId())));
 
-        // 4. AI 일정 생성
-        // log.info("AI 일정 생성 시작");
-        // itineraryGenerationService.generateItinerary(trip, mainFestival, filteredVenues);
+        // 관광지 필터링
+        dto.setRecommendableFestivals(venueFilteringService.filterTourByCategories(dto));
+
+        // AI 일정 생성
+        itineraryGenerationService.generateItinerary(dto);
     }
 
     /**

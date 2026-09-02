@@ -1,10 +1,8 @@
 package com.bosshi.maeul.plan.request;
 
-import com.bosshi.maeul.plan.dto.FestivalDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -17,27 +15,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TripCreateRequest {
-    /**
-     * 목적지 (도시명)
-     * 예: "광주", "부산", "대전"
-     */
-    @JsonProperty("festival")
-    private FestivalDTO festivalDTO;
+public class PlanGenerateRequest {
+
+    @JsonProperty("festival_id")
+    private String festivalId;
 
     /**
      * 여행 시작일
      * 예: "2026-09-01"
      */
     @JsonProperty("startDate")
-    private LocalDate startDate;
+    private String startDate;
 
     /**
      * 여행 종료일
      * 예: "2026-09-10"
      */
     @JsonProperty("endDate")
-    private LocalDate endDate;
+    private String endDate;
 
     /**
      * 선택한 카테고리 목록

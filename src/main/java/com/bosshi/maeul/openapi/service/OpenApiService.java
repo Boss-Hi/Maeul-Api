@@ -40,8 +40,8 @@ public class OpenApiService {
     /**
      * 지역기반 관광정보조회(areaBasedSyncList2) API를 호출한다.
      */
-    public String getAreaBasedSyncList(AreaBasedSyncListRequest request) {
-        return call(TourApiEndpoint.AREA_BASED_SYNC_LIST, request.toQueryParams(), String.class);
+    public SearchFestivalResponse getAreaBasedSyncList(AreaBasedSyncListRequest request) {
+        return call(TourApiEndpoint.AREA_BASED_SYNC_LIST, request.toQueryParams(), SearchFestivalResponse.class);
     }
 
     /**

@@ -3,12 +3,8 @@ package com.bosshi.maeul.plan.entity;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +37,7 @@ public class Trip extends BaseEntity {
      * 사용자의 생년월일
      */
     @Column(nullable = false)
-    private LocalDate birthDate;
+    private String birthDate;
 
     /**
      * 목적지 (광주, 부산, 대전 등)
@@ -53,13 +49,13 @@ public class Trip extends BaseEntity {
      * 여행 시작일
      */
     @Column(nullable = false)
-    private LocalDate startDate;
+    private String startDate;
 
     /**
      * 여행 종료일
      */
     @Column(nullable = false)
-    private LocalDate endDate;
+    private String endDate;
 
     /**
      * 사용자가 선택한 카테고리 (쉼표로 구분)
@@ -98,11 +94,5 @@ public class Trip extends BaseEntity {
         return List.of(selectedCategories.split(","));
     }
 
-    /**
-     * 여행 기간(일 수)을 반환합니다.
-     */
-    public long getDurationDays() {
-        return java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
-    }
 }
 

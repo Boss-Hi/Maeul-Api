@@ -2,10 +2,11 @@ package com.bosshi.maeul.openapi.seeder;
 
 import com.bosshi.maeul.openapi.entity.Festival;
 import com.bosshi.maeul.openapi.repository.FestivalRepository;
-import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
+import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Order(3)
 public class FestivalSeeder implements CommandLineRunner {
 
     private final FestivalRepository repository;
@@ -25,11 +27,10 @@ public class FestivalSeeder implements CommandLineRunner {
             return;
         }
 
-        List<Festival> festivals = openApiService.searchFestival(
-                        SearchFestivalRequest.builder()
+        List<Festival> festivals = openApiService.getAreaBasedSyncList(
+                        AreaBasedSyncListRequest.builder()
                                 .numOfRows(1000)
-                                .lclsSystm1("EV")
-                                .eventStartDate("20260901")
+                                .lDongRegnCd("11")
                                 .build()
                 )
                 .getResponse()

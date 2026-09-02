@@ -2,12 +2,14 @@ package com.bosshi.maeul.openapi.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 지역기반 관광정보조회(areaBasedSyncList2) API 요청 파라미터 DTO.
  */
 @Getter
 @Setter
+@SuperBuilder
 public class AreaBasedSyncListRequest extends OpenApiBaseRequest {
     /** 정렬구분 (A=제목순, C=수정일순, D=생성일순, O/Q/R=대표이미지 필수) */
     private String arrange = "C";

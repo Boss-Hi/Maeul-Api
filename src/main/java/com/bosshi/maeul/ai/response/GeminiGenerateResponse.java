@@ -3,10 +3,12 @@ package com.bosshi.maeul.ai.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.modulith.NamedInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedInterface
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,8 +1,11 @@
 package com.bosshi.maeul.common.utils;
 
+import org.springframework.modulith.NamedInterface;
+
 /**
  * 지리 정보 처리 관련 유틸리티 클래스
  */
+@NamedInterface
 public class GeoUtils {
 
     private static final int EARTH_RADIUS_KM = 6371; // 지구의 반지름 (km)

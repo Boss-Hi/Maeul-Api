@@ -1,9 +1,9 @@
 package com.bosshi.maeul.plan.dto;
 
+import com.bosshi.maeul.openapi.entity.Festival;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -11,41 +11,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TripGenerateDTO {
-    /**
-     * 사용자의 성별
-     * 예: "man", "girl"
-     */
-    @JsonProperty("gender")
-    private String gender;
+public class PlanGenerateDTO {
+    @JsonProperty("festival_id")
+    private String festivalId;
 
-    /**
-     * 사용자의 생년월일
-     * 예: "1999-01-01"
-     */
-    @JsonProperty("birthDate")
-    private LocalDate birthDate;
+    @JsonProperty("festival")
+    private Festival festival;
 
-    /**
-     * 목적지 (도시명)
-     * 예: "광주", "부산", "대전"
-     */
-    @JsonProperty("destination")
-    private String destination;
+    @JsonProperty("recommendableFestivals")
+    private List<Festival> recommendableFestivals;
 
     /**
      * 여행 시작일
      * 예: "2026-09-01"
      */
     @JsonProperty("startDate")
-    private LocalDate startDate;
+    private String startDate;
 
     /**
      * 여행 종료일
      * 예: "2026-09-10"
      */
     @JsonProperty("endDate")
-    private LocalDate endDate;
+    private String endDate;
 
     /**
      * 선택한 카테고리 목록
@@ -64,14 +52,11 @@ public class TripGenerateDTO {
      * 입력 값 검증
      */
     public boolean isValid() {
-        return gender != null &&
-                birthDate != null &&
-                destination != null &&
-                startDate != null &&
+        return startDate != null &&
                 endDate != null &&
                 selectedCategories != null &&
                 !selectedCategories.isEmpty() &&
-                endDate.isAfter(startDate);
+                endDate.compareTo(startDate) > 0;
     }
 
     @Getter
