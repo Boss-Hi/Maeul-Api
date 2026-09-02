@@ -1,8 +1,8 @@
-package com.bosshi.maeul.plan.service;
+package com.bosshi.maeul.itinerary.service;
 
+import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.repository.TourRepository;
-import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.plan.repository.ItineraryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

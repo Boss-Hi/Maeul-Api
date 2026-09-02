@@ -1,4 +1,4 @@
-package com.bosshi.maeul.plan.entity;
+package com.bosshi.maeul.itinerary.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.openapi.entity.Tour;

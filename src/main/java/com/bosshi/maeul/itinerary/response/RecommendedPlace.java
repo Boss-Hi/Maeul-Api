@@ -1,4 +1,4 @@
-package com.bosshi.maeul.plan.response;
+package com.bosshi.maeul.itinerary.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

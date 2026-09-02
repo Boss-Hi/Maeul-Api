@@ -1,6 +1,6 @@
-package com.bosshi.maeul.plan.repository;
+package com.bosshi.maeul.itinerary.repository;
 
-import com.bosshi.maeul.plan.entity.Itinerary;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,8 +1,8 @@
-package com.bosshi.maeul.plan.controller;
+package com.bosshi.maeul.itinerary.controller;
 
-import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.plan.request.PlanGenerateRequest;
-import com.bosshi.maeul.plan.service.ItineraryService;
+import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.request.PlanGenerateRequest;
+import com.bosshi.maeul.itinerary.service.ItineraryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

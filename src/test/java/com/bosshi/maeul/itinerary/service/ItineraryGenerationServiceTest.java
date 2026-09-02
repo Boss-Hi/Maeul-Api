@@ -1,11 +1,11 @@
-package com.bosshi.maeul.plan.service;
+package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
 import com.bosshi.maeul.ai.service.GeminiService;
+import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.entity.Tour;
-import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.plan.entity.Itinerary;
-import com.bosshi.maeul.plan.repository.ItineraryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

@@ -1,12 +1,12 @@
-package com.bosshi.maeul.plan.service;
+package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.ai.service.GeminiService;
+import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.entity.ItineraryDay;
+import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.entity.Tour;
-import com.bosshi.maeul.plan.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.plan.entity.Itinerary;
-import com.bosshi.maeul.plan.entity.ItineraryDay;
-import com.bosshi.maeul.plan.entity.ItineraryTour;
-import com.bosshi.maeul.plan.repository.ItineraryRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

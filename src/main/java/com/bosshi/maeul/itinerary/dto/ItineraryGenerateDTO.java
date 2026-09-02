@@ -1,4 +1,4 @@
-package com.bosshi.maeul.plan.dto;
+package com.bosshi.maeul.itinerary.dto;
 
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.annotation.JsonProperty;

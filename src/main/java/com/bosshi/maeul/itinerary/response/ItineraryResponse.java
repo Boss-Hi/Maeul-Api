@@ -1,4 +1,4 @@
-package com.bosshi.maeul.plan.response;
+package com.bosshi.maeul.itinerary.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

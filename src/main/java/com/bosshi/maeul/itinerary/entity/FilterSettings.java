@@ -1,13 +1,9 @@
-package com.bosshi.maeul.plan.entity;
+package com.bosshi.maeul.itinerary.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 /**
  * 여행 일정 생성 시 적용되는 필터 조건을 나타내는 도메인 모델

@@ -1,4 +1,4 @@
-package com.bosshi.maeul.plan.request;
+package com.bosshi.maeul.itinerary.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
