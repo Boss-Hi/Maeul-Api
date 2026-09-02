@@ -5,9 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public record TourCategoryTreeResponse(
-        Long id,
+        String id,
         String name,
-        String code,
         List<ChildResponse> children
 ) {
     public static List<TourCategoryTreeResponse> buildTree(List<TourCategoryResponse> categories) {
@@ -21,9 +20,8 @@ public record TourCategoryTreeResponse(
 
         return parents.stream()
                 .map(parent -> new TourCategoryTreeResponse(
-                        parent.id(),
+                        parent.code().toLowerCase(),
                         parent.name(),
-                        parent.code(),
                         childrenByParent.getOrDefault(parent.code(), List.of()).stream()
                                 .map(ChildResponse::from)
                                 .toList()
@@ -32,14 +30,12 @@ public record TourCategoryTreeResponse(
     }
 
     public record ChildResponse(
-            Long id,
-            String code,
+            String id,
             String name
     ) {
         public static ChildResponse from(TourCategoryResponse category) {
             return new ChildResponse(
-                    category.id(),
-                    category.code(),
+                    category.code().toLowerCase(),
                     category.name()
             );
         }

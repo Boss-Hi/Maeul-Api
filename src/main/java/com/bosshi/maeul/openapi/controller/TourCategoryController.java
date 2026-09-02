@@ -1,5 +1,6 @@
 package com.bosshi.maeul.openapi.controller;
 
+import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.openapi.response.TourCategoryTreeResponse;
 import com.bosshi.maeul.openapi.service.TourCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,6 @@ public class TourCategoryController {
 
     @GetMapping
     public ResponseEntity<?> index() {
-        return ResponseEntity.ok(TourCategoryTreeResponse.buildTree(tourCategoryService.all()));
+        return ApiResponse.success(TourCategoryTreeResponse.buildTree(tourCategoryService.all()));
     }
 }

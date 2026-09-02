@@ -66,16 +66,16 @@ class TourCategoryServiceTest {
         
         assertThat(treeResult).hasSize(1);
         TourCategoryTreeResponse parentResponse = treeResult.get(0);
-        assertThat(parentResponse.id()).isEqualTo("AC");
+        assertThat(parentResponse.id()).isEqualTo("ac");
         assertThat(parentResponse.name()).isEqualTo("숙박");
         assertThat(parentResponse.children()).hasSize(2);
 
         TourCategoryTreeResponse.ChildResponse childResponse1 = parentResponse.children().get(0);
-        assertThat(childResponse1.id()).isEqualTo("AC01");
+        assertThat(childResponse1.id()).isEqualTo("ac01");
         assertThat(childResponse1.name()).isEqualTo("호텔");
 
         TourCategoryTreeResponse.ChildResponse childResponse2 = parentResponse.children().get(1);
-        assertThat(childResponse2.id()).isEqualTo("AC02");
+        assertThat(childResponse2.id()).isEqualTo("ac02");
         assertThat(childResponse2.name()).isEqualTo("콘도미니엄");
     }
 }
