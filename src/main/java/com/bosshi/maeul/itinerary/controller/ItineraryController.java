@@ -1,7 +1,7 @@
 package com.bosshi.maeul.itinerary.controller;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.itinerary.request.PlanGenerateRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +36,7 @@ public class ItineraryController {
      * @return 생성 요청 결과
      */
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(
-            @RequestBody PlanGenerateRequest request
-    ) {
+    public ResponseEntity<?> generate(@RequestBody ItineraryGenerateRequest request) {
         ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())

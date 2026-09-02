@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlanGenerateRequest {
+public class ItineraryGenerateRequest {
 
     @JsonProperty("tour_id")
     private String tourId;
