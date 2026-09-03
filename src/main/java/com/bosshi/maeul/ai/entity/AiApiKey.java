@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @NamedInterface
 @Entity
-@Table(name = "gemini_api_keys")
+@Table(name = "ai_api_keys")
 @Getter
 @Setter
 @NoArgsConstructor
