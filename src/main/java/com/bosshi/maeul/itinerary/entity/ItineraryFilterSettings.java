@@ -11,14 +11,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * 관리자가 설정한 글로벌 기본값과 사용자의 오버라이드 값을 포함합니다.
  */
 @Entity
-@Table(name = "filter_settings")
+@Table(name = "tour_filter_settings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class FilterSettings extends BaseEntity {
+public class ItineraryFilterSettings extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,7 +30,7 @@ public class FilterSettings extends BaseEntity {
      */
     @Column(nullable = false)
     @Builder.Default
-    private Integer maxVenuesPerDay = 5;
+    private Integer maxItinerariesPerDay = 5;
 
     /**
      * MainFestival 주변 반경 (단위: km)

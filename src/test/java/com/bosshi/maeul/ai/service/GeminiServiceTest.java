@@ -1,7 +1,7 @@
 package com.bosshi.maeul.ai.service;
 
 import com.bosshi.maeul.ai.config.GeminiConfig;
-import com.bosshi.maeul.ai.entity.GeminiApiKey;
+import com.bosshi.maeul.ai.entity.AiApiKey;
 import com.bosshi.maeul.ai.repository.GeminiApiKeyRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,13 +38,13 @@ class GeminiServiceTest {
 
         // then
         assertThat(apiKey).isEqualTo("config-api-key");
-        verify(geminiApiKeyRepository, never()).save(any(GeminiApiKey.class));
+        verify(geminiApiKeyRepository, never()).save(any(AiApiKey.class));
     }
 
     @Test
     void getApiKeyShouldReturnDatabaseKeyAndUpdateLastUsedAtWhenActiveKeyExists() {
         // given
-        GeminiApiKey mockKey = GeminiApiKey.builder()
+        AiApiKey mockKey = AiApiKey.builder()
                 .id(1L)
                 .apiKey("db-api-key-1")
                 .active(true)

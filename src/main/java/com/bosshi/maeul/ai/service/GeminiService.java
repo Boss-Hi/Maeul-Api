@@ -1,7 +1,7 @@
 package com.bosshi.maeul.ai.service;
 
 import com.bosshi.maeul.ai.config.GeminiConfig;
-import com.bosshi.maeul.ai.entity.GeminiApiKey;
+import com.bosshi.maeul.ai.entity.AiApiKey;
 import com.bosshi.maeul.ai.repository.GeminiApiKeyRepository;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
@@ -64,9 +64,9 @@ public class GeminiService {
 
     @Transactional
     public String getApiKey() {
-        Optional<GeminiApiKey> keyOptional = geminiApiKeyRepository.findNextApiKey();
+        Optional<AiApiKey> keyOptional = geminiApiKeyRepository.findNextApiKey();
         if (keyOptional.isPresent()) {
-            GeminiApiKey key = keyOptional.get();
+            AiApiKey key = keyOptional.get();
             key.setLastUsedAt(java.time.LocalDateTime.now());
             geminiApiKeyRepository.save(key);
             log.info("Gemini API key from database used: id={}", key.getId());

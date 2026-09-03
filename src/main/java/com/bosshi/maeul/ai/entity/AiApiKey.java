@@ -1,5 +1,6 @@
 package com.bosshi.maeul.ai.entity;
 
+import com.bosshi.maeul.ai.type.AiProviderType;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,13 +16,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GeminiApiKey extends BaseEntity {
+public class AiApiKey extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "api_key", nullable = false, unique = true)
+    // 키 식별용 이름 (예: "A key", "B key", "개발용 Gemini 키")
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
+    // AI 제공자 유형 (예: GEMINI, GPT, CLAUDE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider_type", nullable = false, length = 30)
+    private AiProviderType providerType;
+
+    @Column(name = "api_key", nullable = false, unique = true, length = 255)
     private String apiKey;
 
     @Column(name = "active", nullable = false)
