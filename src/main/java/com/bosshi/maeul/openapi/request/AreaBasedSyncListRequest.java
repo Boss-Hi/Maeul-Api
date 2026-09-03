@@ -1,5 +1,6 @@
 package com.bosshi.maeul.openapi.request;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -12,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class AreaBasedSyncListRequest extends OpenApiBaseRequest {
     /** 정렬구분 (A=제목순, C=수정일순, D=생성일순, O/Q/R=대표이미지 필수) */
+    @Builder.Default
     private String arrange = "C";
     /** 관광타입 ID */
     private String contentTypeId;

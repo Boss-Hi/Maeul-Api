@@ -3,6 +3,8 @@ package com.bosshi.maeul.common.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,9 +33,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // KraftAdmin 로그인 및 API 경로를 Spring Security 검증에서 제외
+                        .requestMatchers("/admin/**", "/admin/api/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/open/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
-                        .requestMatchers("/api/tours/**", "/api/itinerary/**").permitAll()
+                        .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
+                        .requestMatchers( "/api/open/**","/api/itinerary/**").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -44,5 +50,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // AuthenticationManager Bean 노출
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

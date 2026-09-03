@@ -69,6 +69,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
+    // Admin
+    implementation "com.bowerzlabs:kraft-admin:0.1.28-beta"
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'

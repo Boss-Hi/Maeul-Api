@@ -52,8 +52,8 @@ public class TourSeeder implements CommandLineRunner {
                         .eventEndDate(item.getEventenddate())
                         .firstImage(item.getFirstimage())
                         .firstImage2(item.getFirstimage2())
-                        .mapX(Double.valueOf(item.getMapx()))
-                        .mapY(Double.valueOf(item.getMapy()))
+                        .mapX(parseDoubleSafely(item.getMapx()))
+                        .mapY(parseDoubleSafely(item.getMapy()))
                         .mLevel(item.getMlevel())
                         .modifiedTime(item.getModifiedtime())
                         .areaCode(item.getAreacode())
@@ -70,5 +70,16 @@ public class TourSeeder implements CommandLineRunner {
                         .build())
                 .toList();
         repository.saveAll(tours);
+    }
+
+    private Double parseDoubleSafely(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null; // 또는 기본값 0.0D
+        }
+        try {
+            return Double.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null; // 숫자로 변환 불가능한 값 예외 처리
+        }
     }
 }
