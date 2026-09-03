@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * 관리자가 설정한 글로벌 기본값과 사용자의 오버라이드 값을 포함합니다.
  */
 @Entity
-@Table(name = "tour_filter_settings")
+@Table(name = "itinerary_filter_settings")
 @Getter
 @Setter
 @NoArgsConstructor
