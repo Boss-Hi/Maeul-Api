@@ -77,9 +77,6 @@ services:
       - "migrate"
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql:ro
-    depends_on:
-      mysql:
-        condition: service_healthy
     restart: "no"
     extra_hosts:
       - "host.docker.internal:host-gateway"
