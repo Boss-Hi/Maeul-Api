@@ -134,7 +134,6 @@ public class ItineraryGenerator {
      */
     private Itinerary parseItineraryFromResponse(String json, ItineraryGenerateDTO dto) {
         log.info("응답 파싱 시작");
-        log.info(json);
         String cleanedJson = cleanMarkdownJson(json);
         ObjectMapper objectMapper = new ObjectMapper();
 

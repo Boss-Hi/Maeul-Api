@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "ai.gemini")
 public class GeminiConfig {
-    private String baseUrl = "https://generativelanguage.googleapis.com";
+    private String baseUrl;
     private String apiKey;
-    private String model = "gemini-3.5-flash";
-    private Double temperature = 0.5;
-    private Integer maxOutputTokens = 4096;
-    private boolean batchEnabled = false;
-    private String batchPrompt = "Hello from Maeul batch.";
+    private String model;
+    private Double temperature;
+    private Integer maxOutputTokens;
+    private boolean batchEnabled;
+    private String batchPrompt;
 
     /**
      * Gemini API가 사용 가능한지 확인
