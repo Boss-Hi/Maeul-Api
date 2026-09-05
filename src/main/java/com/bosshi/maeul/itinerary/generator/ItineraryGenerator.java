@@ -178,7 +178,7 @@ public class ItineraryGenerator {
 
             return itinerary;
         } catch (Exception e) {
-            log.error("응답 파싱 및 DB 저장 중 오류", e);
+            log.error("응답 파싱 및 DB 저장 중 오류", json);
             throw new RuntimeException("응답 파싱 실패: " + e.getMessage(), e);
         }
     }
