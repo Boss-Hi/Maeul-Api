@@ -1,6 +1,7 @@
 package com.bosshi.maeul.itinerary.filter;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.filter.pipeline.TourPipeline;
 import com.bosshi.maeul.location.service.GeoService;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.entity.TourCategory;
@@ -25,6 +26,34 @@ import java.util.stream.Collectors;
 public class TourFilteringService {
     private final TourCategoryRepository categoryRepository;
     private final TourRepository festivalRepository;
+    private final TourPipeline tourPipeline;
+
+    public List<Tour> filter(ItineraryGenerateDTO dto) {
+        List<String> selected = dto.getSelectedCategories();
+        if (selected == null || selected.isEmpty()) {
+            return List.of();
+        }
+
+        List<TourCategory> tourCategories = categoryRepository.findAll().stream()
+                .filter(c -> selected.contains(c.getName()) || selected.contains(c.getCode()))
+                .toList();
+
+        if (tourCategories.isEmpty()) {
+            log.warn("선택된 카테고리에 매핑되는 TourCategory를 찾을 수 없습니다.");
+            return List.of();
+        }
+
+        // 초기 Context 생성
+        TourFilterContext context = TourFilterContext.builder()
+                .selectedCategories(tourCategories)
+                .candidateTours(festivalRepository.findAll()) // 전체 후보군 세팅
+                .build();
+
+        // 파이프라인 실행
+        TourFilterContext resultContext = tourPipeline.execute(context);
+
+        return resultContext.getCandidateTours();
+    }
 
     /**
      * 카테고리별로 필터링된 관광지를 반환합니다.
