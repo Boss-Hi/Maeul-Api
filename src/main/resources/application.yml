@@ -3,6 +3,10 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: Maeul-Api
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE # SQL 파라미터 출력
   web:
     resources:
       cache:
@@ -19,6 +23,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
   flyway:
     enabled: ${SPRING_FLYWAY_ENABLED:true}
     baseline-on-migrate: ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:true} # 기존 운영 DB에 처음 도입할 때 필요

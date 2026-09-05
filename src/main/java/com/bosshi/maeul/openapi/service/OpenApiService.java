@@ -4,8 +4,10 @@ import com.bosshi.maeul.openapi.config.OpenApiProperties;
 import com.bosshi.maeul.openapi.dto.AreaBasedSyncListDTO;
 import com.bosshi.maeul.openapi.dto.AreaTarSvcDemListDTO;
 import com.bosshi.maeul.openapi.dto.SearchFestivalDTO;
+import com.bosshi.maeul.openapi.dto.ldongCode2ListtDTO;
 import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
+import com.bosshi.maeul.openapi.response.ldongCode2ListtResponse;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,13 @@ public class OpenApiService {
      */
     public AreaTarSvcDemListResponse getAreaTarSvcDemList(AreaTarSvcDemListDTO request) {
         return call(TourApiEndpoint.AREA_TAR_SVC_DEM_LIST, request.toQueryParams(), AreaTarSvcDemListResponse.class);
+    }
+
+    /**
+     * 법정동 코드 조회
+     */
+    public ldongCode2ListtResponse getLdongCode2(ldongCode2ListtDTO request) {
+        return call(TourApiEndpoint.LDONG_CODE2, request.toQueryParams(), ldongCode2ListtResponse.class);
     }
 
     /**

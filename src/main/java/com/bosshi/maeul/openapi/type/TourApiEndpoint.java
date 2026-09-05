@@ -17,6 +17,7 @@ public enum TourApiEndpoint {
     AREA_BASED_LIST("/B551011/KorService2/areaBasedList2"),
     LDONG_CODE("/B551011/KorService2/ldongCode2"),
     LCLS_SYSTEM_CODE("/B551011/KorService2/lclsSystmCode2"),
+    LDONG_CODE2("/B551011/KorService2/ldongCode2"),
 
     AREA_TAR_SVC_DEM_LIST("/B551011/AreaTarResDemService/areaTarSvcDemList");
 
