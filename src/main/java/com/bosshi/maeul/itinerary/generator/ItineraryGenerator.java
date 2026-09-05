@@ -134,6 +134,7 @@ public class ItineraryGenerator {
      */
     private Itinerary parseItineraryFromResponse(String json, ItineraryGenerateDTO dto) {
         log.info("응답 파싱 시작");
+        log.info(json);
         String cleanedJson = cleanMarkdownJson(json);
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -178,7 +179,6 @@ public class ItineraryGenerator {
 
             return itinerary;
         } catch (Exception e) {
-            log.error("응답 파싱 및 DB 저장 중 오류", json);
             throw new RuntimeException("응답 파싱 실패: " + e.getMessage(), e);
         }
     }
