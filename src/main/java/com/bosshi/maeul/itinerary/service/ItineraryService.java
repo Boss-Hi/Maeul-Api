@@ -2,8 +2,8 @@ package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.generator.ItineraryGenerator;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
-import com.bosshi.maeul.openapi.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItineraryService {
 
     private final ItineraryRepository itineraryRepository;
-    private final TourRepository festivalRepository;
-    private final TourFilteringService tourFilteringService;
-    private final ItineraryGenerationService itineraryGenerationService;
+    private final ItineraryGenerator itineraryGenerator;
 
     /**
      * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
@@ -35,7 +33,13 @@ public class ItineraryService {
      * @param dto MainFestival 선택 요청
      */
     public Itinerary generateItinerary(ItineraryGenerateDTO dto) {
-        return null;
+        Itinerary itinerary = itineraryGenerator.generateItinerary(dto);
+        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+        log.info(
+                "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()
+                        .size()
+        );
+        return savedItinerary;
     }
 
     public Itinerary findById(Long id) {

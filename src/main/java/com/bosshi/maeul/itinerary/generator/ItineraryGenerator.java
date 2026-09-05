@@ -1,11 +1,11 @@
-package com.bosshi.maeul.itinerary.service;
+package com.bosshi.maeul.itinerary.generator;
 
+import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
 import com.bosshi.maeul.ai.service.GeminiService;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
 import com.bosshi.maeul.itinerary.entity.ItineraryTour;
-import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ItineraryGenerationService {
-
-    private final ItineraryRepository itineraryRepository;
+public class ItineraryGenerator {
     private final GeminiService geminiService;
 
     /**
@@ -43,55 +41,12 @@ public class ItineraryGenerationService {
 
         // Gemini API 호출 (실패 시 예외 처리 및 Mock 데이터로 Fallback)
         String result;
-            /*GeminiGenerateResponse geminiResponse = geminiService.generate(prompt);
-            result = geminiResponse != null ? geminiResponse.getFirstText() : null;
-            log.info("Gemini API 호출 성공: {}", result);
-            if (result == null || result.isBlank()) {
-                throw new IllegalStateException("Gemini API 응답 결과가 비어있습니다.");
-            }*/
-        result = "[ {\n" +
-                "    \"date\" : \"2026-09-01\",\n" +
-                "    \"dayNumber\" : 1,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"130699\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"142728\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1255726\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    } ]\n" +
-                "  }, {\n" +
-                "    \"date\" : \"2026-09-02\",\n" +
-                "    \"dayNumber\" : 2,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"130231\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"130353\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"130346\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"129724\",\n" +
-                "      \"sequence\" : 4\n" +
-                "    } ]\n" +
-                "  }, {\n" +
-                "    \"date\" : \"2026-09-03\",\n" +
-                "    \"dayNumber\" : 3,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"142733\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1019327\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1105871\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    } ]\n" +
-                "  } ]";
+        GeminiGenerateResponse geminiResponse = geminiService.generate(prompt);
+        result = geminiResponse != null ? geminiResponse.getFirstText() : null;
+        log.info("Gemini API 호출 성공: {}", result);
+        if (result == null || result.isBlank()) {
+            throw new IllegalStateException("Gemini API 응답 결과가 비어있습니다.");
+        }
 
         return parseItineraryFromResponse(result, dto);
     }
@@ -213,13 +168,7 @@ public class ItineraryGenerationService {
 
             itinerary.setItineraryDays(itineraryDays);
 
-            Itinerary savedItinerary = itineraryRepository.save(itinerary);
-            log.info(
-                    "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()
-                            .size()
-            );
-            return savedItinerary;
-
+            return itinerary;
         } catch (Exception e) {
             log.error("응답 파싱 및 DB 저장 중 오류", e);
             throw new RuntimeException("응답 파싱 실패: " + e.getMessage(), e);
@@ -240,6 +189,52 @@ public class ItineraryGenerationService {
         return raw.trim();
     }
 
+    private String getTestResult() {
+        return "[ {\n" +
+                "    \"date\" : \"2026-09-01\",\n" +
+                "    \"dayNumber\" : 1,\n" +
+                "    \"items\" : [ {\n" +
+                "      \"contentId\" : \"130699\",\n" +
+                "      \"sequence\" : 1\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"142728\",\n" +
+                "      \"sequence\" : 2\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"1255726\",\n" +
+                "      \"sequence\" : 3\n" +
+                "    } ]\n" +
+                "  }, {\n" +
+                "    \"date\" : \"2026-09-02\",\n" +
+                "    \"dayNumber\" : 2,\n" +
+                "    \"items\" : [ {\n" +
+                "      \"contentId\" : \"130231\",\n" +
+                "      \"sequence\" : 1\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"130353\",\n" +
+                "      \"sequence\" : 2\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"130346\",\n" +
+                "      \"sequence\" : 3\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"129724\",\n" +
+                "      \"sequence\" : 4\n" +
+                "    } ]\n" +
+                "  }, {\n" +
+                "    \"date\" : \"2026-09-03\",\n" +
+                "    \"dayNumber\" : 3,\n" +
+                "    \"items\" : [ {\n" +
+                "      \"contentId\" : \"142733\",\n" +
+                "      \"sequence\" : 1\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"1019327\",\n" +
+                "      \"sequence\" : 2\n" +
+                "    }, {\n" +
+                "      \"contentId\" : \"1105871\",\n" +
+                "      \"sequence\" : 3\n" +
+                "    } ]\n" +
+                "  } ]";
+    }
+
     private record ItineraryDayJson(
             String date,
             Integer dayNumber,
@@ -252,4 +247,5 @@ public class ItineraryGenerationService {
             Integer sequence
     ) {
     }
+
 }
