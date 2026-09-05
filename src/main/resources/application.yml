@@ -32,6 +32,9 @@ spring:
     baseline-on-migrate: ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:true} # 기존 운영 DB에 처음 도입할 때 필요
     clean-disabled: ${SPRING_FLYWAY_CLEAN_DISABLED:true}
   data:
+    web:
+      pageable:
+        page-serialization-mode: via-dto
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_INTERNAL_PORT}
