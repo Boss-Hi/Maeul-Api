@@ -34,9 +34,6 @@ public class FestivalService {
         return festivalRepository.findAll();
     }
 
-    /**
-     * SearchFestivalRequest 조건에 맞춰 축제를 검색합니다.
-     */
     public Page<Tour> search(SearchFestivalRequest request, Pageable pageable) {
         TourCategory category = null;
         if (request.getTourCategoryCode() != null) {
@@ -58,11 +55,10 @@ public class FestivalService {
         Specification<Tour> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (request.getLDongRegnCd() != null && !request.getLDongRegnCd().isBlank()) {
-                predicates.add(cb.equal(root.get("lDongRegnCd"), request.getLDongRegnCd()));
-            }
-            if (request.getLDongSigunguCd() != null && !request.getLDongSigunguCd().isBlank()) {
-                predicates.add(cb.equal(root.get("lDongSignguCd"), request.getLDongSigunguCd()));
+
+            if (request.getLocation() != null) {
+//                predicates.add(cb.equal(root.get("lDongRegnCd"), request.getLDongRegnCd()));
+//                predicates.add(cb.equal(root.get("lDongSignguCd"), request.getLDongSigunguCd()));
             }
 
             // tourCategoryId 기반 검색 필터링 추가
