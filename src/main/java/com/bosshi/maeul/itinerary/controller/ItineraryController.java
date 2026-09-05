@@ -5,6 +5,7 @@ import com.bosshi.maeul.common.security.CustomUserDetails;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
+import com.bosshi.maeul.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ItineraryController {
-
     private final ItineraryService tripRecommendationService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Itinerary>> show(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ItineraryResponse>> show(@PathVariable Long id) {
         Itinerary itinerary = tripRecommendationService.findById(id);
-        return ApiResponse.success(itinerary);
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 
     /**

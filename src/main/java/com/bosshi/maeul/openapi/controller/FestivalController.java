@@ -43,7 +43,7 @@ public class FestivalController {
     }
 
     @GetMapping("/{contentId}")
-    public ResponseEntity<ApiResponse<Tour>> show(@PathVariable Long contentId) {
+    public ResponseEntity<ApiResponse<Tour>> show(@PathVariable String contentId) {
         return ApiResponse.success(festivalService.findByContentId(contentId));
     }
 }

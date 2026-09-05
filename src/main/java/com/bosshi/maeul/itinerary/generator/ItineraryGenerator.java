@@ -9,6 +9,7 @@ import com.bosshi.maeul.itinerary.entity.ItineraryTour;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ItineraryGenerator {
+    private final EntityManager entityManager;
     private final GeminiService geminiService;
 
     /**
@@ -39,10 +41,13 @@ public class ItineraryGenerator {
         // Gemini API 프롬프트 구성
         String prompt = buildItineraryPrompt(dto);
 
+        if(dto.getRecommendableTours() == null || dto.getRecommendableTours().isEmpty()) {
+            throw new IllegalStateException("추천 가능한 관광지 목록이 비어있습니다.");
+        }
+
         // Gemini API 호출 (실패 시 예외 처리 및 Mock 데이터로 Fallback)
-        String result;
         GeminiGenerateResponse geminiResponse = geminiService.generate(prompt);
-        result = geminiResponse != null ? geminiResponse.getFirstText() : null;
+        String result = geminiResponse != null ? geminiResponse.getFirstText() : null;
         log.info("Gemini API 호출 성공: {}", result);
         if (result == null || result.isBlank()) {
             throw new IllegalStateException("Gemini API 응답 결과가 비어있습니다.");
@@ -87,12 +92,12 @@ public class ItineraryGenerator {
         List<Tour> filteredVenues = dto.getRecommendableTours();
         if (filteredVenues != null) {
             for (int i = 0; i < filteredVenues.size() && i < 20; i++) {
-                Tour venue = filteredVenues.get(i);
+                Tour tour = filteredVenues.get(i);
                 prompt.append("- ")
-                        .append(venue.getTitle())
-                        .append(" (ID: ").append(venue.getContentId()).append(")");
-                if (venue.getAddr1() != null) {
-                    prompt.append(", 주소: ").append(venue.getAddr1());
+                        .append(tour.getTitle())
+                        .append(" (contentId: ").append(tour.getContentId()).append(")");
+                if (tour.getAddr1() != null) {
+                    prompt.append(", 주소: ").append(tour.getAddr1());
                 }
                 prompt.append("\n");
             }
@@ -134,7 +139,7 @@ public class ItineraryGenerator {
 
         try {
             List<ItineraryDayJson> daysJson = objectMapper.readValue(
-                    cleanedJson, new TypeReference<List<ItineraryDayJson>>() {
+                    cleanedJson, new TypeReference<>() {
                     }
             );
 
@@ -150,17 +155,20 @@ public class ItineraryGenerator {
                         .itinerary(itinerary)
                         .date(LocalDate.parse(dayJson.date()))
                         .dayNumber(dayJson.dayNumber())
-                        .venues(new ArrayList<>())
+                        .itineraryTours(new ArrayList<>())
                         .build();
 
                 if (dayJson.items() != null) {
                     for (ItineraryTourJson tourJson : dayJson.items()) {
-                        ItineraryTour tour = ItineraryTour.builder()
+                        // DB 조회를 하지 않고 프록시(참조) 객체만 생성
+                        Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
+
+                        ItineraryTour itineraryTour = ItineraryTour.builder()
                                 .itineraryDay(day)
-                                .contentId(tourJson.contentId())
+                                .tour(tourProxy)
                                 .sequence(tourJson.sequence())
                                 .build();
-                        day.getVenues().add(tour);
+                        day.getItineraryTours().add(itineraryTour);
                     }
                 }
                 itineraryDays.add(day);

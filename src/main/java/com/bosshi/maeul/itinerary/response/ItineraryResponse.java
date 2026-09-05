@@ -1,158 +1,100 @@
 package com.bosshi.maeul.itinerary.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.entity.ItineraryDay;
+import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.openapi.response.TourResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+import lombok.Getter;
+
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * 생성된 여행 일정 응답 DTO
- *
- * AI(Gemini)가 생성한 일별 추천 일정을 클라이언트에 반환합니다.
- */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class ItineraryResponse {
 
-    /**
-     * 일정의 고유 ID
-     */
-    @JsonProperty("tripId")
-    private String tripId;
+    private Long id;
 
-    /**
-     * 목적지
-     */
-    @JsonProperty("destination")
-    private String destination;
-
-    /**
-     * 여행 시작일
-     */
-    @JsonProperty("startDate")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
-    /**
-     * 여행 종료일
-     */
-    @JsonProperty("endDate")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    /**
-     * 주축제 정보
-     */
-    @JsonProperty("mainFestival")
-    private MainFestivalInfo mainFestival;
+    private TourResponse tour;
 
-    /**
-     * 여행 전체 요약
-     */
-    @JsonProperty("summary")
-    private String summary;
-
-    /**
-     * 일별 일정 리스트
-     */
-    @JsonProperty("days")
     private List<ItineraryDayResponse> days;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class MainFestivalInfo {
+    public static ItineraryResponse from(Itinerary itinerary) {
+        if (itinerary == null) {
+            return null;
+        }
 
-        @JsonProperty("name")
-        private String name;
+        List<ItineraryDayResponse> dayResponses = itinerary.getItineraryDays() != null
+                ? itinerary.getItineraryDays().stream()
+                .map(ItineraryDayResponse::from)
+                .toList()
+                : Collections.emptyList();
 
-        @JsonProperty("category")
-        private String category;
-
-        @JsonProperty("startDate")
-        private LocalDate startDate;
-
-        @JsonProperty("endDate")
-        private LocalDate endDate;
+        return ItineraryResponse.builder()
+                .id(itinerary.getId())
+                .startDate(itinerary.getStartDate())
+                .endDate(itinerary.getEndDate())
+                .tour(TourResponse.from(itinerary.getTour()))
+                .days(dayResponses)
+                .build();
     }
 
     @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
     public static class ItineraryDayResponse {
 
-        /**
-         * 해당 날짜
-         */
-        @JsonProperty("date")
+        private Long id;
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate date;
 
-        /**
-         * 일의 순서 (1부터 시작)
-         */
-        @JsonProperty("dayNumber")
         private Integer dayNumber;
+        private Integer tourCount;
+        private List<ItineraryTourResponse> tours;
 
-        /**
-         * 해당 일의 테마
-         */
-        @JsonProperty("theme")
-        private String theme;
+        public static ItineraryDayResponse from(ItineraryDay day) {
+            List<ItineraryTourResponse> tourResponses = day.getItineraryTours() != null
+                    ? day.getItineraryTours().stream()
+                    .map(ItineraryTourResponse::from)
+                    .toList()
+                    : Collections.emptyList();
 
-        /**
-         * 해당 일의 추천 장소들
-         */
-        @JsonProperty("venues")
-        private List<ItineraryVenueResponse> venues;
+            return ItineraryDayResponse.builder()
+                    .id(day.getId())
+                    .date(day.getDate())
+                    .dayNumber(day.getDayNumber())
+                    .tourCount(day.getItineraryTourCount())
+                    .tours(tourResponses)
+                    .build();
+        }
     }
 
     @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
-    public static class ItineraryVenueResponse {
+    public static class ItineraryTourResponse {
 
-        /**
-         * 장소명
-         */
-        @JsonProperty("name")
-        private String name;
-
-        /**
-         * 카테고리
-         */
-        @JsonProperty("category")
-        private String category;
-
-        /**
-         * 방문 시간
-         */
-        @JsonProperty("visitTime")
-        private String visitTime;
-
-        /**
-         * 권장 체류 시간
-         */
-        @JsonProperty("duration")
-        private String duration;
-
-        /**
-         * 위치 설명 또는 추가 정보
-         */
-        @JsonProperty("description")
-        private String description;
-
-        /**
-         * 방문 순서
-         */
-        @JsonProperty("sequence")
+        private Long id;
+        private String contentId;
         private Integer sequence;
+        private TourResponse tour;
+
+        public static ItineraryTourResponse from(ItineraryTour tour) {
+            return ItineraryTourResponse.builder()
+                    .id(tour.getId())
+                    .sequence(tour.getSequence())
+                    .tour(TourResponse.from(tour.getTour()))
+                    .build();
+        }
     }
+
 }
 

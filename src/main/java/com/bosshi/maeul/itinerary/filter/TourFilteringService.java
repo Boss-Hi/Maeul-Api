@@ -1,4 +1,4 @@
-package com.bosshi.maeul.itinerary.service;
+package com.bosshi.maeul.itinerary.filter;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.location.service.GeoService;

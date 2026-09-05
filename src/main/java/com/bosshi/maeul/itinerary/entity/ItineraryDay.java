@@ -53,14 +53,14 @@ public class ItineraryDay extends BaseEntity {
     @OneToMany(mappedBy = "itineraryDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OrderBy("sequence ASC")
     @Builder.Default
-    private List<ItineraryTour> venues = new ArrayList<>();
+    private List<ItineraryTour> itineraryTours = new ArrayList<>();
 
 
     /**
      * 해당 일의 장소 수를 반환합니다.
      */
-    public Integer getVenueCount() {
-        return venues != null ? venues.size() : 0;
+    public Integer getItineraryTourCount() {
+        return itineraryTours != null ? itineraryTours.size() : 0;
     }
 }
 

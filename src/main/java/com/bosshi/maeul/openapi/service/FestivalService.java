@@ -88,7 +88,8 @@ public class FestivalService {
         return festivalRepository.findAll(spec, pageable);
     }
 
-    public Tour findByContentId(Long contentId) {
-        return festivalRepository.findByContentId(contentId);
+    public Tour findByContentId(String contentId) {
+        return festivalRepository.findByContentId(contentId)
+                .orElseThrow(() -> new IllegalArgumentException("Tour을 찾을 수 없습니다: " + contentId));
     }
 }

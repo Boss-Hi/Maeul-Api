@@ -1,6 +1,7 @@
 package com.bosshi.maeul.itinerary.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
+import com.bosshi.maeul.openapi.entity.Tour;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -34,14 +35,14 @@ public class ItineraryTour extends BaseEntity {
     /**
      * 한국관광공사 API의 contentId
      */
-    @Column(nullable = false)
-    private String contentId;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "content_id")
+    private Tour tour;
 
     /**
      * 순서 (같은 날 내에서 방문 순서)
      */
     @Column(nullable = false)
     private Integer sequence;
-
 }
 

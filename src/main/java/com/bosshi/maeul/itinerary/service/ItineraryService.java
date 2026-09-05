@@ -2,8 +2,11 @@ package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itinerary.generator.ItineraryGenerator;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
+import com.bosshi.maeul.openapi.entity.Tour;
+import com.bosshi.maeul.openapi.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class ItineraryService {
-
+    private final TourRepository tourRepository;
+    private final TourFilteringService tourFilteringService;
     private final ItineraryRepository itineraryRepository;
     private final ItineraryGenerator itineraryGenerator;
 
@@ -33,6 +37,11 @@ public class ItineraryService {
      * @param dto MainFestival 선택 요청
      */
     public Itinerary generateItinerary(ItineraryGenerateDTO dto) {
+        Tour tour = tourRepository.findByContentId(dto.getTourId())
+                .orElseThrow(() -> new IllegalArgumentException("Tour를 찾을 수 없습니다: " + dto.getTourId()));
+        dto.setTour(tour);
+        dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
+
         Itinerary itinerary = itineraryGenerator.generateItinerary(dto);
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
         log.info(
