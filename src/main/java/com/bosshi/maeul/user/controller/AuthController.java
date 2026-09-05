@@ -1,5 +1,6 @@
 package com.bosshi.maeul.user.controller;
 
+import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.user.request.LoginRequest;
 import com.bosshi.maeul.user.request.RegisterRequest;
 import com.bosshi.maeul.user.service.AuthService;
@@ -17,13 +18,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<Boolean>> register(@RequestBody RegisterRequest request) {
         authService.register(request);
-        return ResponseEntity.ok().build();
+        return ApiResponse.success(true);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody LoginRequest request) {
+        return ApiResponse.success(authService.login(request));
     }
 }
