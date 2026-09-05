@@ -8,7 +8,7 @@ import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.type.FestivalCategory;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.modulith.NamedInterface;
@@ -37,7 +37,7 @@ public class FestivalService {
     /**
      * SearchFestivalRequest 조건에 맞춰 축제를 검색합니다.
      */
-    public List<Tour> search(SearchFestivalRequest request) {
+    public Page<Tour> search(SearchFestivalRequest request, Pageable pageable) {
         TourCategory category = null;
         if (request.getTourCategoryCode() != null) {
             category = tourCategoryRepository.findByCode(request.getTourCategoryCode())
@@ -89,13 +89,7 @@ public class FestivalService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        int page = request.getPageNo() != null ? request.getPageNo() - 1 : 0;
-        int size = request.getNumOfRows() != null ? request.getNumOfRows() : 10;
-        if (page < 0) page = 0;
-        if (size <= 0) size = 10;
-        Pageable pageable = PageRequest.of(page, size);
-
-        return festivalRepository.findAll(spec, pageable).getContent();
+        return festivalRepository.findAll(spec, pageable);
     }
 
     public Tour findByContentId(Long contentId) {

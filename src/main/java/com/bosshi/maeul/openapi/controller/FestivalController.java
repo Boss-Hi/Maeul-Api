@@ -8,6 +8,10 @@ import com.bosshi.maeul.openapi.service.FestivalService;
 import com.bosshi.maeul.openapi.service.TourCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +37,9 @@ public class FestivalController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Tour>>> index(@Valid SearchFestivalRequest request) {
-        return ApiResponse.success(festivalService.search(request));
+    public ResponseEntity<ApiResponse<Page<Tour>>> index(@Valid SearchFestivalRequest request, @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<Tour> tours = festivalService.search(request, pageable);
+        return ApiResponse.success(tours);
     }
 
     @GetMapping("/{contentId}")

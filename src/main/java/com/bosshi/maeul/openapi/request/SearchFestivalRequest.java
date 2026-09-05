@@ -1,6 +1,9 @@
 package com.bosshi.maeul.openapi.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.springframework.modulith.NamedInterface;
@@ -38,10 +41,4 @@ public class SearchFestivalRequest{
      */
     private String tourCategoryCode;
 
-    /** 한 페이지 결과 수 (기본: 10) */
-    @Builder.Default
-    private Integer numOfRows = 10;
-    /** 페이지 번호 (기본: 1) */
-    @Builder.Default
-    private Integer pageNo = 1;
 }
