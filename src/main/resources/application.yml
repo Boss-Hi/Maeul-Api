@@ -58,6 +58,14 @@ ai:
     batch-prompt: ${GEMINI_BATCH_PROMPT:Hello from Maeul batch.}
     batch-cron: "${GEMINI_BATCH_CRON:0 0/30 * * * *}"
 
+kakao:
+    rest-api:
+        key: ${KAKAO_REST_API_KEY:}
+        base-url: ${KAKAO_REST_API_BASE_URL:https://dapi.kakao.com}
+        callback-url: ${KAKAO_REST_API_CALLBACK_URL:https://dapi.kakao.com}
+        timeout-seconds: ${KAKAO_REST_API_TIMEOUT_SECONDS:5}
+        retry-count: ${KAKAO_REST_API_RETRY_COUNT:1}
+
 management:
   endpoints:
     web:

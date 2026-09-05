@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/admin/api/**").permitAll()
                         // 모니터링
                         .requestMatchers("/actuator/**").permitAll()
+                        // location
+                        .requestMatchers("/api/location").permitAll()
                         // 관광
                         .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
                         // 축제

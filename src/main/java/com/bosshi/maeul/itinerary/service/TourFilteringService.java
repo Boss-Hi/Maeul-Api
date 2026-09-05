@@ -1,7 +1,7 @@
 package com.bosshi.maeul.itinerary.service;
 
-import com.bosshi.maeul.common.utils.GeoUtils;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.location.service.GeoService;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.entity.TourCategory;
 import com.bosshi.maeul.openapi.repository.TourCategoryRepository;
@@ -74,7 +74,7 @@ public class TourFilteringService {
                     if (baseLat == null || baseLon == null || f.getMapY() == null || f.getMapX() == null) {
                         return true; // 좌표가 없으면 우선 포함
                     }
-                    Double dist = GeoUtils.calculateDistance(baseLat, baseLon, f.getMapY(), f.getMapX());
+                    Double dist = GeoService.calculateDistance(baseLat, baseLon, f.getMapY(), f.getMapX());
                     return dist <= finalMaxDistanceKm;
                 })
                 .limit(10)
