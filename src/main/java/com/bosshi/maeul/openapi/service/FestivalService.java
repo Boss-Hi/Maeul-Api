@@ -1,8 +1,11 @@
 package com.bosshi.maeul.openapi.service;
 
 import com.bosshi.maeul.openapi.entity.Tour;
+import com.bosshi.maeul.openapi.entity.TourCategory;
+import com.bosshi.maeul.openapi.repository.TourCategoryRepository;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
+import com.bosshi.maeul.openapi.type.FestivalCategory;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @NamedInterface
@@ -21,6 +25,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class FestivalService {
     private final TourRepository festivalRepository;
+    private final TourCategoryRepository tourCategoryRepository;
 
     /**
      * 모든 축제 목록을 조회합니다.
@@ -33,38 +38,44 @@ public class FestivalService {
      * SearchFestivalRequest 조건에 맞춰 축제를 검색합니다.
      */
     public List<Tour> search(SearchFestivalRequest request) {
+        TourCategory category = null;
+        if (request.getTourCategoryCode() != null) {
+            category = tourCategoryRepository.findByCode(request.getTourCategoryCode())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다."));
+
+            // FestivalCategory에 존재하는 코드인지 검증
+            final String code = category.getCode();
+            boolean isValid = Arrays.stream(FestivalCategory.values())
+                    .anyMatch(fc -> fc.getCode().equalsIgnoreCase(code));
+
+            if (!isValid) {
+                throw new IllegalArgumentException("올바른 카테고리가 아닙니다.");
+            }
+        }
+
+        final TourCategory finalCategory = category;
+
         Specification<Tour> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (request.getAreaCode() != null && !request.getAreaCode().isBlank()) {
-                predicates.add(cb.equal(root.get("areaCode"), request.getAreaCode()));
-            }
-            if (request.getSigunguCode() != null && !request.getSigunguCode().isBlank()) {
-                predicates.add(cb.equal(root.get("sigunguCode"), request.getSigunguCode()));
-            }
-            if (request.getCat1() != null && !request.getCat1().isBlank()) {
-                predicates.add(cb.equal(root.get("cat1"), request.getCat1()));
-            }
-            if (request.getCat2() != null && !request.getCat2().isBlank()) {
-                predicates.add(cb.equal(root.get("cat2"), request.getCat2()));
-            }
-            if (request.getCat3() != null && !request.getCat3().isBlank()) {
-                predicates.add(cb.equal(root.get("cat3"), request.getCat3()));
-            }
             if (request.getLDongRegnCd() != null && !request.getLDongRegnCd().isBlank()) {
                 predicates.add(cb.equal(root.get("lDongRegnCd"), request.getLDongRegnCd()));
             }
             if (request.getLDongSigunguCd() != null && !request.getLDongSigunguCd().isBlank()) {
                 predicates.add(cb.equal(root.get("lDongSignguCd"), request.getLDongSigunguCd()));
             }
-            if (request.getLclsSystm1() != null && !request.getLclsSystm1().isBlank()) {
-                predicates.add(cb.equal(root.get("lclsSystm1"), request.getLclsSystm1()));
-            }
-            if (request.getLclsSystm2() != null && !request.getLclsSystm2().isBlank()) {
-                predicates.add(cb.equal(root.get("lclsSystm2"), request.getLclsSystm2()));
-            }
-            if (request.getLclsSystm3() != null && !request.getLclsSystm3().isBlank()) {
-                predicates.add(cb.equal(root.get("lclsSystm3"), request.getLclsSystm3()));
+
+            // tourCategoryId 기반 검색 필터링 추가
+            if (finalCategory != null) {
+                String categoryCode = finalCategory.getCode();
+                Integer depth = finalCategory.getDepth();
+                if (depth == 1) {
+                    predicates.add(cb.equal(root.get("lclsSystm1"), categoryCode));
+                } else if (depth == 2) {
+                    predicates.add(cb.equal(root.get("lclsSystm2"), categoryCode));
+                } else if (depth == 3) {
+                    predicates.add(cb.equal(root.get("lclsSystm3"), categoryCode));
+                }
             }
 
             // Date range filtering

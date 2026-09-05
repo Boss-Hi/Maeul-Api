@@ -1,6 +1,6 @@
 package com.bosshi.maeul.openapi.validation;
 
-import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
+import com.bosshi.maeul.openapi.dto.AreaBasedSyncListDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
@@ -14,12 +14,12 @@ public class AreaBasedSyncListRequestValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return AreaBasedSyncListRequest.class.isAssignableFrom(clazz);
+        return AreaBasedSyncListDTO.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        AreaBasedSyncListRequest request = (AreaBasedSyncListRequest) target;
+        AreaBasedSyncListDTO request = (AreaBasedSyncListDTO) target;
 
         if (StringUtils.hasText(request.getLDongSignguCd()) && !StringUtils.hasText(request.getLDongRegnCd())) {
             errors.rejectValue("lDongRegnCd", "required", "lDongRegnCd is required when lDongSignguCd is provided.");

@@ -1,8 +1,8 @@
 package com.bosshi.maeul.openapi.seeder;
 
+import com.bosshi.maeul.openapi.dto.AreaBasedSyncListDTO;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
-import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -28,7 +28,7 @@ public class TourSeeder implements CommandLineRunner {
         }
 
         List<Tour> tours = openApiService.getAreaBasedSyncList(
-                        AreaBasedSyncListRequest.builder()
+                        AreaBasedSyncListDTO.builder()
                                 .numOfRows(1000)
                                 .lDongRegnCd("11")
                                 .build()

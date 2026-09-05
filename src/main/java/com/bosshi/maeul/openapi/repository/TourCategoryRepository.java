@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @NamedInterface
-public interface TourCategoryRepository extends JpaRepository<TourCategory, String> {
+public interface TourCategoryRepository extends JpaRepository<TourCategory, Long> {
     Optional<TourCategory> findByCode(String code);
     Optional<TourCategory> findByName(String name);
     Optional<TourCategory> findByContentTypeId(String contentTypeId);
     List<TourCategory> findAllByActive(Boolean active);
+
+    List<TourCategory> findByCodeIn(List<String> codes);
 }

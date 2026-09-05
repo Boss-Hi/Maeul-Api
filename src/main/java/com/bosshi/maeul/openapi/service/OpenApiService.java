@@ -1,9 +1,9 @@
 package com.bosshi.maeul.openapi.service;
 
 import com.bosshi.maeul.openapi.config.OpenApiProperties;
-import com.bosshi.maeul.openapi.request.AreaBasedSyncListRequest;
-import com.bosshi.maeul.openapi.request.AreaTarSvcDemListRequest;
-import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
+import com.bosshi.maeul.openapi.dto.AreaBasedSyncListDTO;
+import com.bosshi.maeul.openapi.dto.AreaTarSvcDemListDTO;
+import com.bosshi.maeul.openapi.dto.SearchFestivalDTO;
 import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
 import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
@@ -33,21 +33,21 @@ public class OpenApiService {
      * 행사정보조회 API를 호출하고 DTO로 변환해 반환한다.
      * 요청 객체에 들어 있는 필드들을 query param으로 바꿔 외부 API에 전달한다.
      */
-    public SearchFestivalResponse searchFestival(SearchFestivalRequest request) {
-        return call(TourApiEndpoint.SEARCH_FESTIVAL, request.toQueryParams(), SearchFestivalResponse.class);
+    public SearchFestivalResponse searchFestival(SearchFestivalDTO dto) {
+        return call(TourApiEndpoint.SEARCH_FESTIVAL, dto.toQueryParams(), SearchFestivalResponse.class);
     }
 
     /**
      * 지역기반 관광정보조회(areaBasedSyncList2) API를 호출한다.
      */
-    public SearchFestivalResponse getAreaBasedSyncList(AreaBasedSyncListRequest request) {
-        return call(TourApiEndpoint.AREA_BASED_SYNC_LIST, request.toQueryParams(), SearchFestivalResponse.class);
+    public SearchFestivalResponse getAreaBasedSyncList(AreaBasedSyncListDTO dto) {
+        return call(TourApiEndpoint.AREA_BASED_SYNC_LIST, dto.toQueryParams(), SearchFestivalResponse.class);
     }
 
     /**
      * 지역별 관광 서비스 수요 정보 목록 조회 API를 호출하고 DTO로 변환해 반환한다.
      */
-    public AreaTarSvcDemListResponse getAreaTarSvcDemList(AreaTarSvcDemListRequest request) {
+    public AreaTarSvcDemListResponse getAreaTarSvcDemList(AreaTarSvcDemListDTO request) {
         return call(TourApiEndpoint.AREA_TAR_SVC_DEM_LIST, request.toQueryParams(), AreaTarSvcDemListResponse.class);
     }
 

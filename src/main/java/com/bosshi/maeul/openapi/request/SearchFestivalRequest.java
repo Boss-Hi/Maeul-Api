@@ -1,9 +1,6 @@
 package com.bosshi.maeul.openapi.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.springframework.modulith.NamedInterface;
@@ -19,7 +16,7 @@ import org.springframework.modulith.NamedInterface;
 @AllArgsConstructor
 @SuperBuilder
 @Accessors(chain = true)
-public class SearchFestivalRequest extends OpenApiBaseRequest {
+public class SearchFestivalRequest{
     /**
      * 행사 시작일 (YYYYMMDD)
      */
@@ -29,26 +26,6 @@ public class SearchFestivalRequest extends OpenApiBaseRequest {
      */
     private String eventEndDate;
     /**
-     * 지역코드
-     */
-    private String areaCode;
-    /**
-     * 시군구코드
-     */
-    private String sigunguCode;
-    /**
-     * 대분류 코드
-     */
-    private String cat1;
-    /**
-     * 중분류 코드
-     */
-    private String cat2;
-    /**
-     * 소분류 코드
-     */
-    private String cat3;
-    /**
      * 법정동 시군구 코드
      */
     private String lDongRegnCd;
@@ -57,15 +34,14 @@ public class SearchFestivalRequest extends OpenApiBaseRequest {
      */
     private String lDongSigunguCd;
     /**
-     * 1단계 분류 체계
+     * 카테고리 Code
      */
-    private String lclsSystm1;
-    /**
-     * 2단계 분류 체계
-     */
-    private String lclsSystm2;
-    /**
-     * 3단계 분류 체계
-     */
-    private String lclsSystm3;
+    private String tourCategoryCode;
+
+    /** 한 페이지 결과 수 (기본: 10) */
+    @Builder.Default
+    private Integer numOfRows = 10;
+    /** 페이지 번호 (기본: 1) */
+    @Builder.Default
+    private Integer pageNo = 1;
 }

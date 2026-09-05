@@ -1,17 +1,15 @@
-package com.bosshi.maeul.openapi.request;
+package com.bosshi.maeul.openapi.dto;
 
+import com.bosshi.maeul.openapi.request.OpenApiBaseRequest;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 
 /**
  * 지역별 관광 서비스 수요 정보 목록 조회(areaTarSvcDemList) API 요청 파라미터 DTO.
  */
 @Getter
 @Setter
-public class AreaTarSvcDemListRequest extends OpenApiBaseRequest {
+public class AreaTarSvcDemListDTO extends OpenApiBaseRequest {
     /** 조회 기준 연월 (형식 : YYYYMM) */
     private String baseYm;
     /** 지역 코드 */
