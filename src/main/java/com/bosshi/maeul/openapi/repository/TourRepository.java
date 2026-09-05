@@ -7,4 +7,5 @@ import org.springframework.modulith.NamedInterface;
 
 @NamedInterface
 public interface TourRepository extends JpaRepository<Tour, String>, JpaSpecificationExecutor<Tour> {
+    Tour findByContentId(Long contentId);
 }

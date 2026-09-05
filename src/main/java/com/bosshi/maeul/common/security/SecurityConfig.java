@@ -41,7 +41,7 @@ public class SecurityConfig {
                         // 모니터링
                         .requestMatchers("/actuator/**").permitAll()
                         // 관광
-                        .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
+                        .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**", "/api/festivals").permitAll()
                         // 일정
                         .requestMatchers( "/api/open/**","/api/itinerary/**").permitAll()
                         // 설문

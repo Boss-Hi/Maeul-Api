@@ -86,4 +86,8 @@ public class FestivalService {
 
         return festivalRepository.findAll(spec, pageable).getContent();
     }
+
+    public Tour findByContentId(Long contentId) {
+        return festivalRepository.findByContentId(contentId);
+    }
 }

@@ -1,15 +1,17 @@
 package com.bosshi.maeul.itinerary.controller;
 
+import com.bosshi.maeul.common.response.ApiResponse;
+import com.bosshi.maeul.common.security.CustomUserDetails;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +28,12 @@ public class ItineraryController {
 
     private final ItineraryService tripRecommendationService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Itinerary>> show(@PathVariable Long id) {
+        Itinerary itinerary = tripRecommendationService.findById(id);
+        return ApiResponse.success(itinerary);
+    }
+
     /**
      * Step 3: MainFestival 선택 및 일정 생성
      * <p>
@@ -36,7 +44,9 @@ public class ItineraryController {
      * @return 생성 요청 결과
      */
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody ItineraryGenerateRequest request) {
+    public ResponseEntity<ApiResponse<Long>> generate(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody ItineraryGenerateRequest request) {
         ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
@@ -50,9 +60,9 @@ public class ItineraryController {
                 .build();
 
         // 일정 생성
-        tripRecommendationService.generateItinerary(dto);
+        Itinerary itinerary = tripRecommendationService.generateItinerary(dto);
 
-        return ResponseEntity.accepted().body("");
+        return ApiResponse.success("일정 생성 요청이 성공적으로 처리되었습니다.", itinerary.getId());
     }
 }
 

@@ -1,6 +1,7 @@
 package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,20 +34,13 @@ public class ItineraryService {
      *
      * @param dto MainFestival 선택 요청
      */
-    public void generateItinerary(ItineraryGenerateDTO dto) {
-        if (!dto.isValid()) {
-            throw new IllegalArgumentException("입력 값이 유효하지 않습니다");
-        }
-
-        dto.setTour(festivalRepository.findById(dto.getTourId())
-                .orElseThrow(() -> new IllegalArgumentException("Tour을 찾을 수 없습니다: " + dto.getTourId())));
-
-        // 관광지 필터링
-        dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
-
-        // AI 일정 생성
-        itineraryGenerationService.generateItinerary(dto);
+    public Itinerary generateItinerary(ItineraryGenerateDTO dto) {
+        return null;
     }
 
+    public Itinerary findById(Long id) {
+        return itineraryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Itinerary을 찾을 수 없습니다: " + id));
+    }
 }
 
