@@ -3,6 +3,7 @@ package com.bosshi.maeul.common.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,13 +34,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Auth
+                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         // KraftAdmin 로그인 및 API 경로를 Spring Security 검증에서 제외
                         .requestMatchers("/admin/**", "/admin/api/**").permitAll()
+                        // 모니터링
                         .requestMatchers("/actuator/**").permitAll()
+                        // 관광
                         .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
+                        // 일정
                         .requestMatchers( "/api/open/**","/api/itinerary/**").permitAll()
-                        .requestMatchers("/admin/**").permitAll()
+                        // 설문
+                        .requestMatchers(HttpMethod.GET, "/api/surveys/first").permitAll()
+                        // 루트 페이지, 에러
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
