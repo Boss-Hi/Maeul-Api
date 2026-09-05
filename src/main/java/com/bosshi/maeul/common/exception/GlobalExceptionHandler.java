@@ -3,6 +3,7 @@ package com.bosshi.maeul.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
@@ -13,6 +14,23 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    /**
+     * @Valid 유효성 검사 실패 예외 처리 (MethodArgumentNotValidException 포함)
+     */
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
+        String defaultMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.warn("Validation failed: {}", defaultMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ErrorResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error("Bad Request")
+                        .message(defaultMessage)
+                        .build()
+        );
+    }
 
     /**
      * IllegalArgumentException 처리
