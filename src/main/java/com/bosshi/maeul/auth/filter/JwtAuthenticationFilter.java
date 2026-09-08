@@ -1,7 +1,7 @@
-package com.bosshi.maeul.common.security;
+package com.bosshi.maeul.auth.filter;
 
-import com.bosshi.maeul.common.jwt.JwtTokenProvider;
-import com.bosshi.maeul.common.service.CustomUserDetailsService;
+import com.bosshi.maeul.auth.jwt.JwtTokenProvider;
+import com.bosshi.maeul.auth.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

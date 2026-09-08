@@ -2,15 +2,12 @@ package com.bosshi.maeul.post.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.post.type.PostCategory;
-import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

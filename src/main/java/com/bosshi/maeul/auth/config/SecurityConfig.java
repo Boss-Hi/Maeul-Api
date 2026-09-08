@@ -1,5 +1,6 @@
-package com.bosshi.maeul.common.security;
+package com.bosshi.maeul.auth.config;
 
+import com.bosshi.maeul.auth.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

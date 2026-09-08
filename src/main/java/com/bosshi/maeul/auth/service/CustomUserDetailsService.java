@@ -1,7 +1,7 @@
-package com.bosshi.maeul.common.service;
+package com.bosshi.maeul.auth.service;
 
-import com.bosshi.maeul.common.security.CustomUserDetails;
-import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.auth.CustomUserDetails;
+import com.bosshi.maeul.user.entity.User;
 import com.bosshi.maeul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;

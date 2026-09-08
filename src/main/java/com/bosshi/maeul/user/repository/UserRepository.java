@@ -1,6 +1,6 @@
 package com.bosshi.maeul.user.repository;
 
-import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.modulith.NamedInterface;
 

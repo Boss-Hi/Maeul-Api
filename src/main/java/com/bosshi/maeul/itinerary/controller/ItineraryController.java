@@ -1,7 +1,7 @@
 package com.bosshi.maeul.itinerary.controller;
 
+import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
-import com.bosshi.maeul.common.security.CustomUserDetails;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;

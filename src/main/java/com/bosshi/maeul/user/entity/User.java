@@ -1,4 +1,4 @@
-package com.bosshi.maeul.user.domain;
+package com.bosshi.maeul.user.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.user.type.UserRole;

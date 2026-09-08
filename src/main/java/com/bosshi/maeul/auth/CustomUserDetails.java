@@ -1,4 +1,4 @@
-package com.bosshi.maeul.common.security;
+package com.bosshi.maeul.auth;
 
 import lombok.Getter;
 import org.springframework.modulith.NamedInterface;

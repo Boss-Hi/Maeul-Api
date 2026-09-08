@@ -6,7 +6,7 @@ import com.bosshi.maeul.post.request.PostCreateRequest;
 import com.bosshi.maeul.post.request.PostUpdateRequest;
 import com.bosshi.maeul.post.response.PostResponse;
 import com.bosshi.maeul.post.type.PostCategory;
-import com.bosshi.maeul.user.domain.User;
+import com.bosshi.maeul.user.entity.User;
 import com.bosshi.maeul.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

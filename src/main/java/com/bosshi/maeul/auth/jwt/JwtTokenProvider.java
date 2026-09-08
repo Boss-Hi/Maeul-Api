@@ -1,4 +1,4 @@
-package com.bosshi.maeul.common.jwt;
+package com.bosshi.maeul.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

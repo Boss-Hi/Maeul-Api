@@ -1,4 +1,4 @@
-package com.bosshi.maeul.user.domain;
+package com.bosshi.maeul.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

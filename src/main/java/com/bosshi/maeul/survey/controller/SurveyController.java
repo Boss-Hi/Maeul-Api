@@ -1,7 +1,7 @@
 package com.bosshi.maeul.survey.controller;
 
+import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
-import com.bosshi.maeul.common.security.CustomUserDetails;
 import com.bosshi.maeul.survey.entity.Survey;
 import com.bosshi.maeul.survey.request.SurveySubmitRequest;
 import com.bosshi.maeul.survey.response.SurveyResponse;
