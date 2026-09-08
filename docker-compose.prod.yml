@@ -72,8 +72,6 @@ services:
       - "-url=jdbc:mysql://${FLYWAY_MYSQL_HOST:-mysql}:${MYSQL_INTERNAL_PORT:-3306}/${MYSQL_DATABASE:-maeul}?useSSL=${MYSQL_USE_SSL:-false}&allowPublicKeyRetrieval=${MYSQL_ALLOW_PUBLIC_KEY_RETRIEVAL:-true}"
       - "-user=${MYSQL_USER:-maeul}"
       - "-password=${MYSQL_PASSWORD:-maeul}"
-      - "-cleanDisabled=false"
-      - "clean"
       - "migrate"
     volumes:
       - ./src/main/resources/db/migration:/flyway/sql:ro
