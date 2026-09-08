@@ -1,6 +1,7 @@
 package com.bosshi.maeul.auth.config;
 
 import com.bosshi.maeul.auth.filter.JwtAuthenticationFilter;
+import com.bosshi.maeul.auth.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,7 +38,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/oauth2/**").permitAll()
                         // KraftAdmin 로그인 및 API 경로를 Spring Security 검증에서 제외
                         .requestMatchers("/admin/**", "/admin/api/**").permitAll()
                         // 모니터링
@@ -52,8 +54,13 @@ public class SecurityConfig {
                         // 설문
                         .requestMatchers(HttpMethod.GET, "/api/surveys/first").permitAll()
                         // 루트 페이지, 에러
-                        .requestMatchers("/", "/error").permitAll()
+                        .requestMatchers("/", "/error", "/index.html").permitAll()
                         .anyRequest().authenticated())
+                        // oauth2Login() 호출 필수
+                        .oauth2Login(oauth2 -> oauth2
+                                .defaultSuccessUrl("/", true)
+                                .successHandler(oAuth2SuccessHandler) // 커스텀 SuccessHandler 등록
+                        )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
