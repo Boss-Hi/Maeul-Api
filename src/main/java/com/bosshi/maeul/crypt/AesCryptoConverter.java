@@ -9,6 +9,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -22,10 +24,19 @@ public class AesCryptoConverter implements AttributeConverter<String, String> {
 
     private final SecretKeySpec keySpec;
 
-    public AesCryptoConverter(@Value("${app.security.db-encrypt-key}") String secretKey) {
+    public AesCryptoConverter(@Value("${app.encrypt.db-key}") String secretKey) {
         // 32바이트(256비트) 키 사용
-        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = generate256BitKey(secretKey);
         this.keySpec = new SecretKeySpec(keyBytes, "AES");
+    }
+
+    private byte[] generate256BitKey(String secretKey) {
+        try {
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            return sha256.digest(secretKey.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 알고리즘을 찾을 수 없습니다.", e);
+        }
     }
 
     // DB에 저장될 때 (암호화)

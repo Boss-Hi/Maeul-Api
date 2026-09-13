@@ -57,7 +57,9 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
+app:
+  encrypt:
+    db-key: ${APP_ENCRYPT_DB_KEY:default-encryption-key}
 server:
   port: ${SERVER_PORT:8080}
   oauth2:
