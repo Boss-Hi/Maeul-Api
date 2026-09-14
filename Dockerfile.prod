@@ -2,10 +2,14 @@ FROM eclipse-temurin:26-jdk
 
 WORKDIR /app
 
-# SCP로 전송되어 PROJECT_PATH에 위치한 JAR 파일 복사
-COPY *.jar app.jar
+# 1. 경로 문제 해결: deploy_2.yml의 구조(build/libs/)에 맞춰 JAR 파일 복사 경로 수정
+COPY build/libs/*.jar app.jar
+
+# 2. 운영 서버 시간대(Timezone) 설정 (한국 시간 적용을 위해 필수)
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 EXPOSE 8080
 
-# bootRun이 아닌 빌드된 JAR 직접 실행 (가장 빠르고 확실함)
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 3. 이전 단계에서 논의된 환경 변수(ALLOWED_ADMIN_HOST 등)와 운영 프로필 주입을 고려한 실행 명령어
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
