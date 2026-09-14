@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class AdminPathDomainCheckFilter extends OncePerRequestFilter {
 
@@ -33,6 +35,8 @@ public class AdminPathDomainCheckFilter extends OncePerRequestFilter {
             if (host != null && host.contains(":")) {
                 host = host.split(":")[0];
             }
+
+            log.info("Request URI: {}, Host: {}", requestURI, host);
 
             // Host가 admin.maeul.duckdns.org 가 아니면 403 차단
             if (host == null || !allowedAdminHost.equalsIgnoreCase(host)) {
