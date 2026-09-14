@@ -114,6 +114,7 @@ kraftadmin:
   base-path: /admin
   title: "KraftAdmin Dashboard"
   logo-url: "https://example.com/logo.png"
+  allowed-host: ${ALLOWED_ADMIN_HOST:}
 
   theme:
     primary-color: "#3b82f6"
