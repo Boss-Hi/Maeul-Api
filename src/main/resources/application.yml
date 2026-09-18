@@ -65,6 +65,8 @@ spring:
       redis:
         namespace: spring:session:maeul-admin
         flush-mode: on_save
+    jdbc:
+      initialize-schema: always # 애플리케이션 시작 시 세션 테이블 자동 생성
 app:
   encrypt:
     db-key: ${APP_ENCRYPT_DB_KEY:default-encryption-key}
