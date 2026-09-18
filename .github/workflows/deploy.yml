@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           # JAR 파일, docker-compose.prod.yml, Dockerfile 모두 전송
-          source: "build/libs/*.jar, docker-compose.prod.yml, Dockerfile"
+          source: "build/libs/*.jar, docker-compose.prod.yml, Dockerfile, src/main/resources/db/migration"
           target: ${{secrets.PROJECT_PATH}}/
           strip_components: 0 # 파일들이 프로젝트 루트 및 지정된 구조대로 들어가도록 유지하거나 상황에 맞게 조정
 
@@ -45,5 +45,8 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
+            # flyway 컨테이너를 강제로 재생성하여 새 SQL 스크립트를 실행하도록 강제
+            docker compose -f docker-compose.prod.yml up -d --force-recreate flyway
+            # 이후 앱 컨테이너 재빌드 및 재시작
             docker compose -f docker-compose.prod.yml up -d --build app
             docker image prune -f || true
