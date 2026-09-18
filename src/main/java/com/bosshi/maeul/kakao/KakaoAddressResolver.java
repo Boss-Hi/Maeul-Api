@@ -29,8 +29,8 @@ public class KakaoAddressResolver implements AddressResolver {
         // 3. 디테일한 응답 데이터 가공 및 예외 처리
         if (response == null || response.getDocuments() == null || response.getDocuments().isEmpty()) {
             return LocationDTO.builder()
-                    .region1depthName("알 수 없는 지역")
-                    .region2depthName("")
+                    .region1depth("알 수 없는 지역")
+                    .region2depth("")
                     .build();
         }
 
@@ -41,8 +41,8 @@ public class KakaoAddressResolver implements AddressResolver {
                 .orElse(response.getDocuments().get(0));
 
         return LocationDTO.builder()
-                .region1depthName(document.getRegion1depthName())
-                .region2depthName(document.getRegion2depthName())
+                .region1depth(document.getRegion1depthName())
+                .region2depth(document.getRegion2depthName())
                 .build();
     }
 }

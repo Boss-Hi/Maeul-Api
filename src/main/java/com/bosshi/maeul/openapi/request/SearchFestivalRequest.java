@@ -32,5 +32,5 @@ public class SearchFestivalRequest {
     /**
      * 위치 정보
      */
-    private LocationDTO location;
+    private LocationDTO location = new LocationDTO();
 }

@@ -57,8 +57,12 @@ public class FestivalService {
 
 
             if (request.getLocation() != null) {
-//                predicates.add(cb.equal(root.get("lDongRegnCd"), request.getLDongRegnCd()));
-//                predicates.add(cb.equal(root.get("lDongSignguCd"), request.getLDongSigunguCd()));
+                if(request.getLocation().getRegion1depth() != null) {
+                    predicates.add(cb.equal(root.get("lDongRegnCd"), request.getLocation().getRegion1depth()));
+                }
+                if(request.getLocation().getRegion2depth() != null) {
+                    predicates.add(cb.equal(root.get("lDongSignguCd"), request.getLocation().getRegion2depth()));
+                }
             }
 
             // tourCategoryId 기반 검색 필터링 추가
