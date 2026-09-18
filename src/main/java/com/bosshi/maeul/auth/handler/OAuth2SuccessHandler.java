@@ -22,7 +22,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     public OAuth2SuccessHandler(
             JwtTokenProvider jwtProvider,
-            @Value("${server.oauth2.redirect-url}") String redirectBaseUrl
+            @Value("${server.oauth2.redirect-url:http://localhost:8080/oauth/redirect}") String redirectBaseUrl
     ) {
         this.jwtProvider = jwtProvider;
         this.redirectBaseUrl = redirectBaseUrl;

@@ -25,6 +25,11 @@ spring:
       host: ${TEST_SPRING_DATA_REDIS_HOST:localhost}
       port: ${TEST_SPRING_DATA_REDIS_PORT:6379}
 
+server:
+  port: ${SERVER_PORT:8080}
+  oauth2:
+    redirect-url: ${SPRING_OAUTH_REDIRECT_URL:http://localhost:8080/oauth/redirect}
+
 app:
   encrypt:
     db-key: ${APP_ENCRYPT_DB_KEY:test-encryption-key-32bytes-len!}
