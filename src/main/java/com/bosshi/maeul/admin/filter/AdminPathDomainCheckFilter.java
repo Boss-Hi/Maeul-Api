@@ -16,7 +16,7 @@ import java.io.IOException;
 @Component
 public class AdminPathDomainCheckFilter extends OncePerRequestFilter {
 
-    @Value("${kraftadmin.allowed-host}")
+    @Value("${kraftadmin.allowed-host:}")
     private String allowedAdminHost;
 
     @Override
@@ -38,8 +38,8 @@ public class AdminPathDomainCheckFilter extends OncePerRequestFilter {
 
             log.info("Request URI: {}, Host: {}", requestURI, host);
 
-            // Host가 admin.maeul.duckdns.org 가 아니면 403 차단
-            if (host == null || !allowedAdminHost.equalsIgnoreCase(host)) {
+            // Host가 allowedAdminHost 가 아니면 403 차단 (설정된 경우에만 검사)
+            if (allowedAdminHost != null && !allowedAdminHost.isBlank() && !allowedAdminHost.equalsIgnoreCase(host)) {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Access Denied");

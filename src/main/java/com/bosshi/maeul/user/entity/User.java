@@ -28,8 +28,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
 
-    private java.time.LocalDateTime deletedAt;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile;
 }

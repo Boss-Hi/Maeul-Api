@@ -31,7 +31,7 @@ public class SurveyQuestionOption extends BaseEntity {
     @Column(name = "sub_label")
     private String subLabel;
 
-    @Column(nullable = false, length = 32)
+    @Column(name = "`value`", nullable = false, length = 32)
     private String value;
 
     @Column(name = "icon_url", length = 512)

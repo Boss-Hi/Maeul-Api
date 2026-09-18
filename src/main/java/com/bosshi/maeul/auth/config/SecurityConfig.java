@@ -5,6 +5,7 @@ import com.bosshi.maeul.auth.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -14,15 +15,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Optional;
+
 /**
- * Spring Security 필터 체인 설정.
- * - CSRF 비활성화 (JWT Stateless 방식)
- * - 세션 생성 안 함 (STATELESS)
- * - 루트 페이지, 인증 API, Open API 프록시 API는 인증 없이 허용, 나머지는 인증 필요
- * - JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
+ * 일반 사용자 및 공용 API 전용 Security 설정.
+ * - 우선순위: @Order(2)
+ * - JWT Stateless 인증 방식 및 OAuth2 소셜 로그인 연동
  */
 @Configuration
 @EnableWebSecurity
@@ -30,17 +32,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final Optional<ClientRegistrationRepository> clientRegistrationRepository;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(2)
+    public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Auth
+                        // Auth & OAuth2
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/oauth2/**").permitAll()
-                        // KraftAdmin 로그인 및 API 경로를 Spring Security 검증에서 제외
-                        .requestMatchers("/admin/**", "/admin/api/**").permitAll()
                         // 모니터링
                         .requestMatchers("/actuator/**").permitAll()
                         // location
@@ -50,18 +52,25 @@ public class SecurityConfig {
                         // 축제
                         .requestMatchers("/api/festivals/**").permitAll()
                         // 일정
-                        .requestMatchers( "/api/open/**","/api/itinerary/**").permitAll()
+                        .requestMatchers("/api/open/**", "/api/itinerary/**").permitAll()
                         // 설문
                         .requestMatchers(HttpMethod.GET, "/api/surveys/first").permitAll()
+                        // 관리자 전용 API
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 루트 페이지, 에러
                         .requestMatchers("/", "/error", "/index.html").permitAll()
-                        .anyRequest().authenticated())
-                        // oauth2Login() 호출 필수
-                        .oauth2Login(oauth2 -> oauth2
-                                .defaultSuccessUrl("/", true)
-                                .successHandler(oAuth2SuccessHandler) // 커스텀 SuccessHandler 등록
-                        )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().authenticated()
+                );
+
+        if (clientRegistrationRepository.isPresent()) {
+            http.oauth2Login(oauth2 -> oauth2
+                    .clientRegistrationRepository(clientRegistrationRepository.get())
+                    .defaultSuccessUrl("/", true)
+                    .successHandler(oAuth2SuccessHandler)
+            );
+        }
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

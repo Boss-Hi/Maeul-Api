@@ -8,14 +8,33 @@ spring:
     url: ${TEST_SPRING_DATASOURCE_URL:jdbc:h2:mem:maeul-test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
     username: ${TEST_SPRING_DATASOURCE_USERNAME:sa}
     password: ${TEST_SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: create-drop
+        format_sql: true
+    show-sql: false
+  flyway:
+    enabled: false
   data:
     redis:
       host: ${TEST_SPRING_DATA_REDIS_HOST:localhost}
       port: ${TEST_SPRING_DATA_REDIS_PORT:6379}
 
+app:
+  encrypt:
+    db-key: ${APP_ENCRYPT_DB_KEY:test-encryption-key-32bytes-len!}
+
 jwt:
   secret: ${JWT_SECRET_KEY:secret-key}
   expiration: ${JWT_EXPIRATION:3600000}
+
+kraftadmin:
+  allowed-host: ${KRAFTADMIN_ALLOWED_HOST:admin.maeul.duckdns.org}
 
 open-api:
   korea-tourism:
