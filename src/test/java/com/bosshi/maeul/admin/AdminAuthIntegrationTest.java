@@ -35,32 +35,36 @@ class AdminAuthIntegrationTest {
     @BeforeEach
     void setUp() {
         // 1. AdminUser 등록
-        AdminUser admin = new AdminUser();
-        admin.setEmail("admin@maeul.com");
-        admin.setPassword(passwordEncoder.encode("admin1234"));
-        adminUserRepository.save(admin);
+        if (!adminUserRepository.existsByEmail("admin@example.com")) {
+            AdminUser admin = new AdminUser();
+            admin.setEmail("admin@example.com");
+            admin.setPassword(passwordEncoder.encode("change-me"));
+            adminUserRepository.save(admin);
+        }
 
         // 2. 일반 User 등록
-        User user = new User();
-        user.setEmail("user@maeul.com");
-        user.setPassword(passwordEncoder.encode("user1234"));
-        userRepository.save(user);
+        if (!userRepository.existsByEmail("user@example.com")) {
+            User user = new User();
+            user.setEmail("user@example.com");
+            user.setPassword(passwordEncoder.encode("user1234"));
+            userRepository.save(user);
+        }
     }
 
     @Test
     @DisplayName("AdminUser 정보로 KraftAdmin 인증 성공")
     void adminUser_authentication_success() {
-        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("admin@maeul.com", "admin1234");
+        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("admin@example.com", "change-me");
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getUsername()).isEqualTo("admin@maeul.com");
+        assertThat(dto.getUsername()).isEqualTo("admin@example.com");
         assertThat(dto.getRoles()).contains("ROLE_ADMIN");
     }
 
     @Test
     @DisplayName("일반 User 정보로는 KraftAdmin 인증 실패")
     void regularUser_cannot_authenticate_as_admin() {
-        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("user@maeul.com", "user1234");
+        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("user@example.com", "user1234");
 
         assertThat(dto).isNull();
     }
@@ -68,7 +72,7 @@ class AdminAuthIntegrationTest {
     @Test
     @DisplayName("잘못된 비밀번호로 인증 시 실패")
     void adminUser_wrong_password_fails() {
-        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("admin@maeul.com", "wrongpassword");
+        AdminUserDTO dto = springSecurityAdapter.authenticateCredentials("admin@example.com", "wrongpassword");
 
         assertThat(dto).isNull();
     }

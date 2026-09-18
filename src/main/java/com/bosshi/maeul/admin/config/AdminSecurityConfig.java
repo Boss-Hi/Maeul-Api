@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,16 +13,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import security.SpringSecurityAdapter;
-
-import java.util.Collections;
 
 /**
  * Admin (KraftAdmin) 전용 Security 설정.
  * - 우선순위: @Order(1)
  * - /admin/** 및 /admin/api/** 경로 대상
  */
-@Configuration
+@Configuration("maeulAdminSecurityConfig")
 @RequiredArgsConstructor
 public class AdminSecurityConfig {
 
@@ -53,13 +48,5 @@ public class AdminSecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(adminUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
-    }
-
-    @Bean
-    public SpringSecurityAdapter springSecurityAdapter(
-            DaoAuthenticationProvider adminAuthenticationProvider
-    ) {
-        AuthenticationManager authManager = new ProviderManager(Collections.singletonList(adminAuthenticationProvider));
-        return new SpringSecurityAdapter(authManager);
     }
 }

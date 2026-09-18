@@ -39,7 +39,14 @@ jwt:
   expiration: ${JWT_EXPIRATION:3600000}
 
 kraftadmin:
+  enabled: true
+  base-path: /admin
   allowed-host: ${KRAFTADMIN_ALLOWED_HOST:admin.maeul.duckdns.org}
+  security:
+    session-expiry-minutes: 120
+    cookie-name: "KRAFTADMIN_SESSION"
+    required-roles:
+      - ROLE_ADMIN
 
 open-api:
   korea-tourism:
