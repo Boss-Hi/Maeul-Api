@@ -2,17 +2,19 @@ FROM eclipse-temurin:26-jdk
 
 WORKDIR /app
 
-# 1. JAR 파일들을 임시 디렉토리로 복사
-COPY build/libs/*.jar /app/temp/
+# 1. 현재 디렉토리(빌드 컨텍스트)에 있는 JAR 파일들을 임시 디렉토리로 복사
+COPY *.jar /app/temp/
 
 # 2. -plain.jar 파일을 삭제하고 남은 메인 JAR 파일을 app.jar로 이동 후 임시 디렉토리 삭제
 RUN rm -f /app/temp/*-plain.jar && \
     mv /app/temp/*.jar /app/app.jar && \
     rm -rf /app/temp
 
+# 3. 한국 시간대 적용
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 EXPOSE 8080
 
+# 4. prod 프로필로 Spring Boot 실행
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]

@@ -22,20 +22,31 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 2. 빌드된 JAR 파일 및 Docker 관련 설정 파일 서버로 전송
-      - name: Transfer JAR and Docker Config via SCP
+      # 2. 빌드된 JAR 파일 전송 (build/libs 디렉토리 구조 제거 후 루트로)
+      - name: Transfer JAR via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          # JAR 파일, docker-compose.prod.yml, Dockerfile 모두 전송
-          source: "build/libs/*.jar, docker-compose.prod.yml, Dockerfile.prod, src/main/resources/db/migration"
+          source: "build/libs/*.jar"
           target: ${{secrets.PROJECT_PATH}}/
-          strip_components: 0 # 파일들이 프로젝트 루트 및 지정된 구조대로 들어가도록 유지하거나 상황에 맞게 조정
+          strip_components: 2
 
-      # 3. 전송된 파일들을 기반으로 운영 서버에서 Docker 컨테이너 재시작
+      # 3. Docker 설정 파일 및 Flyway 마이그레이션 폴더 전송 (경로 구조 유지)
+      - name: Transfer Configs and Migration via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "docker-compose.prod.yml, Dockerfile.prod, src/main/resources/db/migration"
+          target: ${{secrets.PROJECT_PATH}}/
+          strip_components: 0
+
+      # 4. 운영 서버에서 Docker 컨테이너 재시작
       - name: Deploy Docker Container
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -45,5 +56,11 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{secrets.PROJECT_PATH}}
+            # 1) flyway 컨테이너를 강제로 재실행하여 마이그레이션 적용
+            # docker compose -f docker-compose.prod.yml up -d --force-recreate flyway
+            
+            # 2) app 컨테이너 재빌드 및 실행
             docker compose -f docker-compose.prod.yml up -d --build app
+            
+            # 3) 사용하지 않는 찌꺼기 이미지 정리
             docker image prune -f || true
