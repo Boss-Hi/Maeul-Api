@@ -57,6 +57,14 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+  # 1. 세션 저장소를 Redis로 지정
+  session:
+    store-type: redis
+    timeout: 30m
+    data:
+      redis:
+        namespace: spring:session:maeul-admin
+        flush-mode: on_save
 app:
   encrypt:
     db-key: ${APP_ENCRYPT_DB_KEY:default-encryption-key}
@@ -66,7 +74,7 @@ server:
     redirect-url: ${SPRING_OAUTH_REDIRECT_URL:http://localhost:8080/oauth/redirect}
 
 jwt:
-  secret: ${JWT_SECRET_KEY:secret-key}
+  secret: ${JWT_SECRET_KEY}
   expiration: 3600000
 
 open-api:
