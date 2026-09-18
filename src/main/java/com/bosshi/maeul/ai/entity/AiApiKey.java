@@ -1,5 +1,6 @@
 package com.bosshi.maeul.ai.entity;
 
+import com.bosshi.maeul.ai.listener.AiApiKeyEntityListener;
 import com.bosshi.maeul.ai.type.AiProviderType;
 import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.crypt.AesCryptoConverter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @NamedInterface
 @Entity
 @Table(name = "ai_api_keys")
+@EntityListeners(AiApiKeyEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,7 +34,6 @@ public class AiApiKey extends BaseEntity {
     @Column(name = "provider_type", nullable = false, length = 30)
     private AiProviderType providerType;
 
-    @Convert(converter = AesCryptoConverter.class)
     @Column(name = "api_key", nullable = false, unique = true, length = 255)
     private String apiKey;
 
@@ -42,4 +43,12 @@ public class AiApiKey extends BaseEntity {
 
     @Column(name = "last_used_at")
     private LocalDateTime lastUsedAt;
+
+    // Service 등 비즈니스 로직용 커스텀 복호화 메서드
+    public String getDecryptedApiKey(AesCryptoConverter cryptoConverter) {
+        if (this.apiKey == null) {
+            return null;
+        }
+        return cryptoConverter.convertToEntityAttribute(this.apiKey);
+    }
 }

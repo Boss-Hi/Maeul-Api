@@ -5,6 +5,7 @@ import com.bosshi.maeul.ai.entity.AiApiKey;
 import com.bosshi.maeul.ai.repository.GeminiApiKeyRepository;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
+import com.bosshi.maeul.crypt.AesCryptoConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.NamedInterface;
@@ -27,6 +28,7 @@ public class GeminiService {
     private final RestClient.Builder restClientBuilder;
     private final GeminiConfig config;
     private final GeminiApiKeyRepository geminiApiKeyRepository;
+    private final AesCryptoConverter cryptoConverter;
 
     public GeminiGenerateResponse generateText(String prompt) {
         if (!StringUtils.hasText(prompt)) {
@@ -70,7 +72,7 @@ public class GeminiService {
             key.setLastUsedAt(java.time.LocalDateTime.now());
             geminiApiKeyRepository.save(key);
             log.info("Gemini API key from database used: id={}", key.getId());
-            return key.getApiKey();
+            return key.getDecryptedApiKey(cryptoConverter);
         }
         log.info("Gemini API key from configuration used.");
         return config.getApiKey();
