@@ -2,14 +2,17 @@ FROM eclipse-temurin:26-jdk
 
 WORKDIR /app
 
-# 1. 경로 문제 해결: deploy_2.yml의 구조(build/libs/)에 맞춰 JAR 파일 복사 경로 수정
-COPY build/libs/*.jar app.jar
+# 1. JAR 파일들을 임시 디렉토리로 복사
+COPY build/libs/*.jar /app/temp/
 
-# 2. 운영 서버 시간대(Timezone) 설정 (한국 시간 적용을 위해 필수)
+# 2. -plain.jar 파일을 삭제하고 남은 메인 JAR 파일을 app.jar로 이동 후 임시 디렉토리 삭제
+RUN rm -f /app/temp/*-plain.jar && \
+    mv /app/temp/*.jar /app/app.jar && \
+    rm -rf /app/temp
+
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 EXPOSE 8080
 
-# 3. 이전 단계에서 논의된 환경 변수(ALLOWED_ADMIN_HOST 등)와 운영 프로필 주입을 고려한 실행 명령어
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
