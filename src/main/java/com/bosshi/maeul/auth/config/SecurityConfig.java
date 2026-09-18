@@ -6,9 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Optional;
@@ -28,6 +30,7 @@ import java.util.Optional;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -41,28 +44,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Auth & OAuth2
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/oauth2/**").permitAll()
-                        // 모니터링
-                        .requestMatchers("/actuator/**").permitAll()
-                        // location
-                        .requestMatchers("/api/location").permitAll()
-                        // region
-                        .requestMatchers("/api/regions").permitAll()
-                        // 관광
-                        .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
-                        // 축제
-                        .requestMatchers("/api/festivals/**").permitAll()
-                        // 일정
-                        .requestMatchers("/api/open/**", "/api/itinerary/**").permitAll()
-                        // 설문
-                        .requestMatchers(HttpMethod.GET, "/api/surveys/first").permitAll()
-                        // 관리자 전용 API
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // 루트 페이지, 에러
-                        .requestMatchers("/", "/error", "/index.html").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
+                )
+                // 인증 실패 시 리다이렉트하지 않고 401 Unauthorized 반환
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 );
+
 
         if (clientRegistrationRepository.isPresent()) {
             http.oauth2Login(oauth2 -> oauth2

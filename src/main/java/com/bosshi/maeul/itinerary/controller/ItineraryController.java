@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,7 @@ public class ItineraryController {
      * @return 생성 요청 결과
      */
     @PostMapping("/generate")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Long>> generate(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody ItineraryGenerateRequest request) {

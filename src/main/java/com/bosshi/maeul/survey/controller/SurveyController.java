@@ -9,6 +9,7 @@ import com.bosshi.maeul.survey.service.SurveyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,7 @@ public class SurveyController {
      * 설문 답변 제출
      */
     @PostMapping()
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Long>> submitSurvey(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody SurveySubmitRequest request
