@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         // location
                         .requestMatchers("/api/location").permitAll()
+                        // region
+                        .requestMatchers("/api/regions").permitAll()
                         // 관광
                         .requestMatchers("/api/tours/**", "/api/tour-category-types/**", "/api/tour-categories/**").permitAll()
                         // 축제
