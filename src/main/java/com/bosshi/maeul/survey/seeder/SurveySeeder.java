@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Order(3)
+@Order(1)
 public class SurveySeeder implements CommandLineRunner {
 
     private final SurveyRepository repository;
