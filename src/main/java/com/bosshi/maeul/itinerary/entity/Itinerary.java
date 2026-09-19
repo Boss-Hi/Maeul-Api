@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,9 @@ public class Itinerary extends BaseEntity {
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate endDate;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     /**
      * 주축제 (사용자가 선택한 중심 축제)
      */
@@ -62,5 +66,16 @@ public class Itinerary extends BaseEntity {
     /*@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "filter_settings_id")
     private FilterSettings filterSettings;*/
+
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ItineraryMissionMapping> itineraryMissionMappings = new ArrayList<>();
+
+    @Transient
+    public List<Mission> getMissions() {
+        return this.itineraryMissionMappings.stream()
+                .map(ItineraryMissionMapping::getMission)
+                .toList();
+    }
 }
 

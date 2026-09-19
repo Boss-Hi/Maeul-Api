@@ -32,7 +32,7 @@ public class Mission extends BaseEntity {
     // 직접 MissionTrigger 를 갖는 대신 중간 매핑 테이블을 참조합니다.[cite: 2]
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<MissionTriggerMapping> triggerMappings = new ArrayList<>();
+    private List<MissionTriggerMapping> missionTriggerMappings = new ArrayList<>();
 
     /**
      * 중간 매핑 테이블(MissionTriggerMapping)을 거쳐
@@ -40,7 +40,7 @@ public class Mission extends BaseEntity {
      */
     @Transient // DB 컬럼과 매핑되지 않는 임시/편의용 필드(메서드)임을 명시
     public List<MissionTrigger> getMissionTriggers() {
-        return this.triggerMappings.stream()
+        return this.missionTriggerMappings.stream()
                 .map(MissionTriggerMapping::getMissionTrigger)
                 .toList();
     }

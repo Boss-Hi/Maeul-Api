@@ -49,25 +49,15 @@ CREATE TABLE mission_verifications
     deleted_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. 일정 미션 (Itinerary Mission)
-CREATE TABLE mission_itineraries
-(
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    -- Itinerary 와의 관계 컬럼이 필요하다면 여기에 추가 (예: itinerary_id BIGINT)
-);
-
--- 6. 일정 미션 매핑 (Itinerary Mission Mapping - 중간 테이블)
+-- 5. 일정 미션 매핑 (Itinerary Mission Mapping - 중간 테이블)
 CREATE TABLE itinerary_mission_mappings
 (
-    id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    itinerary_mission_id BIGINT NOT NULL,
-    mission_id           BIGINT NOT NULL,
-    created_at           DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at           DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at           DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_itin_mission_map_itin_mission FOREIGN KEY (itinerary_mission_id) REFERENCES mission_itineraries (id) ON DELETE CASCADE,
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    itinerary_id BIGINT NOT NULL,
+    mission_id   BIGINT NOT NULL,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_itin_mission_map_itin_mission FOREIGN KEY (itinerary_id) REFERENCES itineraries (id) ON DELETE CASCADE,
     CONSTRAINT fk_itin_mission_map_mission FOREIGN KEY (mission_id) REFERENCES missions (id) ON DELETE CASCADE
 );

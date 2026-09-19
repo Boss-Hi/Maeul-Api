@@ -19,6 +19,9 @@ public class ItineraryGenerateDTO {
     @JsonProperty("tour")
     private Tour tour;
 
+    @JsonProperty("user_id")
+    private Long userId;
+
     @JsonProperty("recommendableTours")
     private List<Tour> recommendableTours;
 

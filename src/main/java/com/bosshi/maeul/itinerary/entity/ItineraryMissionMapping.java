@@ -18,8 +18,8 @@ public class ItineraryMissionMapping extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itinerary_mission_id", nullable = false)
-    private ItineraryMission itineraryMission;
+    @JoinColumn(name = "itinerary_id", nullable = false)
+    private Itinerary itinerary;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id", nullable = false)

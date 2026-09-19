@@ -105,10 +105,12 @@ CREATE TABLE itineraries
     `start_date` DATETIME(6) NOT NULL,
     `end_date`   DATETIME(6) NOT NULL,
     `tour_id`    VARCHAR(20) NULL,
+    `user_id`    BIGINT NOT NULL,
     `created_at` DATETIME(6),
     `updated_at` DATETIME(6),
     `deleted_at` DATETIME(6),
     CONSTRAINT fk_itineraries_tour FOREIGN KEY (tour_id) REFERENCES tours (content_id) ON DELETE SET NULL,
+    CONSTRAINT fk_itineraries_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

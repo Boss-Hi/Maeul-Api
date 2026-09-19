@@ -6,7 +6,9 @@ import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
 import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.openapi.entity.Tour;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -28,7 +30,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ItineraryGenerator {
+public class ItineraryGenerator implements ItineraryGeneratorImpl {
     private final EntityManager entityManager;
     private final GeminiService geminiService;
 
@@ -37,11 +39,11 @@ public class ItineraryGenerator {
      *
      * @return 생성된 Itinerary 객체
      */
-    public Itinerary generateItinerary(ItineraryGenerateDTO dto) {
+    public Itinerary generateItinerary(ItineraryGenerateDTO dto) throws JsonProcessingException {
         // Gemini API 프롬프트 구성
         String prompt = buildItineraryPrompt(dto);
 
-        if(dto.getRecommendableTours() == null || dto.getRecommendableTours().isEmpty()) {
+        if (dto.getRecommendableTours() == null || dto.getRecommendableTours().isEmpty()) {
             throw new IllegalStateException("추천 가능한 관광지 목록이 비어있습니다.");
         }
 
@@ -132,54 +134,50 @@ public class ItineraryGenerator {
     /**
      * Gemini 응답을 Itinerary 객체로 파싱합니다.
      */
-    private Itinerary parseItineraryFromResponse(String json, ItineraryGenerateDTO dto) {
-        log.info("응답 파싱 시작");
+    private Itinerary parseItineraryFromResponse(String json, ItineraryGenerateDTO dto) throws JsonProcessingException {
         String cleanedJson = cleanMarkdownJson(json);
         ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
-            List<ItineraryDayJson> daysJson = objectMapper.readValue(
-                    cleanedJson, new TypeReference<>() {
-                    }
-            );
+        List<ItineraryDayJson> daysJson = objectMapper.readValue(
+                cleanedJson, new TypeReference<>() {
+                }
+        );
 
-            Itinerary itinerary = Itinerary.builder()
-                    .startDate(dto.getStartDate())
-                    .endDate(dto.getEndDate())
-                    .tour(dto.getTour())
+        Itinerary itinerary = Itinerary.builder()
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .tour(dto.getTour())
+                .userId(dto.getUserId())
+                .build();
+
+        List<ItineraryDay> itineraryDays = new ArrayList<>();
+        for (ItineraryDayJson dayJson : daysJson) {
+            ItineraryDay day = ItineraryDay.builder()
+                    .itinerary(itinerary)
+                    .date(LocalDate.parse(dayJson.date()))
+                    .dayNumber(dayJson.dayNumber())
+                    .itineraryTours(new ArrayList<>())
                     .build();
 
-            List<ItineraryDay> itineraryDays = new ArrayList<>();
-            for (ItineraryDayJson dayJson : daysJson) {
-                ItineraryDay day = ItineraryDay.builder()
-                        .itinerary(itinerary)
-                        .date(LocalDate.parse(dayJson.date()))
-                        .dayNumber(dayJson.dayNumber())
-                        .itineraryTours(new ArrayList<>())
-                        .build();
+            if (dayJson.items() != null) {
+                for (ItineraryTourJson tourJson : dayJson.items()) {
+                    // DB 조회를 하지 않고 프록시(참조) 객체만 생성
+                    Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
 
-                if (dayJson.items() != null) {
-                    for (ItineraryTourJson tourJson : dayJson.items()) {
-                        // DB 조회를 하지 않고 프록시(참조) 객체만 생성
-                        Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
-
-                        ItineraryTour itineraryTour = ItineraryTour.builder()
-                                .itineraryDay(day)
-                                .tour(tourProxy)
-                                .sequence(tourJson.sequence())
-                                .build();
-                        day.getItineraryTours().add(itineraryTour);
-                    }
+                    ItineraryTour itineraryTour = ItineraryTour.builder()
+                            .itineraryDay(day)
+                            .tour(tourProxy)
+                            .sequence(tourJson.sequence())
+                            .build();
+                    day.getItineraryTours().add(itineraryTour);
                 }
-                itineraryDays.add(day);
             }
-
-            itinerary.setItineraryDays(itineraryDays);
-
-            return itinerary;
-        } catch (Exception e) {
-            throw new RuntimeException("응답 파싱 실패: " + e.getMessage(), e);
+            itineraryDays.add(day);
         }
+
+        itinerary.setItineraryDays(itineraryDays);
+
+        return itinerary;
     }
 
     private String cleanMarkdownJson(String raw) {
@@ -194,65 +192,6 @@ public class ItineraryGenerator {
             raw = raw.substring(0, raw.length() - 3);
         }
         return raw.trim();
-    }
-
-    private String getTestResult() {
-        return "[ {\n" +
-                "    \"date\" : \"2026-09-01\",\n" +
-                "    \"dayNumber\" : 1,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"130699\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"142728\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1255726\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    } ]\n" +
-                "  }, {\n" +
-                "    \"date\" : \"2026-09-02\",\n" +
-                "    \"dayNumber\" : 2,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"130231\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"130353\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"130346\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"129724\",\n" +
-                "      \"sequence\" : 4\n" +
-                "    } ]\n" +
-                "  }, {\n" +
-                "    \"date\" : \"2026-09-03\",\n" +
-                "    \"dayNumber\" : 3,\n" +
-                "    \"items\" : [ {\n" +
-                "      \"contentId\" : \"142733\",\n" +
-                "      \"sequence\" : 1\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1019327\",\n" +
-                "      \"sequence\" : 2\n" +
-                "    }, {\n" +
-                "      \"contentId\" : \"1105871\",\n" +
-                "      \"sequence\" : 3\n" +
-                "    } ]\n" +
-                "  } ]";
-    }
-
-    private record ItineraryDayJson(
-            String date,
-            Integer dayNumber,
-            List<ItineraryTourJson> items
-    ) {
-    }
-
-    private record ItineraryTourJson(
-            String contentId,
-            Integer sequence
-    ) {
     }
 
 }

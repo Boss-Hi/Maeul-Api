@@ -18,12 +18,12 @@ public class MissionTriggerMapping extends BaseEntity {
     private Long id;
 
     // Mission 과의 N:1 관계
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
 
     // MissionTrigger 와의 N:1 관계
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_trigger_id", nullable = false)
     private MissionTrigger missionTrigger;
 

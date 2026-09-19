@@ -43,7 +43,7 @@ public class MissionSeeder implements CommandLineRunner {
         // 실제 CSV 데이터의 내용을 탭(Tab) 또는 지정된 구분자로 복사/붙여넣기 하시면 됩니다.
         String rawCsvData = """
                 미션ID	미션명	트리거코드목록	상세설명
-                ONB-01	여행의 서막	ONB	앱 설치 후 최초로 아무 관광지든 반경 100m 진입 즉시(테마 무관, 전체 통틀어 최초 1건만 인정). 첫 여행 시 자동 매칭.
+                FIRST	여행의 서막	FIRST	앱 설치 후 최초로 아무 관광지든 반경 100m 진입 즉시(테마 무관, 전체 통틀어 최초 1건만 인정). 첫 여행 시 자동 매칭.
                 AC-01	오늘 밤은 여기서! 체크인	AC01,AC02,AC03,AC04,AC06	숙박시설 POI 반경 100m 진입 즉시. 체크인/체크아웃 시각 별도 확인 없음.
                 AC-02	텐트 치고 별 보기	AC05	캠핑장 POI 반경 200m 진입 즉시. 캠핑장은 부지가 넓어 반경을 100m보다 크게(200m) 설정.
                 EV-01	축제 한복판 뛰어들기	EV01	축제장 POI 반경 150m 진입 즉시. 축제장은 부지가 넓은 편이라 반경 150m 이내 진입 시점에 자동 인증.
@@ -104,7 +104,7 @@ public class MissionSeeder implements CommandLineRunner {
                         MissionTrigger trigger = triggerMap.get(cleanCode);
 
                         if (trigger != null) {
-                            mission.getTriggerMappings().add(MissionTriggerMapping.builder()
+                            mission.getMissionTriggerMappings().add(MissionTriggerMapping.builder()
                                     .mission(mission)
                                     .missionTrigger(trigger)
                                     .build());

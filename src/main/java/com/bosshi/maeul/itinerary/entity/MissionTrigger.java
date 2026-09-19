@@ -5,6 +5,8 @@ import com.bosshi.maeul.itinerary.type.MissionTriggerType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "mission_triggers")
 @Getter
@@ -31,5 +33,7 @@ public class MissionTrigger extends BaseEntity {
     @Column(nullable = false, length = 2048)
     private String description;
 
+    @OneToMany(mappedBy = "missionTrigger", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MissionTriggerMapping> missionTriggerMappings;
 }
 

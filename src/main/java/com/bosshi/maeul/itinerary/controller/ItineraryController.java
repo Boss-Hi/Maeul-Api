@@ -6,7 +6,9 @@ import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
+import com.bosshi.maeul.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +29,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ItineraryController {
-    private final ItineraryService tripRecommendationService;
+    private final ItineraryService itineraryService;
+    private final ItineraryMissionService itineraryMissionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ItineraryResponse>> show(@PathVariable Long id) {
-        Itinerary itinerary = tripRecommendationService.findById(id);
+        Itinerary itinerary = itineraryService.findById(id);
         return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 
@@ -48,11 +51,13 @@ public class ItineraryController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Long>> generate(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody ItineraryGenerateRequest request) {
+            @Valid @RequestBody ItineraryGenerateRequest request
+    ) throws JsonProcessingException {
         ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .tourId(request.getTourId())
+                .userId(userDetails.getId())
                 .selectedCategories(List.of("VE06", "EV02", "AC01"))
                 .filterSettings(new ItineraryGenerateDTO.FilterSettingsRequest(
                         5,
@@ -62,7 +67,9 @@ public class ItineraryController {
                 .build();
 
         // 일정 생성
-        Itinerary itinerary = tripRecommendationService.generateItinerary(dto);
+        Itinerary itinerary = itineraryService.generateItinerary(dto);
+
+        itineraryMissionService.generateMissionsForItinerary(itinerary);
 
         return ApiResponse.success("일정 생성 요청이 성공적으로 처리되었습니다.", itinerary.getId());
     }

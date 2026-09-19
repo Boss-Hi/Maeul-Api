@@ -29,7 +29,7 @@ public class TourSeeder implements CommandLineRunner {
 
         List<Tour> tours = openApiService.getAreaBasedSyncList(
                         AreaBasedSyncListDTO.builder()
-                                .numOfRows(5000)
+                                .numOfRows(10000)
                                 .build()
                 )
                 .getResponse()

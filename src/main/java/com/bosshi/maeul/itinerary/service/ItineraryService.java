@@ -3,12 +3,13 @@ package com.bosshi.maeul.itinerary.service;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.filter.TourFilteringService;
-import com.bosshi.maeul.itinerary.generator.ItineraryGenerator;
+import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,23 +23,34 @@ import org.springframework.transaction.annotation.Transactional;
  * 4. AI 일정 생성
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class ItineraryService {
     private final TourRepository tourRepository;
     private final TourFilteringService tourFilteringService;
     private final ItineraryRepository itineraryRepository;
-    private final ItineraryGenerator itineraryGenerator;
+    private final ItineraryGeneratorImpl itineraryGenerator;
 
+    // @RequiredArgsConstructor 대신 직접 생성자를 작성하고 파라미터에 @Qualifier 적용
+    public ItineraryService(
+            TourRepository tourRepository,
+            TourFilteringService tourFilteringService,
+            ItineraryRepository itineraryRepository,
+            @Qualifier("itineraryTestGenerator") ItineraryGeneratorImpl itineraryGenerator) {
+
+        this.tourRepository = tourRepository;
+        this.tourFilteringService = tourFilteringService;
+        this.itineraryRepository = itineraryRepository;
+        this.itineraryGenerator = itineraryGenerator;
+    }
     /**
      * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
      *
      * @param dto MainFestival 선택 요청
      */
-    public Itinerary generateItinerary(ItineraryGenerateDTO dto) {
+    public Itinerary generateItinerary(ItineraryGenerateDTO dto) throws JsonProcessingException {
         Tour tour = tourRepository.findByContentId(dto.getTourId())
-                .orElseThrow(() -> new IllegalArgumentException("Tour를 찾을 수 없습니다: " + dto.getTourId()));
+                .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + dto.getTourId()));
         dto.setTour(tour);
         dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
 
@@ -53,7 +65,7 @@ public class ItineraryService {
 
     public Itinerary findById(Long id) {
         return itineraryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Itinerary을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + id));
     }
 }
 
