@@ -29,11 +29,11 @@ public class ItineraryMissionTaskVerificationMapping extends BaseEntity {
     @Builder.Default
     private MissionVerificationType type = MissionVerificationType.GPS;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "itinerary_mission_task_mapping_id", nullable = false)
     private ItineraryMissionTaskMapping itineraryMissionTaskMapping;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_task_verification_id", nullable = false)
     private MissionTaskVerification missionTaskVerification;
 }

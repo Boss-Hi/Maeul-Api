@@ -4,6 +4,8 @@ import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "itinerary_mission_task_mappings")
 @Getter
@@ -33,5 +35,8 @@ public class ItineraryMissionTaskMapping extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_task_id", nullable = false)
     private MissionTask missionTask;
+
+    @OneToMany(mappedBy = "itineraryMissionTaskMapping", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ItineraryMissionTaskVerificationMapping> itineraryMissionTaskVerificationMappings;
 }
 

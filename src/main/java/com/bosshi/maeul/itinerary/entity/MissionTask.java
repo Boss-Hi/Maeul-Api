@@ -26,7 +26,7 @@ public class MissionTask extends BaseEntity {
     @Column(nullable = false, length = 2048)
     private String description;
 
-    @OneToMany(mappedBy = "missionTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "missionTask", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<MissionTaskVerificationMapping> missionTaskVerificationMappings = new ArrayList<>();
 

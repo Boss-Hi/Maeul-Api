@@ -24,7 +24,7 @@ public class TourSyncService {
      * Open API를 호출하여 최신 데이터를 가져온 뒤, DB의 Tour 값과 다르면 업데이트합니다.
      */
     @Transactional
-    public Tour syncTourData(Tour tour) {
+    public Tour syncDetailCommon(Tour tour) {
         if (tour == null || tour.getContentId() == null) {
             return tour;
         }
@@ -32,16 +32,32 @@ public class TourSyncService {
         DetailCommonResponse detailCommonResponse = openApiService.getDetailCommon2(
                 DetailCommon2DTO.builder().contentId(tour.getContentId()).build()
         );
-        DetailIntroResponse detailIntroResponse = openApiService.getDetailIntro2(
-                DetailIntro2DTO.builder().contentId(tour.getContentId()).build()
-        );
 
         // API 응답 데이터 추출 (Null Safe)
         DetailCommonResponse.Item commonItem = extractCommonItem(detailCommonResponse);
+
+        // 값이 변경된 항목이 있다면 DB에 저장
+        if (updateTourIfChanged(tour, commonItem, null)) {
+            tourRepository.save(tour);
+        }
+        return tour;
+    }
+
+    @Transactional
+    public Tour syncDetailIntro(Tour tour) {
+        if (tour == null || tour.getContentId() == null) {
+            return tour;
+        }
+
+        DetailIntroResponse detailIntroResponse = openApiService.getDetailIntro2(
+                DetailIntro2DTO.builder().contentId(tour.getContentId()).contentTypeId(tour.getContentTypeId()).build()
+        );
+
+        // API 응답 데이터 추출 (Null Safe)
         DetailIntroResponse.Item introItem = extractIntroItem(detailIntroResponse);
 
         // 값이 변경된 항목이 있다면 DB에 저장
-        if (updateTourIfChanged(tour, commonItem, introItem)) {
+        if (updateTourIfChanged(tour, null, introItem)) {
             tourRepository.save(tour);
             log.info("Tour 데이터가 업데이트되었습니다. [ContentId: {}]", tour.getContentId());
         }

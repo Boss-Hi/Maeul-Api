@@ -20,7 +20,7 @@ public class ItineraryMissionService {
 
     private final MissionTriggerRepository missionTriggerRepository;
     private final ItineraryRepository itineraryRepository;
-    private final int MAX_MISSIONS = 3;
+    private final int MAX_MISSIONS = 1;
 
     /**
      * 일정이 생성되었을 때, 일정 내의 관광지(Tour) 카테고리를 분석하여
@@ -70,25 +70,13 @@ public class ItineraryMissionService {
         }
 
         // 3. 찾은 트리거를 기반으로 연관된 Mission 추출 (중복 제거)
-        // MissionTrigger가 속한 MissionTriggerMapping을 통해 원본 Mission 객체들을 가져옵니다.
         Set<Mission> targetMissions = new HashSet<>();
 
-        // (주의: 이 로직이 정상 작동하려면 MissionTrigger 엔티티에 MissionTriggerMapping 역방향 참조가 있거나,
-        // 별도의 쿼리로 Trigger를 가진 Mission들을 조회해야 합니다.
-        // 만약 MissionTriggerRepository 에서 바로 Mission을 조회하는 커스텀 쿼리를 만드셨다면 그걸 쓰는 것이 가장 좋습니다.
-        // 여기서는 예시로 DB 조회 편의상 MissionRepository (또는 MappingRepository) 쿼리를 호출한다고 가정합니다.)
-
-        // 아래는 이미 연관관계 매핑이 되어있다고 가정했을 때의 논리적 흐름입니다.
         for (MissionTrigger trigger : matchedTriggers) {
             trigger.getMissionTriggerMappings().forEach(mapping -> targetMissions.add(mapping.getMission()));
         }
 
-        // 만약 위 역방향 참조(mappedBy)를 만들지 않았다면, 서비스 단에서 아래처럼 수동으로 세팅할 타겟 미션들을 선별합니다.
-        // ※ 실제 구현 시에는 "List<Mission> findMissionsByTriggerIds(List<Long> triggerIds)" 같은 JPQL을 리포지토리에 추가하는 것을 권장합니다.
-
         // 4. Itinerary 엔티티에 미션 매핑 추가
-        // Itinerary가 직접 ItineraryMissionMapping 리스트를 관리하므로,
-        // 찾아낸 Mission 객체들을 매핑 엔티티로 포장하여 리스트에 더해줍니다.
         if (itinerary.getItineraryMissionMappings() == null) {
             itinerary.setItineraryMissionMappings(new ArrayList<>());
         }
@@ -105,18 +93,53 @@ public class ItineraryMissionService {
                     .anyMatch(mapping -> mapping.getMission().getId().equals(mission.getId()));
 
             if (!alreadyExists) {
+                // 4-1. 루트 미션 매핑 엔티티 생성
                 ItineraryMissionMapping newMapping = ItineraryMissionMapping.builder()
                         .itinerary(itinerary)
                         .mission(mission)
+                        .name(mission.getName())
+                        .description(mission.getDescription())
+                        // 하위 컬렉션 NPE 방지용 빈 리스트 초기화 (엔티티에 @Builder.Default 가 없을 경우를 대비)
+                        .itineraryMissionTaskMappings(new ArrayList<>())
                         .build();
-                itinerary.getItineraryMissionMappings().add(newMapping);
 
-                // 정상적으로 매핑되었을 때 카운트 증가
+                // 4-2. 미션의 하위 Task들을 순회하며 Task 매핑 엔티티 생성[cite: 15]
+                if (mission.getMissionTasks() != null) {
+                    for (MissionTask task : mission.getMissionTasks()) {
+                        ItineraryMissionTaskMapping taskMapping = ItineraryMissionTaskMapping.builder()
+                                .name(task.getName())
+                                .description(task.getDescription())
+                                .isComplete(false) // 기본 완료 상태 false 할당[cite: 15]
+                                .itineraryMissionMapping(newMapping)
+                                .missionTask(task)
+                                .itineraryMissionTaskVerificationMappings(new ArrayList<>())
+                                .build();
+
+                        // 4-3. Task의 하위 Verification들을 순회하며 Verification 매핑 엔티티 생성[cite: 16]
+                        if (task.getMissionTaskVerifications() != null) {
+                            for (MissionTaskVerification verification : task.getMissionTaskVerifications()) {
+                                ItineraryMissionTaskVerificationMapping verificationMapping = ItineraryMissionTaskVerificationMapping.builder()
+                                        .name(verification.getName())
+                                        .description(verification.getDescription())
+                                        .type(verification.getType())
+                                        .itineraryMissionTaskMapping(taskMapping)
+                                        .missionTaskVerification(verification)
+                                        .build();
+
+                                taskMapping.getItineraryMissionTaskVerificationMappings().add(verificationMapping);
+                            }
+                        }
+
+                        newMapping.getItineraryMissionTaskMappings().add(taskMapping);
+                    }
+                }
+
+                itinerary.getItineraryMissionMappings().add(newMapping);
                 currentMissionCount++;
             }
         }
 
-        // 5. 변경된 Itinerary 저장 (Cascade 설정에 의해 Mapping 엔티티도 자동 저장됨)[cite: 23]
+        // 5. 변경된 Itinerary 저장 (Cascade 설정에 의해 하위 Task 및 Verification 매핑도 자동 저장됨)
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
 
         log.info(

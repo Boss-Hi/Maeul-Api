@@ -38,7 +38,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
      */
     public String getTestResultFromDB(LocalDate startDate, LocalDate endDate) {
         // 2. DB에서 랜덤으로 10개의 Tour 데이터 일괄 조회
-        List<Tour> tours = tourRepository.findRandomTours(10);
+        List<Tour> tours = tourRepository.findRandomToursWhereContentTypeIdIs("15", 10);
 
         if (tours.isEmpty()) {
             return "[]";

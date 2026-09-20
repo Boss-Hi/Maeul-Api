@@ -15,6 +15,6 @@ public interface TourRepository extends JpaRepository<Tour, String>, JpaSpecific
     Optional<Tour> findByContentId(String contentId);
 
     // 랜덤으로 limit 개수만큼의 Tour 데이터를 조회
-    @Query(value = "SELECT * FROM tours ORDER BY RAND() LIMIT :limit", nativeQuery = true)
-    List<Tour> findRandomTours(@Param("limit") int limit);
+    @Query(value = "SELECT * FROM tours WHERE content_type_id = :contentTypeId ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Tour> findRandomToursWhereContentTypeIdIs(@Param("contentTypeId") String contentTypeId, @Param("limit") int limit);
 }

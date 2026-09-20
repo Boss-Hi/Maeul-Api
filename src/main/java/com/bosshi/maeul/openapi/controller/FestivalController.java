@@ -6,8 +6,10 @@ import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.response.FestivalCategoryResponse;
 import com.bosshi.maeul.openapi.service.FestivalService;
 import com.bosshi.maeul.openapi.service.TourCategoryService;
+import com.bosshi.maeul.openapi.service.TourSyncService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/festivals")
 @RequiredArgsConstructor
 public class FestivalController {
     private final FestivalService festivalService;
     private final TourCategoryService tourCategoryService;
+    private final TourSyncService tourSyncService;
 
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<FestivalCategoryResponse>>> categories() {
@@ -44,6 +48,19 @@ public class FestivalController {
 
     @GetMapping("/{contentId}")
     public ResponseEntity<ApiResponse<Tour>> show(@PathVariable String contentId) {
-        return ApiResponse.success(festivalService.findByContentId(contentId));
+        Tour tour = festivalService.findByContentId(contentId);
+
+        try {
+            tour = tourSyncService.syncDetailCommon(tour);
+        } catch (Exception e) {
+            log.error("Failed to sync tour data for contentId {}: {}", contentId, e.getMessage());
+        }
+
+        try {
+            tour = tourSyncService.syncDetailIntro(tour);
+        } catch (Exception e) {
+            log.error("Failed to sync tour data for contentId {}: {}", contentId, e.getMessage());
+        }
+        return ApiResponse.success(tour);
     }
 }
