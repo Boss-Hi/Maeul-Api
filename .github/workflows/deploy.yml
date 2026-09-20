@@ -43,6 +43,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            set -e # 추가: 오류 발생 시 즉시 중단 및 실패 반환
+            
             cd ${{secrets.PROJECT_PATH}}
             
             # 서버 소스코드 최신화 (master 브랜치 기준)
@@ -50,7 +52,7 @@ jobs:
             git pull origin master
             
             # 1) flyway 컨테이너를 강제로 재실행하여 마이그레이션 적용
-            # docker compose -f docker-compose.prod.yml up -d --force-recreate flyway
+            docker compose -f docker-compose.prod.yml up -d --force-recreate flyway
             
             # 2) app 컨테이너 재빌드 및 실행
             docker compose -f docker-compose.prod.yml up -d --build app
