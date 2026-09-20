@@ -9,6 +9,8 @@ import com.bosshi.maeul.itinerary.response.CurrentItineraryResponse;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
+import com.bosshi.maeul.openapi.entity.Tour;
+import com.bosshi.maeul.openapi.service.TourSyncService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +34,13 @@ import java.util.List;
 public class ItineraryController {
     private final ItineraryService itineraryService;
     private final ItineraryMissionService itineraryMissionService;
+    private final TourSyncService tourSyncService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ItineraryResponse>> show(@PathVariable Long id) {
         Itinerary itinerary = itineraryService.findById(id);
+        Tour tour = tourSyncService.syncTourData(itinerary.getTour());
+        itinerary.setTour(tour);
         return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 

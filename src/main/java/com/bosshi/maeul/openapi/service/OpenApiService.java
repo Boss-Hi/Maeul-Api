@@ -1,13 +1,8 @@
 package com.bosshi.maeul.openapi.service;
 
 import com.bosshi.maeul.openapi.config.OpenApiProperties;
-import com.bosshi.maeul.openapi.dto.AreaBasedSyncListDTO;
-import com.bosshi.maeul.openapi.dto.AreaTarSvcDemListDTO;
-import com.bosshi.maeul.openapi.dto.SearchFestivalDTO;
-import com.bosshi.maeul.openapi.dto.ldongCode2ListtDTO;
-import com.bosshi.maeul.openapi.response.AreaTarSvcDemListResponse;
-import com.bosshi.maeul.openapi.response.SearchFestivalResponse;
-import com.bosshi.maeul.openapi.response.ldongCode2ListtResponse;
+import com.bosshi.maeul.openapi.dto.*;
+import com.bosshi.maeul.openapi.response.*;
 import com.bosshi.maeul.openapi.type.TourApiEndpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +53,20 @@ public class OpenApiService {
      */
     public ldongCode2ListtResponse getLdongCode2(ldongCode2ListtDTO request) {
         return call(TourApiEndpoint.LDONG_CODE2, request.toQueryParams(), ldongCode2ListtResponse.class);
+    }
+
+    /**
+     * 공통정보 조회
+     */
+    public DetailCommonResponse getDetailCommon2(DetailCommon2DTO request) {
+        return call(TourApiEndpoint.DETAIL_COMMON, request.toQueryParams(), DetailCommonResponse.class);
+    }
+
+    /**
+     * 소개정보 조회
+     */
+    public DetailIntroResponse getDetailIntro2(DetailIntro2DTO request) {
+        return call(TourApiEndpoint.DETAIL_INTRO, request.toQueryParams(), DetailIntroResponse.class);
     }
 
     /**
