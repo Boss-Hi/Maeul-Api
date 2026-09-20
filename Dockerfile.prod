@@ -3,7 +3,7 @@ FROM eclipse-temurin:26-jdk
 WORKDIR /app
 
 # 1. 현재 디렉토리(빌드 컨텍스트)에 있는 JAR 파일들을 임시 디렉토리로 복사
-COPY *.jar /app/temp/
+COPY build/libs/*.jar /app/temp/
 
 # 2. -plain.jar 파일을 삭제하고 남은 메인 JAR 파일을 app.jar로 이동 후 임시 디렉토리 삭제
 RUN rm -f /app/temp/*-plain.jar && \
