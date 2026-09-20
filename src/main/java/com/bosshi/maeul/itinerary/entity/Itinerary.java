@@ -1,6 +1,7 @@
 package com.bosshi.maeul.itinerary.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
+import com.bosshi.maeul.itinerary.type.ItineraryStatus;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -46,6 +47,11 @@ public class Itinerary extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @Column(name = "status", nullable = false, length = 16)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ItineraryStatus status = ItineraryStatus.READY;
 
     /**
      * 주축제 (사용자가 선택한 중심 축제)

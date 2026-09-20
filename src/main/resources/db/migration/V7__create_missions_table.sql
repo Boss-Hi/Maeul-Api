@@ -53,11 +53,13 @@ CREATE TABLE mission_verifications
 CREATE TABLE itinerary_mission_mappings
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    itinerary_id BIGINT NOT NULL,
-    mission_id   BIGINT NOT NULL,
+    status       VARCHAR(16) NOT NULL,
+    itinerary_id BIGINT      NOT NULL,
+    mission_id   BIGINT      NOT NULL,
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_itin_mission_map_itin_mission FOREIGN KEY (itinerary_id) REFERENCES itineraries (id) ON DELETE CASCADE,
-    CONSTRAINT fk_itin_mission_map_mission FOREIGN KEY (mission_id) REFERENCES missions (id) ON DELETE CASCADE
+    CONSTRAINT fk_itin_mission_map_mission FOREIGN KEY (mission_id) REFERENCES missions (id) ON DELETE CASCADE,
+    INDEX idx_itin_mission_map_status (status)
 );

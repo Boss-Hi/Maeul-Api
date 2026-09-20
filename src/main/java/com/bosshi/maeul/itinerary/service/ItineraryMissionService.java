@@ -10,10 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -22,6 +20,7 @@ public class ItineraryMissionService {
 
     private final MissionTriggerRepository missionTriggerRepository;
     private final ItineraryRepository itineraryRepository;
+    private final int MAX_MISSIONS = 3;
 
     /**
      * 일정이 생성되었을 때, 일정 내의 관광지(Tour) 카테고리를 분석하여
@@ -94,7 +93,13 @@ public class ItineraryMissionService {
             itinerary.setItineraryMissionMappings(new ArrayList<>());
         }
 
+        // 현재 등록된 미션 개수 확인
+        int currentMissionCount = itinerary.getItineraryMissionMappings().size();
+
         for (Mission mission : targetMissions) {
+            if (currentMissionCount >= MAX_MISSIONS) {
+                break;
+            }
             // 중복 방지 방어 코드: 이미 해당 미션이 매핑되어 있는지 확인
             boolean alreadyExists = itinerary.getItineraryMissionMappings().stream()
                     .anyMatch(mapping -> mapping.getMission().getId().equals(mission.getId()));
@@ -105,6 +110,9 @@ public class ItineraryMissionService {
                         .mission(mission)
                         .build();
                 itinerary.getItineraryMissionMappings().add(newMapping);
+
+                // 정상적으로 매핑되었을 때 카운트 증가
+                currentMissionCount++;
             }
         }
 
@@ -115,6 +123,16 @@ public class ItineraryMissionService {
                 "[ItineraryMissionService] 일정 ID [{}] 미션 생성 완료. 총 {}개의 미션이 매핑됨.",
                 savedItinerary.getId(), savedItinerary.getItineraryMissionMappings().size()
         );
+    }
 
+    public List<Mission> getMissionsForItinerary(Long itineraryId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid itinerary ID: " + itineraryId));
+
+        return itinerary.getMissions();
+    }
+
+    public Optional<Itinerary> getCurrentItineraryByUserId(Long id) {
+        return itineraryRepository.findFirstByUserIdAndEndDateGreaterThanEqualOrderByStartDateDesc(id, LocalDate.now());
     }
 }

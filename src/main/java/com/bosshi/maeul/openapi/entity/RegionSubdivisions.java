@@ -5,22 +5,22 @@ import lombok.*;
 
 @Entity
 @Table(
-        name = "l_dong_sigungus",
+        name = "region_subdivisions",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_region_sigungu_code", columnNames = {"region_code", "code"})
+                @UniqueConstraint(name = "uk_region_subdivision_code", columnNames = {"region_code", "code"})
         }
 )
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LDongSigungu {
+public class RegionSubdivisions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_code", nullable = false)
-    private LDongRegion region; // 부모 시/도 참조
+    private Region region; // 부모 시/도 참조
 
     @Column(name = "code", nullable = false, length = 16)
     private String code; // 시/군/구 코드 (110, 140 등)
@@ -32,14 +32,14 @@ public class LDongSigungu {
     private Integer rnum; // 행 번호
 
     @Builder
-    public LDongSigungu(String code, String name, Integer rnum) {
+    public RegionSubdivisions(String code, String name, Integer rnum) {
         this.code = code;
         this.name = name;
         this.rnum = rnum;
     }
 
     // 연관관계 편의 메서드용 setter
-    protected void setRegion(LDongRegion region) {
+    protected void setRegion(Region region) {
         this.region = region;
     }
 }

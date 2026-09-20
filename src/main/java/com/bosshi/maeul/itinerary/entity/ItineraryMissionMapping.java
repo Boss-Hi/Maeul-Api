@@ -1,6 +1,7 @@
 package com.bosshi.maeul.itinerary.entity;
 
 import com.bosshi.maeul.common.entity.BaseEntity;
+import com.bosshi.maeul.itinerary.type.MissionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,11 @@ public class ItineraryMissionMapping extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "status", nullable = false, length = 16)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private MissionStatus status = MissionStatus.READY;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerary_id", nullable = false)

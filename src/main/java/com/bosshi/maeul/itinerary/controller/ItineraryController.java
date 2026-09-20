@@ -5,6 +5,7 @@ import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
+import com.bosshi.maeul.itinerary.response.CurrentItineraryResponse;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 여행 추천 REST API 컨트롤러
@@ -39,12 +41,7 @@ public class ItineraryController {
     }
 
     /**
-     * Step 3: MainFestival 선택 및 일정 생성
-     * <p>
-     * POST /api/v1/trips/{tripId}/generate-itinerary
-     * 축제를 선택하고 AI 기반 일정을 생성합니다.
-     *
-     * @param request MainFestival 선택 요청
+     * @param request MainFestival
      * @return 생성 요청 결과
      */
     @PostMapping("/generate")
@@ -72,6 +69,13 @@ public class ItineraryController {
         itineraryMissionService.generateMissionsForItinerary(itinerary);
 
         return ApiResponse.success("일정 생성 요청이 성공적으로 처리되었습니다.", itinerary.getId());
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<ApiResponse<CurrentItineraryResponse>> current(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Optional<Itinerary> itinerary = itineraryMissionService.getCurrentItineraryByUserId(userDetails.getId());
+        return itinerary.map(value -> ApiResponse.success(CurrentItineraryResponse.from(value)))
+                .orElseGet(() -> ApiResponse.success(CurrentItineraryResponse.empty()));
     }
 }
 

@@ -1,8 +1,8 @@
 package com.bosshi.maeul.openapi.seeder;
 
 import com.bosshi.maeul.openapi.dto.ldongCode2ListtDTO;
-import com.bosshi.maeul.openapi.entity.LDongRegion;
-import com.bosshi.maeul.openapi.entity.LDongSigungu;
+import com.bosshi.maeul.openapi.entity.Region;
+import com.bosshi.maeul.openapi.entity.RegionSubdivisions;
 import com.bosshi.maeul.openapi.repository.LDongRegionRepository;
 import com.bosshi.maeul.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class LDongSeeder implements CommandLineRunner {
         }
 
         // 시/도 코드(lDongRegnCd)를 기준으로 그룹화하여 부모-자식 객체 구성
-        Map<String, LDongRegion> regionMap = new LinkedHashMap<>();
+        Map<String, Region> regionMap = new LinkedHashMap<>();
 
         for (var item : items) {
             String regionCode = item.getLDongRegnCd();
@@ -55,21 +55,21 @@ public class LDongSeeder implements CommandLineRunner {
             Integer rnum = item.getRnum();
 
             // 부모 LDongRegion이 Map에 없으면 생성
-            LDongRegion region = regionMap.computeIfAbsent(regionCode, code ->
-                    LDongRegion.builder()
+            Region region = regionMap.computeIfAbsent(regionCode, code ->
+                    Region.builder()
                             .code(code)
                             .name(regionName)
                             .build()
             );
 
-            // 자식 LDongSigungu 생성 및 연관관계 편의 메서드로 연결
-            LDongSigungu sigungu = LDongSigungu.builder()
+            // 자식 RegionSubdivisions 생성 및 연관관계 편의 메서드로 연결
+            RegionSubdivisions regionSubdivisions = RegionSubdivisions.builder()
                     .code(sigunguCode)
                     .name(sigunguName)
                     .rnum(rnum)
                     .build();
 
-            region.addSigungu(sigungu);
+            region.addSubdivision(regionSubdivisions);
         }
 
         // CascadeType.ALL 설정으로 부모만 saveAll() 호출하면 자식 시/군/구까지 영속화
