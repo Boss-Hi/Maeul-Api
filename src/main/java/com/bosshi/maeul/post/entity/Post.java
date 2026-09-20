@@ -29,7 +29,7 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private PostCategory category;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 128)
     private String title;
 
     @Lob

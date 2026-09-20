@@ -17,10 +17,10 @@ public class Profile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 32)
     private String nickname;
 
-    @Column(length = 200)
+    @Column(length = 256)
     private String bio;
 
     private String avatarUrl;

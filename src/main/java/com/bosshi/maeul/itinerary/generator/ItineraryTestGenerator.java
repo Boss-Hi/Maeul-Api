@@ -36,10 +36,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
      *
      * @return JSON 포맷의 일정 문자열
      */
-    public String getTestResultFromDB() {
-        // 1. 테스트용 시작 날짜 지정
-        LocalDate startDate = LocalDate.of(2026, 9, 1);
-
+    public String getTestResultFromDB(LocalDate startDate, LocalDate endDate) {
         // 2. DB에서 랜덤으로 10개의 Tour 데이터 일괄 조회
         List<Tour> tours = tourRepository.findRandomTours(10);
 
@@ -88,7 +85,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
 
     @Override
     public Itinerary generateItinerary(ItineraryGenerateDTO dto) throws JsonProcessingException {
-        String cleanedJson = getTestResultFromDB();
+        String cleanedJson = getTestResultFromDB(dto.getStartDate(), dto.getEndDate());
         com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
 
         List<ItineraryGenerator.ItineraryDayJson> daysJson = objectMapper.readValue(

@@ -31,7 +31,7 @@ public class TourCategory extends BaseEntity {
      * 카테고리명
      * 예: "축제/공연", "체험관광/공예", "숙박/호텔", "음식"
      */
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 128)
     private String name;
 
     /**

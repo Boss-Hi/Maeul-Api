@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS `tours`
     `festival_type`    VARCHAR(32),
     `created_time`     VARCHAR(16),
     `modified_time`    VARCHAR(16),
+    `homepage`         VARCHAR(512),
+    `program`          VARCHAR(2048),
     `created_at`       DATETIME(6),
     `updated_at`       DATETIME(6),
     `deleted_at`       DATETIME(6),

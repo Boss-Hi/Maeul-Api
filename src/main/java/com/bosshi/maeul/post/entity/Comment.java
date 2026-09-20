@@ -30,7 +30,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 512)
     private String content;
 
         }

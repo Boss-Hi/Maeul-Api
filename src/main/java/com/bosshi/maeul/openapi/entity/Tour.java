@@ -16,16 +16,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Tour extends BaseEntity {
 
     @Id
-    @Column(name = "content_id", nullable = false, length = 20)
+    @Column(name = "content_id", nullable = false, length = 32)
     private String contentId; // contentid (PK)
 
-    @Column(name = "content_type_id", length = 10)
+    @Column(name = "content_type_id", length = 16)
     private String contentTypeId; // contenttypeid
 
     @Column(name = "title", nullable = false)
     private String title; // title
 
-    @Column(name = "tel", length = 50)
+    @Column(name = "tel", length = 128)
     private String tel; // tel
 
     @Column(name = "addr1")
@@ -34,22 +34,22 @@ public class Tour extends BaseEntity {
     @Column(name = "addr2")
     private String addr2; // addr2
 
-    @Column(name = "zipcode", length = 10)
+    @Column(name = "zipcode", length = 16)
     private String zipcode; // zipcode
 
-    @Column(name = "area_code", length = 10)
+    @Column(name = "area_code", length = 16)
     private String areaCode; // areacode
 
-    @Column(name = "sigungu_code", length = 10)
+    @Column(name = "sigungu_code", length = 16)
     private String sigunguCode; // sigungucode
 
-    @Column(name = "cat1", length = 10)
+    @Column(name = "cat1", length = 16)
     private String cat1; // cat1
 
-    @Column(name = "cat2", length = 10)
+    @Column(name = "cat2", length = 16)
     private String cat2; // cat2
 
-    @Column(name = "cat3", length = 10)
+    @Column(name = "cat3", length = 16)
     private String cat3; // cat3
 
     @Column(name = "event_start_date")
@@ -58,13 +58,13 @@ public class Tour extends BaseEntity {
     @Column(name = "event_end_date")
     private String eventEndDate; // eventenddate (예: "20260503" -> LocalDate)
 
-    @Column(name = "first_image", length = 500)
+    @Column(name = "first_image", length = 512)
     private String firstImage; // firstimage
 
-    @Column(name = "first_image2", length = 500)
+    @Column(name = "first_image2", length = 512)
     private String firstImage2; // firstimage2
 
-    @Column(name = "cpyrht_div_cd", length = 20)
+    @Column(name = "cpyrht_div_cd", length = 32)
     private String cpyrhtDivCd; // cpyrhtDivCd
 
     @Column(name = "map_x")
@@ -73,29 +73,35 @@ public class Tour extends BaseEntity {
     @Column(name = "map_y")
     private Double mapY; // mapy (위도)
 
-    @Column(name = "m_level", length = 5)
+    @Column(name = "m_level", length = 8)
     private String mLevel; // mlevel
 
-    @Column(name = "l_dong_regn_cd", length = 10)
+    @Column(name = "l_dong_regn_cd", length = 16)
     private String lDongRegnCd; // lDongRegnCd
 
-    @Column(name = "l_dong_signgu_cd", length = 10)
+    @Column(name = "l_dong_signgu_cd", length = 16)
     private String lDongSignguCd; // lDongSignguCd
 
-    @Column(name = "lcls_systm1", length = 20)
+    @Column(name = "lcls_systm1", length = 32)
     private String lclsSystm1; // lclsSystm1
 
-    @Column(name = "lcls_systm2", length = 20)
+    @Column(name = "lcls_systm2", length = 32)
     private String lclsSystm2; // lclsSystm2
 
-    @Column(name = "lcls_systm3", length = 20)
+    @Column(name = "lcls_systm3", length = 32)
     private String lclsSystm3; // lclsSystm3
 
-    @Column(name = "progress_type", length = 20)
+    @Column(name = "progress_type", length = 32)
     private String progressType; // progresstype
 
-    @Column(name = "festival_type", length = 20)
+    @Column(name = "festival_type", length = 32)
     private String festivalType; // festivaltype
+
+    @Column(name = "homepage", length = 512)
+    private String homepage;
+
+    @Column(name = "program", length = 2048)
+    private String program;
 
     @Column(name = "created_time")
     private String createdTime; // createdtime (예: "20240614132716" -> LocalDateTime)

@@ -19,7 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 여행 추천 REST API 컨트롤러
@@ -72,10 +71,10 @@ public class ItineraryController {
     }
 
     @GetMapping("/current")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<CurrentItineraryResponse>> current(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Optional<Itinerary> itinerary = itineraryMissionService.getCurrentItineraryByUserId(userDetails.getId());
-        return itinerary.map(value -> ApiResponse.success(CurrentItineraryResponse.from(value)))
-                .orElseGet(() -> ApiResponse.success(CurrentItineraryResponse.empty()));
+        Itinerary itinerary = itineraryService.getCurrent(userDetails.getId());
+        return ApiResponse.success(CurrentItineraryResponse.from(itinerary));
     }
 }
 

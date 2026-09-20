@@ -26,12 +26,12 @@ public class AiApiKey extends BaseEntity {
     private Long id;
 
     // 키 식별용 이름 (예: "A key", "B key", "개발용 Gemini 키")
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 128)
     private String name;
 
     // AI 제공자 유형 (예: GEMINI, GPT, CLAUDE)
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider_type", nullable = false, length = 30)
+    @Column(name = "provider_type", nullable = false, length = 32)
     private AiProviderType providerType;
 
     @Column(name = "api_key", nullable = false, unique = true, length = 255)

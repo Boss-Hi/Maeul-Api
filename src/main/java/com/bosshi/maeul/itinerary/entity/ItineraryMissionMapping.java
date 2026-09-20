@@ -5,6 +5,8 @@ import com.bosshi.maeul.itinerary.type.MissionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "itinerary_mission_mappings")
 @Getter
@@ -30,5 +32,8 @@ public class ItineraryMissionMapping extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
+
+    @OneToMany(mappedBy = "itineraryMissionMapping", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ItineraryMissionTaskMapping> itineraryMissionTaskMappings;
 }
 

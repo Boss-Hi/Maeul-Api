@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 /**
  * 여행 추천 시스템의 핵심 조율 서비스
  * <p>
@@ -65,7 +67,12 @@ public class ItineraryService {
 
     public Itinerary findById(Long id) {
         return itineraryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: "));
+    }
+
+    public Itinerary getCurrent(Long userId) {
+        return itineraryRepository.findFirstByUserIdAndEndDateGreaterThanEqualOrderByStartDateDesc(userId, LocalDate.now())
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: "));
     }
 }
 
