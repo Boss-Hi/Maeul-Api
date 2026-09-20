@@ -26,28 +26,14 @@ public class MissionTask extends BaseEntity {
     @Column(nullable = false, length = 2048)
     private String description;
 
-    // mission_tasks.mission_id FK → Mission 과의 N:1 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mission_id", nullable = false)
-    private Mission mission;
-
     @OneToMany(mappedBy = "missionTask", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ItineraryMissionTaskMapping> itineraryMissionTaskMappings = new ArrayList<>();
+    private List<MissionTaskVerificationMapping> missionTaskVerificationMappings = new ArrayList<>();
 
-    // 직접 MissionTrigger 를 갖는 대신 중간 매핑 테이블을 참조합니다.
-    @OneToMany(mappedBy = "missionTask", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<MissionTriggerMapping> missionTriggerMappings = new ArrayList<>();
-
-    /**
-     * 중간 매핑 테이블(MissionTriggerMapping)을 거쳐
-     * 실제 MissionTrigger 목록만 반환하는 편의 메서드
-     */
     @Transient // DB 컬럼과 매핑되지 않는 임시/편의용 필드(메서드)임을 명시
-    public List<MissionTrigger> getMissionTriggers() {
-        return this.missionTriggerMappings.stream()
-                .map(MissionTriggerMapping::getMissionTrigger)
+    public List<MissionTaskVerification> getMissionTaskVerifications() {
+        return this.missionTaskVerificationMappings.stream()
+                .map(MissionTaskVerificationMapping::getMissionTaskVerification)
                 .toList();
     }
 }

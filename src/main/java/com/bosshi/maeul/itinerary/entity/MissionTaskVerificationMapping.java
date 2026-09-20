@@ -22,10 +22,10 @@ public class MissionTaskVerificationMapping extends BaseEntity {
     @JoinColumn(name = "mission_task_id", nullable = false)
     private MissionTask missionTask;
 
-    // MissionVerification 와의 N:1 관계
-    @ManyToOne(fetch = FetchType.EAGER)
+    // Cascade 옵션을 추가하여 Mapping이 저장될 때 연결된 MissionTaskVerification도 함께 DB에 저장되도록 설정[cite: 5]
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "mission_verification_id", nullable = false)
-    private MissionTaskVerification missionVerification;
+    private MissionTaskVerification missionTaskVerification;
 
 }
 

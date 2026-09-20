@@ -21,7 +21,8 @@ public class MissionTaskMapping extends BaseEntity {
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Cascade 옵션을 추가하여 Mapping이 저장될 때 연결된 MissionTask도 함께 DB에 저장되도록 설정[cite: 5]
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "mission_task_id", nullable = false)
     private MissionTask missionTask;
 }

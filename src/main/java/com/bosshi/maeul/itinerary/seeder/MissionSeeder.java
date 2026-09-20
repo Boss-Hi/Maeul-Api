@@ -1,9 +1,6 @@
 package com.bosshi.maeul.itinerary.seeder;
 
-import com.bosshi.maeul.itinerary.entity.Mission;
-import com.bosshi.maeul.itinerary.entity.MissionTask;
-import com.bosshi.maeul.itinerary.entity.MissionTrigger;
-import com.bosshi.maeul.itinerary.entity.MissionTriggerMapping;
+import com.bosshi.maeul.itinerary.entity.*;
 import com.bosshi.maeul.itinerary.repository.MissionRepository;
 import com.bosshi.maeul.itinerary.repository.MissionTriggerRepository;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +82,7 @@ public class MissionSeeder implements CommandLineRunner {
                 .filter(line -> !line.isEmpty())
                 .map(line -> {
                     String[] cols = line.split("\\$");
-                    if (cols.length < 3) return null;
+                    if (cols.length < 5) return null;
 
                     String missionCode = cols[0].trim();
                     String missionName = cols[1].trim();
@@ -104,7 +101,6 @@ public class MissionSeeder implements CommandLineRunner {
                     MissionTask missionTask = MissionTask.builder()
                             .name(taskName)
                             .description(description)
-                            .mission(mission)
                             .build();
 
                     // 각 트리거 코드에 해당하는 Trigger를 찾아 MissionTriggerMapping 으로 연결
@@ -113,8 +109,8 @@ public class MissionSeeder implements CommandLineRunner {
                         MissionTrigger trigger = triggerMap.get(cleanCode);
 
                         if (trigger != null) {
-                            missionTask.getMissionTriggerMappings().add(MissionTriggerMapping.builder()
-                                    .missionTask(missionTask)
+                            mission.getMissionTriggerMappings().add(MissionTriggerMapping.builder()
+                                    .mission(mission)
                                     .missionTrigger(trigger)
                                     .build());
                         } else {
@@ -122,7 +118,10 @@ public class MissionSeeder implements CommandLineRunner {
                         }
                     }
 
-                    mission.getMissionTasks().add(missionTask);
+                    mission.getMissionTaskMappings().add(MissionTaskMapping.builder()
+                            .mission(mission)
+                            .missionTask(missionTask)
+                            .build());
 
                     return mission;
                 })
