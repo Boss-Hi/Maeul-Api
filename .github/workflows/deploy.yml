@@ -32,7 +32,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           source: "build/libs/*.jar"
           target: ${{secrets.PROJECT_PATH}}/
-          strip_components: 0  # 2에서 0으로 변경하여 build/libs 폴더 구조 그대로 전송
+          strip_components: 2
 
       # 3. 운영 서버에서 소스 최신화 및 Docker 컨테이너 재시작
       - name: Deploy Docker Container
