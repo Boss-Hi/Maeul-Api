@@ -26,7 +26,7 @@ public class CurrentItineraryResponse {
 
     private int remainingDay;
 
-    private int neighborhoodCount = 0;
+    private int neighborhoodCount;
 
     private TourResponse tour;
     private List<ItineraryMissionMappingResponse> missions;
