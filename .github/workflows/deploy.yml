@@ -46,7 +46,7 @@ jobs:
             cd ${{secrets.PROJECT_PATH}}
             
             # 서버 소스코드 최신화 (master 브랜치 기준)
-            git restore
+            git restore .
             git pull origin master
             
             # 1) flyway 컨테이너를 강제로 재실행하여 마이그레이션 적용
