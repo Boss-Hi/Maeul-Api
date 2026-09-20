@@ -1,9 +1,6 @@
 package com.bosshi.maeul.itinerary.seeder;
 
-import com.bosshi.maeul.itinerary.entity.Mission;
-import com.bosshi.maeul.itinerary.entity.MissionTask;
-import com.bosshi.maeul.itinerary.entity.MissionTrigger;
-import com.bosshi.maeul.itinerary.entity.MissionTriggerMapping;
+import com.bosshi.maeul.itinerary.entity.*;
 import com.bosshi.maeul.itinerary.repository.MissionRepository;
 import com.bosshi.maeul.itinerary.repository.MissionTriggerRepository;
 import lombok.RequiredArgsConstructor;
@@ -100,16 +97,20 @@ public class MissionSeeder implements CommandLineRunner {
                             .description(description)
                             .build();
 
-                    // 각 트리거 코드에 해당하는 Trigger를 찾아 중간 매핑 엔티티(MissionTriggerMapping)로 연결
+                    // 미션당 하나의 MissionTask 생성 (mission 필드 연결)
+                    MissionTask missionTask = MissionTask.builder()
+                            .name(taskName)
+                            .description(description)
+                            .mission(mission)
+                            .build();
+
+                    // 각 트리거 코드에 해당하는 Trigger를 찾아 MissionTriggerMapping 으로 연결
                     for (String tCode : triggerCodes) {
                         String cleanCode = tCode.trim();
                         MissionTrigger trigger = triggerMap.get(cleanCode);
-                        MissionTask missionTask = MissionTask.builder()
-                                .name(taskName)
-                                .build();
 
                         if (trigger != null) {
-                            mission.getMissionTriggerMappings().add(MissionTriggerMapping.builder()
+                            missionTask.getMissionTriggerMappings().add(MissionTriggerMapping.builder()
                                     .missionTask(missionTask)
                                     .missionTrigger(trigger)
                                     .build());
@@ -117,6 +118,8 @@ public class MissionSeeder implements CommandLineRunner {
                             log.warn("[MissionSeeder] 트리거 코드 [{}]를 찾을 수 없어 미션 [{}]에 매핑하지 못했습니다.", cleanCode, missionCode);
                         }
                     }
+
+                    mission.getMissionTasks().add(missionTask);
 
                     return mission;
                 })

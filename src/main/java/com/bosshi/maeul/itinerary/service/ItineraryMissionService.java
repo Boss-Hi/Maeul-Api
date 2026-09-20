@@ -80,7 +80,7 @@ public class ItineraryMissionService {
 
         // 아래는 이미 연관관계 매핑이 되어있다고 가정했을 때의 논리적 흐름입니다.
         for (MissionTrigger trigger : matchedTriggers) {
-            trigger.getMissionTriggerMappings().forEach(mapping -> targetMissions.add(mapping.getMission()));
+            trigger.getMissionTriggerMappings().forEach(mapping -> targetMissions.add(mapping.getMissionTask().getMission()));
         }
 
         // 만약 위 역방향 참조(mappedBy)를 만들지 않았다면, 서비스 단에서 아래처럼 수동으로 세팅할 타겟 미션들을 선별합니다.

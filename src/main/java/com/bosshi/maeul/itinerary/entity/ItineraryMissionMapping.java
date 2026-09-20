@@ -20,6 +20,12 @@ public class ItineraryMissionMapping extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 256)
+    private String name;
+
+    @Column(nullable = false, length = 2048)
+    private String description;
+
     @Column(name = "status", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
     @Builder.Default

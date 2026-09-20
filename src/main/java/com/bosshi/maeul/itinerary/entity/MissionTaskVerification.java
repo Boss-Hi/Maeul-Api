@@ -6,13 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "mission_verifications")
+@Table(name = "mission_task_verifications")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MissionVerification extends BaseEntity {
+public class MissionTaskVerification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +21,9 @@ public class MissionVerification extends BaseEntity {
     @Column(nullable = false, length = 32)
     @Enumerated(EnumType.STRING)
     private MissionVerificationType type;
+
+    @Column(nullable = false, length = 32)
+    private String name;
 
     @Column(nullable = false, length = 256)
     private String value;

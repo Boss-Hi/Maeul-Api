@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "mission_trigger_mappings")
+@Table(name = "mission_task_trigger_mappings")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class MissionTriggerMapping extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Mission 과의 N:1 관계
+    // MissionTask 와의 N:1 관계
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_task_id", nullable = false)
     private MissionTask missionTask;
@@ -28,4 +28,3 @@ public class MissionTriggerMapping extends BaseEntity {
     private MissionTrigger missionTrigger;
 
 }
-
