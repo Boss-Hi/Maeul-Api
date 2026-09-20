@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS `ai_api_keys`
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(100) NOT NULL,
-    provider_type VARCHAR(30)  NOT NULL,
-    api_key       VARCHAR(255) NOT NULL UNIQUE,
+    name          VARCHAR(128) NOT NULL,
+    provider_type VARCHAR(32)  NOT NULL,
+    api_key       VARCHAR(256) NOT NULL UNIQUE,
     active        BOOLEAN      NOT NULL DEFAULT TRUE,
     last_used_at  DATETIME     NULL,
     created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `admin_users`
 (
     `id`         BIGINT       NOT NULL AUTO_INCREMENT,
-    `email`      VARCHAR(255) NOT NULL UNIQUE,
-    `password`   VARCHAR(255) NOT NULL,
+    `email`      VARCHAR(256) NOT NULL UNIQUE,
+    `password`   VARCHAR(256) NOT NULL,
     `created_at` DATETIME(6)  NOT NULL,
     `updated_at` DATETIME(6)  NOT NULL,
     `deleted_at` DATETIME(6),
