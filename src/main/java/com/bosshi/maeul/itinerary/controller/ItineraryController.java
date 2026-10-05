@@ -5,7 +5,6 @@ import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
-import com.bosshi.maeul.itinerary.response.CurrentItineraryResponse;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
@@ -72,9 +71,9 @@ public class ItineraryController {
 
     @GetMapping("/current")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<CurrentItineraryResponse>> current(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<ItineraryResponse>> current(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Itinerary itinerary = itineraryService.getCurrent(userDetails.getId());
-        return ApiResponse.success(CurrentItineraryResponse.from(itinerary));
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 }
 

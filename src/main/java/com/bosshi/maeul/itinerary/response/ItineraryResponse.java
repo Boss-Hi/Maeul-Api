@@ -83,7 +83,6 @@ public class ItineraryResponse {
     public static class ItineraryTourResponse {
 
         private Long id;
-        private String contentId;
         private Integer sequence;
         private TourResponse tour;
 

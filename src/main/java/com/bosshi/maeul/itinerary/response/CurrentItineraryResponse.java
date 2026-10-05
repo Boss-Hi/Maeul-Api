@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.random.RandomGenerator;
 
 @Getter
@@ -29,7 +28,6 @@ public class CurrentItineraryResponse {
     private int neighborhoodCount;
 
     private TourResponse tour;
-    private List<ItineraryMissionMappingResponse> missions;
 
     public static CurrentItineraryResponse from(Itinerary itinerary) {
         if (itinerary == null) {
@@ -44,10 +42,6 @@ public class CurrentItineraryResponse {
                 // @Todo: 임시로 neighborhoodCount를 랜덤으로 설정, 추후 실제 데이터로 변경 필요
                 .neighborhoodCount(RandomGenerator.getDefault().nextInt(0, 3))
                 .tour(TourResponse.from(itinerary.getTour()))
-                .missions(itinerary.getItineraryMissionMappings()
-                        .stream()
-                        .map(ItineraryMissionMappingResponse::from)
-                        .toList())
                 .build();
     }
 
@@ -58,7 +52,6 @@ public class CurrentItineraryResponse {
                 .endDate(null)
                 .remainingDay(0)
                 .tour(null)
-                .missions(null)
                 .build();
     }
 
