@@ -38,7 +38,8 @@ public class CurrentMissionResponse {
             return null;
         }
 
-        ItineraryMissionMapping itineraryMissionMapping = itinerary.getItineraryMissionMappings() != null && !itinerary.getItineraryMissionMappings().isEmpty()
+        ItineraryMissionMapping itineraryMissionMapping = itinerary.getItineraryMissionMappings() != null && !itinerary.getItineraryMissionMappings()
+                .isEmpty()
                 ? itinerary.getItineraryMissionMappings().getFirst()
                 : null;
 
@@ -47,7 +48,10 @@ public class CurrentMissionResponse {
         }
 
         int totalCount = itineraryMissionMapping.getItineraryMissionTaskMappings().size();
-        int completedCount = (int) itineraryMissionMapping.getItineraryMissionTaskMappings().stream().filter(ItineraryMissionTaskMapping::getIsComplete).count();
+        int completedCount = (int) itineraryMissionMapping.getItineraryMissionTaskMappings()
+                .stream()
+                .filter(ItineraryMissionTaskMapping::getIsComplete)
+                .count();
 
         return CurrentMissionResponse.builder()
                 .id(itinerary.getId())
@@ -57,8 +61,8 @@ public class CurrentMissionResponse {
                 // @Todo: 임시로 neighborhoodCount를 랜덤으로 설정, 추후 실제 데이터로 변경 필요
                 .neighborhoodCount(RandomGenerator.getDefault().nextInt(0, 3))
                 .missionTasks(itineraryMissionMapping.getItineraryMissionTaskMappings().stream()
-                .map(ItineraryMissionTaskMappingResponse::from)
-                .toList())
+                        .map(ItineraryMissionTaskMappingResponse::from)
+                        .toList())
                 .name(itineraryMissionMapping.getMission().getName())
                 .description(itineraryMissionMapping.getMission().getDescription())
                 .totalCount(totalCount)
@@ -71,6 +75,7 @@ public class CurrentMissionResponse {
     @Builder
     public static class ItineraryMissionTaskMappingResponse {
 
+        private Long id;
         private String name;
         private String description;
         private Boolean isComplete;
@@ -81,6 +86,7 @@ public class CurrentMissionResponse {
             }
 
             return ItineraryMissionTaskMappingResponse.builder()
+                    .id(itineraryMissionTaskMapping.getId())
                     .isComplete(itineraryMissionTaskMapping.getIsComplete())
                     .name(itineraryMissionTaskMapping.getName())
                     .description(itineraryMissionTaskMapping.getDescription())
