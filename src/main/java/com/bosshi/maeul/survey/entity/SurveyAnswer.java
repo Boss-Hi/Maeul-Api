@@ -31,4 +31,7 @@ public class SurveyAnswer extends BaseEntity {
     @JoinColumn(name = "option_id", nullable = false)
     private SurveyQuestionOption option;
 
+    public void updateOption(SurveyQuestionOption newOption) {
+        this.option = newOption;
+    }
 }

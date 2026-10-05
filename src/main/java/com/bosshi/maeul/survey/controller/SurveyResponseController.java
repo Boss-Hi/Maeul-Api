@@ -4,7 +4,7 @@ import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.survey.entity.Survey;
 import com.bosshi.maeul.survey.entity.SurveyResponse;
-import com.bosshi.maeul.survey.request.SurveySubmitRequest;
+import com.bosshi.maeul.survey.request.SurveyResponseUpdateRequest;
 import com.bosshi.maeul.survey.response.SurveyResResponse;
 import com.bosshi.maeul.survey.service.SurveyResponseService;
 import com.bosshi.maeul.survey.service.SurveyService;
@@ -37,8 +37,7 @@ public class SurveyResponseController {
      */
     @PutMapping("/responses/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<SurveyResResponse>> updateStoredResponse(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id, @RequestBody SurveySubmitRequest request) {
-        Survey survey = surveyService.getFirst();
+    public ResponseEntity<ApiResponse<SurveyResResponse>> updateStoredResponse(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id, @RequestBody SurveyResponseUpdateRequest request) {
         SurveyResponse surveyResponse = surveyResponseService.updateBySurveyResponseId(id, request);
         return ApiResponse.success(SurveyResResponse.from(surveyResponse));
     }

@@ -37,4 +37,5 @@ public class SurveyResponse extends BaseEntity {
         this.answers.add(answer);
         answer.setSurveyResponse(this);
     }
+
 }
