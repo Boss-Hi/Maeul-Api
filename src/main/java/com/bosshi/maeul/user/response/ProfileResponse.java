@@ -9,7 +9,10 @@ public record ProfileResponse(
         String nickname,
         String name,
         String description,
-        String avatarUrl
+        String avatarUrl,
+        int year,
+        int month,
+        int day
 ) {
 
     public static ProfileResponse from(Profile profile) {
@@ -20,7 +23,10 @@ public record ProfileResponse(
                 profile.getNickname(),
                 profile.getName(),
                 profile.getDescription(),
-                profile.getAvatarUrl()
+                profile.getAvatarUrl(),
+                profile.getYear(),
+                profile.getMonth(),
+                profile.getDay()
         );
     }
 }

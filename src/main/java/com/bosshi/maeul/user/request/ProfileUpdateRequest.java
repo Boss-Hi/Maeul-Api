@@ -4,7 +4,10 @@ public record ProfileUpdateRequest(
         String name,
         String nickname,
         String description,
-        String avatarUrl
+        String avatarUrl,
+        int year,
+        int month,
+        int day
 ) {
 }
 

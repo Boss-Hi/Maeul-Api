@@ -26,4 +26,8 @@ public class Profile {
     private String description;
 
     private String avatarUrl;
+
+    private int year = 0;
+    private int month = 0;
+    private int day = 0;
 }

@@ -18,13 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final ProfileService profileService;
 
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<ProfileResponse>> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Profile profile = profileService.getMyProfile(userDetails.getId());
-        return ApiResponse.success(ProfileResponse.from(profile));
-    }
-
     @GetMapping("/me/profile")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ProfileResponse>> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
