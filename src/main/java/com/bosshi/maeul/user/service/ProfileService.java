@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProfileService {
     private static final int NICKNAME_MAX_LENGTH = 30;
-    private static final int BIO_MAX_LENGTH = 256;
+    private static final int DESCRIPTION_MAX_LENGTH = 1024;
     private static final int AVATAR_URL_MAX_LENGTH = 256;
 
     private final UserRepository userRepository;
@@ -32,8 +32,11 @@ public class ProfileService {
         if (request.nickname() != null) {
             profile.setNickname(validateNickname(request.nickname()));
         }
-        if (request.bio() != null) {
-            profile.setBio(validateLength(request.bio(), BIO_MAX_LENGTH, "자기소개"));
+        if (request.name() != null) {
+            profile.setName(validateLength(request.name(), NICKNAME_MAX_LENGTH, "이름"));
+        }
+        if (request.description() != null) {
+            profile.setDescription(validateLength(request.description(), DESCRIPTION_MAX_LENGTH, "설명"));
         }
         if (request.avatarUrl() != null) {
             profile.setAvatarUrl(validateLength(request.avatarUrl(), AVATAR_URL_MAX_LENGTH, "아바타 URL"));

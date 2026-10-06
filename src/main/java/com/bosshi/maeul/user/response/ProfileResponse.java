@@ -7,7 +7,8 @@ public record ProfileResponse(
         Long userId,
         String email,
         String nickname,
-        String bio,
+        String name,
+        String description,
         String avatarUrl
 ) {
 
@@ -17,7 +18,8 @@ public record ProfileResponse(
                 user.getId(),
                 user.getEmail(),
                 profile.getNickname(),
-                profile.getBio(),
+                profile.getName(),
+                profile.getDescription(),
                 profile.getAvatarUrl()
         );
     }

@@ -1,8 +1,9 @@
 package com.bosshi.maeul.user.request;
 
 public record ProfileUpdateRequest(
+        String name,
         String nickname,
-        String bio,
+        String description,
         String avatarUrl
 ) {
 }

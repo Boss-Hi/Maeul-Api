@@ -20,8 +20,9 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<String>> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.success(userDetails.getUsername());
+    public ResponseEntity<ApiResponse<ProfileResponse>> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Profile profile = profileService.getMyProfile(userDetails.getId());
+        return ApiResponse.success(ProfileResponse.from(profile));
     }
 
     @GetMapping("/me/profile")

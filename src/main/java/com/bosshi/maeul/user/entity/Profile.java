@@ -18,10 +18,12 @@ public class Profile {
     private User user;
 
     @Column(nullable = false, length = 32)
+    private String name;
+
+    @Column(nullable = false, length = 32)
     private String nickname;
 
-    @Column(length = 256)
-    private String bio;
+    private String description;
 
     private String avatarUrl;
 }
