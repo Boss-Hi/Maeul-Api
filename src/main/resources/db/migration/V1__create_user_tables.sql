@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS `profiles`
 (
     `id`          BIGINT      NOT NULL AUTO_INCREMENT,
     `user_id`     BIGINT      NOT NULL UNIQUE,
-    `name`        VARCHAR(32) NOT NULL,
+    `name`        VARCHAR(32)      DEFAULT NULL,
     `nickname`    VARCHAR(32) NOT NULL,
-    `description` TEXT        NOT NULL,
+    `description` TEXT             DEFAULT NULL,
     `year`        int unsigned     DEFAULT NULL,
     `month`       tinyint unsigned DEFAULT NULL,
     `day`         tinyint unsigned DEFAULT NULL,
