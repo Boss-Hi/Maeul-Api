@@ -19,14 +19,18 @@ CREATE TABLE IF NOT EXISTS `users`
 
 CREATE TABLE IF NOT EXISTS `profiles`
 (
-    `id`         BIGINT      NOT NULL AUTO_INCREMENT,
-    `user_id`    BIGINT      NOT NULL UNIQUE,
-    `nickname`   VARCHAR(30) NOT NULL,
-    `bio`        VARCHAR(256),
-    `avatar_url` VARCHAR(256),
-    `created_at` DATETIME(6),
-    `updated_at` DATETIME(6),
-    `deleted_at` DATETIME(6),
+    `id`          BIGINT      NOT NULL AUTO_INCREMENT,
+    `user_id`     BIGINT      NOT NULL UNIQUE,
+    `name`        VARCHAR(32) NOT NULL,
+    `nickname`    VARCHAR(32) NOT NULL,
+    `description` TEXT        NOT NULL,
+    `year`        int unsigned     DEFAULT NULL,
+    `month`       tinyint unsigned DEFAULT NULL,
+    `day`         tinyint unsigned DEFAULT NULL,
+    `avatar_url`  VARCHAR(256),
+    `created_at`  DATETIME(6),
+    `updated_at`  DATETIME(6),
+    `deleted_at`  DATETIME(6),
     PRIMARY KEY (`id`),
     INDEX `idx_profiles_user_id` (`user_id`),
     CONSTRAINT `fk_profiles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE

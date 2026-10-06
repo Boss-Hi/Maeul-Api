@@ -64,7 +64,7 @@ services:
     restart: always
 
   flyway:
-    image: flyway/flyway:9
+    image: flyway/flyway:latest
     env_file:
       - .env
     # Run migrations against local mysql; reads SQL from project resources
