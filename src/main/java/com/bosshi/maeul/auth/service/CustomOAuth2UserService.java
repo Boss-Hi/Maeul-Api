@@ -1,6 +1,7 @@
 package com.bosshi.maeul.auth.service;
 
 import com.bosshi.maeul.auth.dto.KakaoUserInfo;
+import com.bosshi.maeul.auth.type.AuthType;
 import com.bosshi.maeul.user.entity.Profile;
 import com.bosshi.maeul.user.entity.User;
 import com.bosshi.maeul.user.repository.UserRepository;
@@ -56,6 +57,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 user.setEmail(email);
                 // OAuth2 사용자는 랜덤 비밀번호(암호화)로 저장
                 user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                user.setAuthType(AuthType.KAKAO.name());
+                user.setAuthId(kakaoUserInfo.getProviderId());
 
                 Profile profile = new Profile();
                 profile.setUser(user);

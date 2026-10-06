@@ -1,6 +1,7 @@
 package com.bosshi.maeul.user.service;
 
 import com.bosshi.maeul.auth.jwt.JwtTokenProvider;
+import com.bosshi.maeul.auth.type.AuthType;
 import com.bosshi.maeul.user.entity.Profile;
 import com.bosshi.maeul.user.entity.User;
 import com.bosshi.maeul.user.repository.UserRepository;
@@ -25,6 +26,7 @@ public class AuthService {
         User user = new User();
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setAuthType(AuthType.BASIC.name());
 
         Profile profile = new Profile();
         profile.setUser(user);
