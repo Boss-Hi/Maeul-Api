@@ -1,6 +1,5 @@
 package com.bosshi.maeul.auth.entity;
 
-import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,7 +14,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthType extends BaseEntity {
+public class AuthType {
     @Id
     private String code;
 

@@ -1,5 +1,6 @@
 package com.bosshi.maeul.user.entity;
 
+import com.bosshi.maeul.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Table(name = "profiles")
 @Getter
 @Setter
-public class Profile {
+public class Profile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
