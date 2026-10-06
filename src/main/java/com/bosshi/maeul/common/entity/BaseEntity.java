@@ -1,11 +1,11 @@
 package com.bosshi.maeul.common.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.modulith.NamedInterface;
 
@@ -16,10 +16,14 @@ import java.time.LocalDateTime;
 @EnableJpaAuditing
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
+
+    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -32,14 +36,14 @@ public abstract class BaseEntity {
 
     @PrePersist
     protected void prePersist() {
-        LocalDateTime now = now();
+        /*LocalDateTime now = now();
         if (this.createdAt == null) this.createdAt = now;
-        this.updatedAt = now;
+        this.updatedAt = now;*/
     }
 
     @PreUpdate
     protected void preUpdate() {
-        this.updatedAt = now();
+        /*this.updatedAt = now();*/
     }
 
     public void softDelete() {
