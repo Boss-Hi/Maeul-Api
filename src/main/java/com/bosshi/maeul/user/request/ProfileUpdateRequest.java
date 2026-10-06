@@ -5,9 +5,9 @@ public record ProfileUpdateRequest(
         String nickname,
         String description,
         String avatarUrl,
-        int year,
-        int month,
-        int day
+        Integer year,
+        Integer month,
+        Integer day
 ) {
 }
 

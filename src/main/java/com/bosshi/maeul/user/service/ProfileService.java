@@ -41,6 +41,15 @@ public class ProfileService {
         if (request.avatarUrl() != null) {
             profile.setAvatarUrl(validateLength(request.avatarUrl(), AVATAR_URL_MAX_LENGTH, "아바타 URL"));
         }
+        if (request.year() != null) {
+            profile.setYear(request.year());
+        }
+        if (request.month() != null) {
+            profile.setMonth(request.month());
+        }
+        if (request.day() != null) {
+            profile.setDay(request.day());
+        }
 
         return profileRepository.save(profile);
     }
