@@ -1,5 +1,6 @@
 package com.bosshi.maeul.auth.filter;
 
+import com.bosshi.maeul.auth.type.AuthType;
 import com.bosshi.maeul.auth.jwt.JwtTokenProvider;
 import com.bosshi.maeul.auth.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -39,8 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getEmailFromToken(token);
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                String subject = jwtTokenProvider.getEmailFromToken(token);
+                AuthType authType = jwtTokenProvider.getAuthTypeFromToken(token);
+                String principal = AuthType.BASIC.equals(authType) ? subject : authType.name() + ":" + subject;
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(principal);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 

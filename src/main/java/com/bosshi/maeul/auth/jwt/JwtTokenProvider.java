@@ -1,5 +1,6 @@
 package com.bosshi.maeul.auth.jwt;
 
+import com.bosshi.maeul.auth.type.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -46,15 +47,23 @@ public class JwtTokenProvider {
         // 카카오 사용자 식별자 추출 (Kakao 고유 ID 또는 이메일)
         String providerId = String.valueOf(oAuth2User.getAttributes().get("id"));
 
+        AuthType authType = AuthType.BASIC;
+        String email = null;
+
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
-        String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+        if(kakaoAccount != null) {
+            authType = AuthType.KAKAO;
+            email = providerId;
+        } else {
+            email = (String) oAuth2User.getAttributes().get("email");
+        }
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .setSubject(providerId)
-                .claim("email", email)
+                .claims(Map.of("email", email, "authType", authType))
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -72,6 +81,28 @@ public class JwtTokenProvider {
                 .getPayload();
 
         return claims.getSubject();
+    }
+
+    /**
+     * 토큰의 payload에서 authType을 추출한다. 없거나 유효하지 않으면 BASIC을 반환한다.
+     */
+    public AuthType getAuthTypeFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        String authTypeValue = claims.get("authType", String.class);
+        if (authTypeValue == null || authTypeValue.isBlank()) {
+            return AuthType.BASIC;
+        }
+
+        try {
+            return AuthType.valueOf(authTypeValue.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return AuthType.BASIC;
+        }
     }
 
     /**

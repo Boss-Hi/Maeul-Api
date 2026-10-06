@@ -5,5 +5,7 @@ import org.springframework.modulith.NamedInterface;
 @NamedInterface
 public enum AuthType {
     KAKAO,
-    BASIC
+    BASIC,
+    GOOGLE,
+    APPLE
 }
