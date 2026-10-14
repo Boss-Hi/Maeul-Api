@@ -24,6 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FestivalService {
+    private static final String FESTIVAL_CONTENT_TYPE_ID = "15";
+    private static final int POPULAR_LIMIT = 10;
+
     private final TourRepository festivalRepository;
     private final TourCategoryRepository tourCategoryRepository;
 
@@ -32,6 +35,10 @@ public class FestivalService {
      */
     public List<Tour> all() {
         return festivalRepository.findAll();
+    }
+
+    public List<Tour> popular() {
+        return festivalRepository.findRandomToursWhereContentTypeIdIs(FESTIVAL_CONTENT_TYPE_ID, POPULAR_LIMIT);
     }
 
     public Page<Tour> search(SearchFestivalRequest request, Pageable pageable) {

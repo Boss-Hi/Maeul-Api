@@ -46,6 +46,12 @@ public class FestivalController {
         return ApiResponse.success(tours);
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<ApiResponse<List<Tour>>> popular() {
+        List<Tour> tours = festivalService.popular();
+        return ApiResponse.success(tours);
+    }
+
     @GetMapping("/{contentId}")
     public ResponseEntity<ApiResponse<Tour>> show(@PathVariable String contentId) {
         Tour tour = festivalService.findByContentId(contentId);
