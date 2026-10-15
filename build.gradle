@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.bosshi'
-version = '0.0.2'
+version = '0.0.3'
 description = 'Maeul-Api'
 
 java {
