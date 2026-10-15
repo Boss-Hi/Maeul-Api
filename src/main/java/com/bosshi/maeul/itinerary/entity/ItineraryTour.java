@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalTime;
+
 /**
  * 일정에 포함된 개별 장소를 나타내는 도메인 모델
  * <p>
@@ -44,5 +46,11 @@ public class ItineraryTour extends BaseEntity {
      */
     @Column(nullable = false)
     private Integer sequence;
+
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
 }
 

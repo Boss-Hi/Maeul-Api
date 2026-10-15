@@ -4,7 +4,12 @@ import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itinerary.request.ItineraryDayCreateRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryDayUpdateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryTourCreateRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryTourUpdateRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryUpdateRequest;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itinerary.service.ItineraryService;
@@ -73,6 +78,65 @@ public class ItineraryController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ItineraryResponse>> current(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Itinerary itinerary = itineraryService.getCurrent(userDetails.getId());
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItineraryResponse>> update(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody ItineraryUpdateRequest request
+    ) {
+        Itinerary itinerary = itineraryService.updateItinerary(id, userDetails.getId(), request);
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    @PostMapping("/{id}/days")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItineraryResponse>> addDay(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody ItineraryDayCreateRequest request
+    ) {
+        Itinerary itinerary = itineraryService.addDay(id, userDetails.getId(), request);
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    @PutMapping("/{id}/days/{dayId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItineraryResponse>> updateDay(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @PathVariable Long dayId,
+            @RequestBody ItineraryDayUpdateRequest request
+    ) {
+        Itinerary itinerary = itineraryService.updateDay(id, dayId, userDetails.getId(), request);
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    @PostMapping("/{id}/days/{dayId}/tours")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItineraryResponse>> addTourItem(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @PathVariable Long dayId,
+            @RequestBody ItineraryTourCreateRequest request
+    ) {
+        Itinerary itinerary = itineraryService.addTourItem(id, dayId, userDetails.getId(), request);
+        return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    @PutMapping("/{id}/days/{dayId}/tours/{tourId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItineraryResponse>> updateTourItem(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @PathVariable Long dayId,
+            @PathVariable Long tourId,
+            @RequestBody ItineraryTourUpdateRequest request
+    ) {
+        Itinerary itinerary = itineraryService.updateTourItem(id, dayId, tourId, userDetails.getId(), request);
         return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 }

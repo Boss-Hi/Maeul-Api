@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,12 +85,18 @@ public class ItineraryResponse {
 
         private Long id;
         private Integer sequence;
+        @JsonFormat(pattern = "HH:mm")
+        private LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
+        private LocalTime endTime;
         private TourResponse tour;
 
         public static ItineraryTourResponse from(ItineraryTour tour) {
             return ItineraryTourResponse.builder()
                     .id(tour.getId())
                     .sequence(tour.getSequence())
+                    .startTime(tour.getStartTime())
+                    .endTime(tour.getEndTime())
                     .tour(TourResponse.from(tour.getTour()))
                     .build();
         }
