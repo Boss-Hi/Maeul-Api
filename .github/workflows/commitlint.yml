@@ -1,0 +1,22 @@
+name: Lint Commit Messages
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      # PR에 포함된 모든 커밋 히스토리를 가져오기 위해 fetch-depth: 0 필수 설정
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # commitlint 액션을 실행하여 PR 내 모든 커밋 검증
+      - name: Run commitlint
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: '.commitlintrc.json'
+          failOnWarnings: false
