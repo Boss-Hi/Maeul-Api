@@ -3,10 +3,15 @@ package com.bosshi.maeul.itinerary.service;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
 import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
+import com.bosshi.maeul.itinerary.entity.ItineraryScheduleType;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itinerary.repository.ItineraryScheduleRepository;
+import com.bosshi.maeul.itinerary.repository.ItineraryScheduleTypeRepository;
 import com.bosshi.maeul.itinerary.request.ItineraryTourCreateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryTourUpdateRequest;
+import com.bosshi.maeul.location.entity.LocationMapping;
+import com.bosshi.maeul.location.repository.LocationMappingRepository;
+import com.bosshi.maeul.location.type.LocationTargetType;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import lombok.AllArgsConstructor;
@@ -15,20 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-/**
- * 여행 추천 시스템의 핵심 조율 서비스
- * <p>
- * 전체 여행 일정 추천 프로세스를 관리합니다:
- * 1. Trip 생성
- * 2. MainFestival 선택
- * 3. 관광지 필터링
- * 4. AI 일정 생성
- */
+// enum alias: use fully qualified for the type-package enum to disambiguate
+// com.bosshi.maeul.itinerary.type.ItineraryScheduleType → referenced inline below
+
 @Service
 @Slf4j
 @Transactional
@@ -36,7 +32,9 @@ import java.util.Objects;
 public class ItineraryScheduleService {
     private final ItineraryRepository itineraryRepository;
     private final ItineraryScheduleRepository itineraryScheduleRepository;
+    private final ItineraryScheduleTypeRepository scheduleTypeRepository;
     private final TourRepository tourRepository;
+    private final LocationMappingRepository locationMappingRepository;
 
     public ItinerarySchedule show(Long itineraryId, Long itineraryDayId, Long id, Long userId) {
         Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
@@ -44,48 +42,89 @@ public class ItineraryScheduleService {
         return findTourOrThrow(day, id);
     }
 
-    public Itinerary addTourItem(Long itineraryId, Long dayId, Long userId, ItineraryTourCreateRequest request) {
+    public Optional<LocationMapping> getLocation(Long scheduleId) {
+        return locationMappingRepository.findByTargetAndTargetId(LocationTargetType.ITINERARY_SCHEDULE, scheduleId);
+    }
+
+    public ItinerarySchedule store(Long itineraryId, Long dayId, Long userId, ItineraryTourCreateRequest request) {
         Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
         ItineraryDay day = findDayOrThrow(itinerary, dayId);
 
-        if (request.getContentId() == null || request.getContentId().isBlank()) {
-            throw new IllegalArgumentException("contentId는 필수입니다.");
-        }
-        if (request.getSequence() == null) {
-            throw new IllegalArgumentException("sequence는 필수입니다.");
-        }
+        List<ItinerarySchedule> schedules = ensureSchedules(day);
 
-        Tour tour = tourRepository.findByContentId(request.getContentId())
-                .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + request.getContentId()));
+        int sequence = (request.getSequence() != null)
+                ? request.getSequence()
+                : schedules.stream()
+                        .mapToInt(s -> s.getSequence() != null ? s.getSequence() : 0)
+                        .max()
+                        .orElse(0) + 1;
 
-        validateSequenceUnique(day.getItinerarySchedules(), request.getSequence(), null);
+        validateSequenceUnique(schedules, sequence, null);
         validateTimeRange(request.getStartTime(), request.getEndTime());
-        validateNoTimeOverlap(day.getItinerarySchedules(), request.getStartTime(), request.getEndTime(), null);
+        validateNoTimeOverlap(schedules, request.getStartTime(), request.getEndTime(), null);
 
-        ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
+        String typeCode = request.getType() != null ? request.getType().name() : com.bosshi.maeul.itinerary.type.ItineraryScheduleType.TOUR.name();
+        validateByTypeCode(typeCode, request.getContentId(), request.getTitle(), request.getDescription());
+
+        ItineraryScheduleType typeEntity = findScheduleTypeOrThrow(typeCode);
+
+        ItinerarySchedule itinerarySchedule = ItinerarySchedule.builder()
                 .itineraryDay(day)
-                .tour(tour)
-                .sequence(request.getSequence())
+                .type(typeEntity.getCode())
+                .sequence(sequence)
+                .title(request.getTitle())
+                .description(request.getDescription())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .build();
 
-        day.getItinerarySchedules().add(itineraryTour);
-        day.getItinerarySchedules().sort(Comparator.comparing(ItinerarySchedule::getSequence));
+        if (com.bosshi.maeul.itinerary.type.ItineraryScheduleType.TOUR.name().equals(typeCode)) {
+            Tour tour = tourRepository.findByContentId(request.getContentId())
+                    .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + request.getContentId()));
+            itinerarySchedule.setTour(tour);
+        }
 
-        return itineraryRepository.save(itinerary);
+        ItinerarySchedule saved = itineraryScheduleRepository.save(itinerarySchedule);
+        schedules.add(saved);
+        schedules.sort(Comparator.comparing(ItinerarySchedule::getSequence, Comparator.nullsLast(Comparator.naturalOrder())));
+
+        return saved;
     }
 
-    public Itinerary updateTourItem(Long itineraryId, Long dayId, Long itineraryTourId, Long userId, ItineraryTourUpdateRequest request) {
+    public ItinerarySchedule updateTourItem(Long itineraryId, Long dayId, Long itineraryScheduleId, Long userId, ItineraryTourUpdateRequest request) {
         Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
         ItineraryDay day = findDayOrThrow(itinerary, dayId);
-        ItinerarySchedule itineraryTour = findTourOrThrow(day, itineraryTourId);
+        ItinerarySchedule itineraryTour = findTourOrThrow(day, itineraryScheduleId);
 
-        if (request.getContentId() != null && !request.getContentId().isBlank()) {
+        String typeCode = request.getType() != null ? request.getType().name()
+                : itineraryTour.getType();
+
+        if (request.getType() != null || request.getContentId() != null
+                || request.getTitle() != null || request.getDescription() != null) {
+            String contentId = request.getContentId() != null ? request.getContentId()
+                    : ("TOUR".equals(typeCode) && itineraryTour.getTour() != null
+                            ? itineraryTour.getTour().getContentId() : null);
+            String title = request.getTitle() != null ? request.getTitle() : itineraryTour.getTitle();
+            String description = request.getDescription() != null ? request.getDescription() : itineraryTour.getDescription();
+            validateByTypeCode(typeCode, contentId, title, description);
+        }
+
+        if (request.getType() != null) {
+            itineraryTour.setType(typeCode);
+        }
+
+        if ("TOUR".equals(typeCode) && request.getContentId() != null && !request.getContentId().isBlank()) {
             Tour tour = tourRepository.findByContentId(request.getContentId())
                     .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + request.getContentId()));
             itineraryTour.setTour(tour);
+            itineraryTour.setTitle(null);
+            itineraryTour.setDescription(null);
+        } else if ("NORMAL".equals(typeCode)) {
+            if (request.getTitle() != null) itineraryTour.setTitle(request.getTitle());
+            if (request.getDescription() != null) itineraryTour.setDescription(request.getDescription());
+            itineraryTour.setTour(null);
         }
+
         if (request.getSequence() != null) {
             validateSequenceUnique(day.getItinerarySchedules(), request.getSequence(), itineraryTour.getId());
             itineraryTour.setSequence(request.getSequence());
@@ -107,8 +146,8 @@ public class ItineraryScheduleService {
                 itineraryTour.getId()
         );
 
-        day.getItinerarySchedules().sort(Comparator.comparing(ItinerarySchedule::getSequence));
-        return itineraryRepository.save(itinerary);
+        ensureSchedules(day).sort(Comparator.comparing(ItinerarySchedule::getSequence, Comparator.nullsLast(Comparator.naturalOrder())));
+        return itineraryScheduleRepository.save(itineraryTour);
     }
 
     public Itinerary findItineraryById(Long id) {
@@ -143,6 +182,33 @@ public class ItineraryScheduleService {
             itinerary.setItineraryDays(new ArrayList<>());
         }
         return itinerary.getItineraryDays();
+    }
+
+    private List<ItinerarySchedule> ensureSchedules(ItineraryDay day) {
+        if (day.getItinerarySchedules() == null) {
+            day.setItinerarySchedules(new ArrayList<>());
+        }
+        return day.getItinerarySchedules();
+    }
+
+    private ItineraryScheduleType findScheduleTypeOrThrow(String code) {
+        return scheduleTypeRepository.findById(code)
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 스케줄 타입입니다: " + code));
+    }
+
+    private void validateByTypeCode(String typeCode, String contentId, String title, String description) {
+        if ("TOUR".equals(typeCode)) {
+            if (contentId == null || contentId.isBlank()) {
+                throw new IllegalArgumentException("TOUR 타입은 contentId가 필수입니다.");
+            }
+        } else if ("NORMAL".equals(typeCode)) {
+            if (title == null || title.isBlank()) {
+                throw new IllegalArgumentException("NORMAL 타입은 title이 필수입니다.");
+            }
+            if (description == null || description.isBlank()) {
+                throw new IllegalArgumentException("NORMAL 타입은 description이 필수입니다.");
+            }
+        }
     }
 
     private void validateDayNumberUnique(List<ItineraryDay> days, Integer dayNumber, Long excludeDayId) {

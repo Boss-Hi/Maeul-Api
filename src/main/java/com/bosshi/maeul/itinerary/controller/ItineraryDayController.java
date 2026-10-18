@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 여행 추천 REST API 컨트롤러
- * <p>
- * 여행 일정 추천 시스템의 API 엔드포인트를 제공합니다.
- */
 @RestController
 @RequestMapping("/api/itinerary/{itinerary}/days")
 @RequiredArgsConstructor

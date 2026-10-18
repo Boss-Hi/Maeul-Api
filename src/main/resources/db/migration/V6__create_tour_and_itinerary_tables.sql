@@ -154,20 +154,32 @@ CREATE TABLE itinerary_days
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `itinerary_schedule_types`
+(
+    `code`        VARCHAR(16)  NOT NULL,
+    `name`        VARCHAR(64)  NOT NULL UNIQUE,
+    `description` VARCHAR(256) NOT NULL,
+    PRIMARY KEY (`code`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE itinerary_schedules
 (
     `id`               BIGINT       NOT NULL AUTO_INCREMENT,
     `itinerary_day_id` BIGINT       NOT NULL,
     `content_id`       VARCHAR(256),
     `sequence`         INT          NOT NULL,
-    `title`            VARCHAR(256) NOT NULL,
-    `description`      TEXT         NOT NULL,
+    `type`             VARCHAR(16)  NOT NULL DEFAULT 'TOUR' COMMENT 'FK → itinerary_schedule_types.code',
+    `title`            VARCHAR(256) NULL,
+    `description`      TEXT         NULL,
     `start_time`       TIME         NULL,
     `end_time`         TIME         NULL,
     `created_at`       DATETIME(6),
     `updated_at`       DATETIME(6),
     `deleted_at`       DATETIME(6),
     CONSTRAINT fk_itinerary_venues_day FOREIGN KEY (`itinerary_day_id`) REFERENCES itinerary_days (`id`) ON DELETE CASCADE,
+    CONSTRAINT fk_itinerary_schedules_type FOREIGN KEY (`type`) REFERENCES itinerary_schedule_types (`code`) ON UPDATE CASCADE,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

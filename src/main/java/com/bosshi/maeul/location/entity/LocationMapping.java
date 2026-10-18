@@ -5,6 +5,9 @@ import com.bosshi.maeul.location.type.LocationTargetType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.modulith.NamedInterface;
+
+@NamedInterface
 
 @Entity
 @Table(
