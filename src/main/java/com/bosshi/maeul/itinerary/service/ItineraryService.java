@@ -6,12 +6,10 @@ import com.bosshi.maeul.itinerary.entity.ItineraryDay;
 import com.bosshi.maeul.itinerary.entity.ItineraryTour;
 import com.bosshi.maeul.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
-import com.bosshi.maeul.itinerary.request.ItineraryDayCreateRequest;
-import com.bosshi.maeul.itinerary.request.ItineraryDayUpdateRequest;
+import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itinerary.request.ItineraryTourCreateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryTourUpdateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryUpdateRequest;
-import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -107,44 +105,6 @@ public class ItineraryService {
             itinerary.setTour(tour);
         }
 
-        return itineraryRepository.save(itinerary);
-    }
-
-    public Itinerary addDay(Long itineraryId, Long userId, ItineraryDayCreateRequest request) {
-        Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
-
-        if (request.getDate() == null || request.getDayNumber() == null) {
-            throw new IllegalArgumentException("date와 dayNumber는 필수입니다.");
-        }
-
-        List<ItineraryDay> days = ensureDays(itinerary);
-        validateDayNumberUnique(days, request.getDayNumber(), null);
-
-        ItineraryDay day = ItineraryDay.builder()
-                .itinerary(itinerary)
-                .date(request.getDate())
-                .dayNumber(request.getDayNumber())
-                .itineraryTours(new ArrayList<>())
-                .build();
-
-        days.add(day);
-        days.sort(Comparator.comparing(ItineraryDay::getDayNumber));
-        return itineraryRepository.save(itinerary);
-    }
-
-    public Itinerary updateDay(Long itineraryId, Long dayId, Long userId, ItineraryDayUpdateRequest request) {
-        Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
-        ItineraryDay day = findDayOrThrow(itinerary, dayId);
-
-        if (request.getDate() != null) {
-            day.setDate(request.getDate());
-        }
-        if (request.getDayNumber() != null) {
-            validateDayNumberUnique(ensureDays(itinerary), request.getDayNumber(), day.getId());
-            day.setDayNumber(request.getDayNumber());
-        }
-
-        ensureDays(itinerary).sort(Comparator.comparing(ItineraryDay::getDayNumber));
         return itineraryRepository.save(itinerary);
     }
 
