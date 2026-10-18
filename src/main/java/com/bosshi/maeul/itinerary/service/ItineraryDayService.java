@@ -76,14 +76,14 @@ public class ItineraryDayService {
     }
 
     private Itinerary findOwnedItinerary(Long itineraryId, Long userId) {
-        Itinerary itinerary = findById(itineraryId);
+        Itinerary itinerary = findItineraryById(itineraryId);
         if (!itinerary.getUserId().equals(userId)) {
             throw new IllegalArgumentException("해당 일정에 대한 수정 권한이 없습니다.");
         }
         return itinerary;
     }
 
-    private Itinerary findById(Long itineraryId) {
+    private Itinerary findItineraryById(Long itineraryId) {
         return itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + itineraryId));
     }

@@ -38,7 +38,7 @@ public class ItineraryMissionService {
         if (itinerary.getItineraryDays() != null) {
             for (ItineraryDay day : itinerary.getItineraryDays()) {
                 if (day.getItineraryTours() != null) {
-                    for (ItineraryTour iTour : day.getItineraryTours()) {
+                    for (ItinerarySchedule iTour : day.getItineraryTours()) {
                         Tour tour = iTour.getTour();
                         if (tour != null) {
                             if (tour.getLclsSystm1() != null) categoryCodes.add(tour.getLclsSystm1());

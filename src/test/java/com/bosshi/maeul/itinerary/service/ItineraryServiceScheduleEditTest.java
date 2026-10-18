@@ -2,7 +2,7 @@ package com.bosshi.maeul.itinerary.service;
 
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
-import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
 import com.bosshi.maeul.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
@@ -117,8 +117,8 @@ class ItineraryServiceScheduleEditTest {
         Itinerary result = itineraryService.addTourItem(1L, 100L, 10L, request);
 
         // Then
-        List<ItineraryTour> tours = result.getItineraryDays().getFirst().getItineraryTours();
-        ItineraryTour added = tours.stream()
+        List<ItinerarySchedule> tours = result.getItineraryDays().getFirst().getItineraryTours();
+        ItinerarySchedule added = tours.stream()
                 .filter(t -> "C-NEW".equals(t.getTour().getContentId()))
                 .findFirst()
                 .orElseThrow();
@@ -153,7 +153,7 @@ class ItineraryServiceScheduleEditTest {
                 .build();
 
         Tour tour = Tour.builder().contentId("C-EXIST").title("기존 장소").build();
-        ItineraryTour itineraryTour = ItineraryTour.builder()
+        ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
                 .id(itineraryTourId)
                 .itineraryDay(day)
                 .tour(tour)

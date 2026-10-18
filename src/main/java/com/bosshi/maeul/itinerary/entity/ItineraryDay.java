@@ -53,7 +53,7 @@ public class ItineraryDay extends BaseEntity {
     @OneToMany(mappedBy = "itineraryDay", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OrderBy("sequence ASC")
     @Builder.Default
-    private List<ItineraryTour> itineraryTours = new ArrayList<>();
+    private List<ItinerarySchedule> itineraryTours = new ArrayList<>();
 
 
     /**

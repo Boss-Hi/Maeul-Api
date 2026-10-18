@@ -14,14 +14,14 @@ import java.time.LocalTime;
  * ItineraryTour는 ItineraryDay에 속한 관광지, 축제, 식당, 숙박시설 등을 나타냅니다.
  */
 @Entity
-@Table(name = "itinerary_tours")
+@Table(name = "itinerary_schedules")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class ItineraryTour extends BaseEntity {
+public class ItinerarySchedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

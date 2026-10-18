@@ -3,7 +3,7 @@ package com.bosshi.maeul.itinerary.generator;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
-import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
@@ -114,7 +114,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
                     // DB 조회를 하지 않고 프록시(참조) 객체만 생성
                     Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
 
-                    ItineraryTour itineraryTour = ItineraryTour.builder()
+                    ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
                             .itineraryDay(day)
                             .tour(tourProxy)
                             .sequence(tourJson.sequence())

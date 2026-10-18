@@ -2,7 +2,7 @@ package com.bosshi.maeul.itinerary.response;
 
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
-import com.bosshi.maeul.itinerary.entity.ItineraryTour;
+import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
 import com.bosshi.maeul.openapi.response.TourResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
@@ -91,7 +91,7 @@ public class ItineraryResponse {
         private LocalTime endTime;
         private TourResponse tour;
 
-        public static ItineraryTourResponse from(ItineraryTour tour) {
+        public static ItineraryTourResponse from(ItinerarySchedule tour) {
             return ItineraryTourResponse.builder()
                     .id(tour.getId())
                     .sequence(tour.getSequence())
