@@ -59,13 +59,13 @@ public class ItineraryResponse {
         private LocalDate date;
 
         private Integer dayNumber;
-        private Integer tourCount;
-        private List<ItineraryTourResponse> tours;
+        private Integer scheduleCount;
+        private List<ItineraryScheduleResponse> schedules;
 
         public static ItineraryDayResponse from(ItineraryDay day) {
-            List<ItineraryTourResponse> tourResponses = day.getItineraryTours() != null
-                    ? day.getItineraryTours().stream()
-                    .map(ItineraryTourResponse::from)
+            List<ItineraryScheduleResponse> scheduleResponses = day.getItinerarySchedules() != null
+                    ? day.getItinerarySchedules().stream()
+                    .map(ItineraryScheduleResponse::from)
                     .toList()
                     : Collections.emptyList();
 
@@ -73,15 +73,15 @@ public class ItineraryResponse {
                     .id(day.getId())
                     .date(day.getDate())
                     .dayNumber(day.getDayNumber())
-                    .tourCount(day.getItineraryTourCount())
-                    .tours(tourResponses)
+                    .scheduleCount(day.getItineraryScheduleCount())
+                    .schedules(scheduleResponses)
                     .build();
         }
     }
 
     @Getter
     @Builder
-    public static class ItineraryTourResponse {
+    public static class ItineraryScheduleResponse {
 
         private Long id;
         private Integer sequence;
@@ -91,13 +91,13 @@ public class ItineraryResponse {
         private LocalTime endTime;
         private TourResponse tour;
 
-        public static ItineraryTourResponse from(ItinerarySchedule tour) {
-            return ItineraryTourResponse.builder()
-                    .id(tour.getId())
-                    .sequence(tour.getSequence())
-                    .startTime(tour.getStartTime())
-                    .endTime(tour.getEndTime())
-                    .tour(TourResponse.from(tour.getTour()))
+        public static ItineraryScheduleResponse from(ItinerarySchedule schedule) {
+            return ItineraryScheduleResponse.builder()
+                    .id(schedule.getId())
+                    .sequence(schedule.getSequence())
+                    .startTime(schedule.getStartTime())
+                    .endTime(schedule.getEndTime())
+                    .tour(TourResponse.from(schedule.getTour()))
                     .build();
         }
     }

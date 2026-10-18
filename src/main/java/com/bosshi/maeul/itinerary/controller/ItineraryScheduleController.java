@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * 여행 일정 추천 시스템의 API 엔드포인트를 제공합니다.
  */
 @RestController
-@RequestMapping("/api/itinerary/{itinerary}/days/{itineraryDay}/schedule")
+@RequestMapping("/api/itinerary/{itinerary}/days/{itineraryDay}/schedules")
 @RequiredArgsConstructor
 @Slf4j
 public class ItineraryScheduleController {
@@ -29,17 +29,17 @@ public class ItineraryScheduleController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<ItineraryResponse.ItineraryDayResponse>> show(
+    public ResponseEntity<ApiResponse<ItineraryResponse.ItineraryScheduleResponse>> show(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long itinerary,
             @PathVariable Long itineraryDay,
             @PathVariable Long id
     ) {
-        ItinerarySchedule itinerarySchedule = itineraryScheduleService.show(itinerary, id, userDetails.getId());
-        return ApiResponse.success(ItineraryResponse.ItineraryDayResponse.from(itinerarySchedule));
+        ItinerarySchedule itinerarySchedule = itineraryScheduleService.show(itinerary, itineraryDay, id, userDetails.getId());
+        return ApiResponse.success(ItineraryResponse.ItineraryScheduleResponse.from(itinerarySchedule));
     }
 
-    @PostMapping("/{id}/days/{dayId}/tours")
+    @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ItineraryResponse>> addTourItem(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,7 +51,7 @@ public class ItineraryScheduleController {
         return ApiResponse.success(ItineraryResponse.from(itinerary));
     }
 
-    @PutMapping("/{id}/days/{dayId}/tours/{tourId}")
+    @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ItineraryResponse>> updateTourItem(
             @AuthenticationPrincipal CustomUserDetails userDetails,

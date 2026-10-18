@@ -38,9 +38,10 @@ public class ItineraryScheduleService {
     private final ItineraryScheduleRepository itineraryScheduleRepository;
     private final TourRepository tourRepository;
 
-    public ItinerarySchedule show(Long itineraryId, Long id, Long userId) {
+    public ItinerarySchedule show(Long itineraryId, Long itineraryDayId, Long id, Long userId) {
         Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
-        return findTourOrThrow(itinerary, id);
+        ItineraryDay day = findDayOrThrow(itinerary, itineraryDayId);
+        return findTourOrThrow(day, id);
     }
 
     public Itinerary addTourItem(Long itineraryId, Long dayId, Long userId, ItineraryTourCreateRequest request) {
@@ -57,9 +58,9 @@ public class ItineraryScheduleService {
         Tour tour = tourRepository.findByContentId(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + request.getContentId()));
 
-        validateSequenceUnique(day.getItineraryTours(), request.getSequence(), null);
+        validateSequenceUnique(day.getItinerarySchedules(), request.getSequence(), null);
         validateTimeRange(request.getStartTime(), request.getEndTime());
-        validateNoTimeOverlap(day.getItineraryTours(), request.getStartTime(), request.getEndTime(), null);
+        validateNoTimeOverlap(day.getItinerarySchedules(), request.getStartTime(), request.getEndTime(), null);
 
         ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
                 .itineraryDay(day)
@@ -69,8 +70,8 @@ public class ItineraryScheduleService {
                 .endTime(request.getEndTime())
                 .build();
 
-        day.getItineraryTours().add(itineraryTour);
-        day.getItineraryTours().sort(Comparator.comparing(ItinerarySchedule::getSequence));
+        day.getItinerarySchedules().add(itineraryTour);
+        day.getItinerarySchedules().sort(Comparator.comparing(ItinerarySchedule::getSequence));
 
         return itineraryRepository.save(itinerary);
     }
@@ -86,7 +87,7 @@ public class ItineraryScheduleService {
             itineraryTour.setTour(tour);
         }
         if (request.getSequence() != null) {
-            validateSequenceUnique(day.getItineraryTours(), request.getSequence(), itineraryTour.getId());
+            validateSequenceUnique(day.getItinerarySchedules(), request.getSequence(), itineraryTour.getId());
             itineraryTour.setSequence(request.getSequence());
         }
 
@@ -100,13 +101,13 @@ public class ItineraryScheduleService {
         }
 
         validateNoTimeOverlap(
-                day.getItineraryTours(),
+                day.getItinerarySchedules(),
                 itineraryTour.getStartTime(),
                 itineraryTour.getEndTime(),
                 itineraryTour.getId()
         );
 
-        day.getItineraryTours().sort(Comparator.comparing(ItinerarySchedule::getSequence));
+        day.getItinerarySchedules().sort(Comparator.comparing(ItinerarySchedule::getSequence));
         return itineraryRepository.save(itinerary);
     }
 
@@ -131,7 +132,7 @@ public class ItineraryScheduleService {
     }
 
     private ItinerarySchedule findTourOrThrow(ItineraryDay day, Long itineraryTourId) {
-        return day.getItineraryTours().stream()
+        return day.getItinerarySchedules().stream()
                 .filter(tour -> tour.getId().equals(itineraryTourId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("일정 항목을 찾을 수 없습니다: " + itineraryTourId));

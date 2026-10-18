@@ -3,16 +3,29 @@
 
 SET @@foreign_key_checks = 0;
 
+CREATE TABLE IF NOT EXISTS `auth_types`
+(
+    `code`        VARCHAR(32)  NOT NULL,
+    `name`        VARCHAR(256) NOT NULL UNIQUE,
+    `description` VARCHAR(256) NOT NULL,
+    PRIMARY KEY (`code`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `users`
 (
     `id`         BIGINT       NOT NULL AUTO_INCREMENT,
     `email`      VARCHAR(256) NOT NULL UNIQUE,
     `password`   VARCHAR(256) NOT NULL,
     `role`       VARCHAR(64)  NOT NULL,
+    `auth_type` VARCHAR(32) DEFAULT NULL COMMENT '로그인 유형',
+    `auth_id` VARCHAR(256) DEFAULT NULL COMMENT '로그인 id',
     `created_at` DATETIME(6),
     `updated_at` DATETIME(6),
     `deleted_at` DATETIME(6),
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_users_auth_type` FOREIGN KEY (`auth_type`) REFERENCES `auth_types` (`code`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

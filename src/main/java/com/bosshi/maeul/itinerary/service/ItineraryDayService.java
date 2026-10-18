@@ -51,7 +51,7 @@ public class ItineraryDayService {
                 .itinerary(itinerary)
                 .date(request.getDate())
                 .dayNumber(request.getDayNumber())
-                .itineraryTours(new ArrayList<>())
+                .itinerarySchedules(new ArrayList<>())
                 .build();
 
         days.add(day);

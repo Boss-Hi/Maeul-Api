@@ -156,7 +156,7 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
                     .itinerary(itinerary)
                     .date(LocalDate.parse(dayJson.date()))
                     .dayNumber(dayJson.dayNumber())
-                    .itineraryTours(new ArrayList<>())
+                    .itinerarySchedules(new ArrayList<>())
                     .build();
 
             if (dayJson.items() != null) {
@@ -169,7 +169,7 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
                             .tour(tourProxy)
                             .sequence(tourJson.sequence())
                             .build();
-                    day.getItineraryTours().add(itineraryTour);
+                    day.getItinerarySchedules().add(itineraryTour);
                 }
             }
             itineraryDays.add(day);

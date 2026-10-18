@@ -154,12 +154,14 @@ CREATE TABLE itinerary_days
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE itinerary_tours
+CREATE TABLE itinerary_schedules
 (
     `id`               BIGINT       NOT NULL AUTO_INCREMENT,
     `itinerary_day_id` BIGINT       NOT NULL,
-    `content_id`       VARCHAR(256) NOT NULL,
+    `content_id`       VARCHAR(256),
     `sequence`         INT          NOT NULL,
+    `start_time`       TIME NULL,
+    `end_time`         TIME NULL,
     `created_at`       DATETIME(6),
     `updated_at`       DATETIME(6),
     `deleted_at`       DATETIME(6),
