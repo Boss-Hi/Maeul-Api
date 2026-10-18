@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,22 @@ public class GlobalExceptionHandler {
                         .status(HttpStatus.UNAUTHORIZED.value())
                         .error("Unauthorized")
                         .message("Authentication failed. Please check your credentials.")
+                        .build()
+        );
+    }
+
+    /**
+     * 401 Unauthorized 처리 (사용자 조회 실패)
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        log.warn("Unauthorized(User Not Found): {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ErrorResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .error("Unauthorized")
+                        .message(e.getMessage())
                         .build()
         );
     }
