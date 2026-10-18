@@ -8,7 +8,22 @@
 ## [Unreleased]
 
 ### In Progress
-- 여행 일정 수정 기능 개발 중 (`f1be4d7`)
+- 
+
+## [0.1.0] - 2026-10-18
+
+> 상세 일정 기능 개발
+
+### Added
+- ItineraryDay (일정 - 일별 일정) 조회 API 추가
+- ItinerarySchedule (일정 - 일별 일정 - 상세 일정) 생성 API 추가
+- ItinerarySchedule (일정 - 일별 일정 - 상세 일정) 조회 API 추가
+- ItinerarySchedule (일정 - 일별 일정 - 상세 일정) 수정 API 추가
+- 매핑 용 주소 데이터 추가
+
+### Fixed
+- 로그인 오류 시 500 Server Error 대신 401 Unauthorized 응답 반환 수정
+- 일정 response 중 tour 네이밍을 schedule 로 변경
 
 ---
 
