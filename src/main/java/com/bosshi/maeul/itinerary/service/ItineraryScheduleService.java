@@ -7,6 +7,8 @@ import com.bosshi.maeul.itinerary.entity.ItineraryScheduleType;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itinerary.repository.ItineraryScheduleRepository;
 import com.bosshi.maeul.itinerary.repository.ItineraryScheduleTypeRepository;
+import com.bosshi.maeul.itinerary.request.ItineraryScheduleReorderRequest;
+import com.bosshi.maeul.itinerary.request.ItineraryScheduleReorderRequest.ScheduleOrderItem;
 import com.bosshi.maeul.itinerary.request.ItineraryTourCreateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryTourUpdateRequest;
 import com.bosshi.maeul.location.entity.LocationMapping;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // enum alias: use fully qualified for the type-package enum to disambiguate
 // com.bosshi.maeul.itinerary.type.ItineraryScheduleType → referenced inline below
@@ -44,6 +47,41 @@ public class ItineraryScheduleService {
 
     public Optional<LocationMapping> getLocation(Long scheduleId) {
         return locationMappingRepository.findByTargetAndTargetId(LocationTargetType.ITINERARY_SCHEDULE, scheduleId);
+    }
+
+    public List<ItinerarySchedule> reorder(Long itineraryId, Long dayId, Long userId, ItineraryScheduleReorderRequest request) {
+        Itinerary itinerary = findOwnedItinerary(itineraryId, userId);
+        ItineraryDay day = findDayOrThrow(itinerary, dayId);
+        List<ItinerarySchedule> schedules = ensureSchedules(day);
+
+        List<ScheduleOrderItem> items = request.getSchedules();
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("schedules는 비어 있을 수 없습니다.");
+        }
+
+        // 중복 sequence 검증
+        Set<Integer> uniqueSeqs = items.stream().map(ScheduleOrderItem::getSequence).collect(Collectors.toSet());
+        if (uniqueSeqs.size() != items.size()) {
+            throw new IllegalArgumentException("중복된 sequence가 존재합니다.");
+        }
+
+        // 전체 커버리지 검증 — day의 schedule id 집합과 완전 일치해야 함
+        Set<Long> requestIds = items.stream().map(ScheduleOrderItem::getId).collect(Collectors.toSet());
+        Set<Long> dayIds = schedules.stream().map(ItinerarySchedule::getId).collect(Collectors.toSet());
+        if (!requestIds.equals(dayIds)) {
+            throw new IllegalArgumentException("day의 모든 schedule id를 빠짐없이 포함해야 합니다.");
+        }
+
+        // sequence 일괄 적용
+        Map<Long, Integer> sequenceMap = items.stream()
+                .collect(Collectors.toMap(ScheduleOrderItem::getId, ScheduleOrderItem::getSequence));
+        for (ItinerarySchedule schedule : schedules) {
+            schedule.setSequence(sequenceMap.get(schedule.getId()));
+        }
+
+        List<ItinerarySchedule> saved = itineraryScheduleRepository.saveAll(schedules);
+        saved.sort(Comparator.comparing(ItinerarySchedule::getSequence));
+        return saved;
     }
 
     public ItinerarySchedule store(Long itineraryId, Long dayId, Long userId, ItineraryTourCreateRequest request) {

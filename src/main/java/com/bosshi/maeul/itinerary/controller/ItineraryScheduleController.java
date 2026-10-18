@@ -3,6 +3,7 @@ package com.bosshi.maeul.itinerary.controller;
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
+import com.bosshi.maeul.itinerary.request.ItineraryScheduleReorderRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryTourCreateRequest;
 import com.bosshi.maeul.itinerary.request.ItineraryTourUpdateRequest;
 import com.bosshi.maeul.itinerary.response.ItineraryResponse;
@@ -15,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -47,6 +49,21 @@ public class ItineraryScheduleController {
     ) {
         ItinerarySchedule itinerarySchedule = itineraryScheduleService.store(itinerary, itineraryDay, userDetails.getId(), request);
         return ApiResponse.success(ItineraryResponse.ItineraryScheduleResponse.from(itinerarySchedule));
+    }
+
+    @PutMapping("/reorder")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<ItineraryResponse.ItineraryScheduleResponse>>> reorder(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long itinerary,
+            @PathVariable Long itineraryDay,
+            @RequestBody ItineraryScheduleReorderRequest request
+    ) {
+        List<ItinerarySchedule> schedules = itineraryScheduleService.reorder(itinerary, itineraryDay, userDetails.getId(), request);
+        List<ItineraryResponse.ItineraryScheduleResponse> responses = schedules.stream()
+                .map(ItineraryResponse.ItineraryScheduleResponse::from)
+                .toList();
+        return ApiResponse.success(responses);
     }
 
     @PutMapping("/{id}")
