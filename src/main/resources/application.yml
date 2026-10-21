@@ -58,15 +58,19 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
   kafka:
-    bootstrap-servers: ${KAFKA_CFG_ADVERTISED_LISTENERS:} # Kafka 서버 주소
+    bootstrap-servers: ${KAFKA_CFG_ADVERTISED_LISTENERS:localhost:9092} # Kafka 서버 주소
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: maeul-group # 컨슈머 그룹 ID
+      # group-id는 전역 설정을 제거하고 각 @KafkaListener에서 개별 관리합니다.
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.bosshi.maeul.itinerary.dto
+        spring.json.value.default.type: com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO
+        spring.json.use.type.headers: false
   # 세션 저장소를 Redis로 지정
   session:
     store-type: redis
