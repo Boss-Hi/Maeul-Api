@@ -7,5 +7,5 @@ public interface MessageProducer {
      * @param topic   발행할 토픽 이름
      * @param message 발행할 메시지 내용
      */
-    void sendMessage(String topic, String message);
+    void sendMessage(String topic, Object message);
 }
