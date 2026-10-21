@@ -3,7 +3,7 @@ package com.bosshi.maeul.itinerary.controller;
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
-import com.bosshi.maeul.itinerary.kafka.ItineraryTopics;
+import com.bosshi.maeul.itinerary.kafka.ItineraryTopic;
 import com.bosshi.maeul.itinerary.request.ItineraryGenerateRequest;
 import com.bosshi.maeul.kafka.MessageProducer;
 import jakarta.validation.Valid;
@@ -49,7 +49,7 @@ public class ItineraryKafkaController {
                 ))
                 .build();
 
-        messageProducer.sendMessage(ItineraryTopics.ItineraryGenerateEvent, dto);
+        messageProducer.sendMessage(ItineraryTopic.ItineraryGenerate, dto);
 
         return ApiResponse.success("일정 생성 요청이 성공적으로 처리되었습니다.", null);
     }
