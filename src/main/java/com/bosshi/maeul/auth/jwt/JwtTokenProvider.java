@@ -1,11 +1,14 @@
 package com.bosshi.maeul.auth.jwt;
 
 import com.bosshi.maeul.auth.type.AuthType;
+import com.bosshi.maeul.user.entity.User;
+import com.bosshi.maeul.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.modulith.NamedInterface;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,17 +24,18 @@ import java.util.Map;
  */
 @NamedInterface
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+    private final UserRepository userRepository;
     @Value("${jwt.secret}")
     private String secretKey;
-
     @Value("${jwt.expiration}")
     private long expirationMs;
 
     /**
      * 이메일을 subject로 담은 서명된 JWT를 생성한다.
      */
-    public String generateToken(String email) {
+    public String generateToken(String email, Map<String, Object> claims) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
@@ -39,6 +43,7 @@ public class JwtTokenProvider {
                 .subject(email)
                 .issuedAt(now)
                 .expiration(expiry)
+                .claims(claims)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -53,21 +58,53 @@ public class JwtTokenProvider {
         Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
         if(kakaoAccount != null) {
             authType = AuthType.KAKAO;
+            // email = (String) kakaoAccount.get("email");
             email = providerId;
         } else {
             email = (String) oAuth2User.getAttributes().get("email");
         }
+
+        Long userId = resolveUserId(authType, providerId, email);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .setSubject(providerId)
-                .claims(Map.of("email", email, "authType", authType))
+                .claims(Map.of(
+                        "userId", userId,
+                        "email", email,
+                        "authId", providerId,
+                        "authType", authType)
+                )
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    private Long resolveUserId(AuthType authType, String providerId, String email) {
+        if (authType == AuthType.KAKAO) {
+            return userRepository.findByAuthId(providerId)
+                    .map(User::getId)
+                    .orElseGet(() -> findUserIdByEmailOrThrow(email, providerId));
+        }
+
+        if (email != null && !email.isBlank() && userRepository.existsByEmail(email)) {
+            return userRepository.findByEmail(email).getId();
+        }
+
+        return userRepository.findByAuthId(providerId)
+                .map(User::getId)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다. providerId=" + providerId));
+    }
+
+    private Long findUserIdByEmailOrThrow(String email, String providerId) {
+        if (email != null && !email.isBlank() && userRepository.existsByEmail(email)) {
+            return userRepository.findByEmail(email).getId();
+        }
+
+        throw new IllegalStateException("Kakao 사용자를 찾을 수 없습니다. providerId=" + providerId);
     }
 
     /**
@@ -81,6 +118,16 @@ public class JwtTokenProvider {
                 .getPayload();
 
         return claims.getSubject();
+    }
+
+    public String getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("userId", Long.class).toString();
     }
 
     /**
