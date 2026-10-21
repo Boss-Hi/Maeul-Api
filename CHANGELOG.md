@@ -8,6 +8,13 @@
 ## [Unreleased]
 
 ### In Progress
+
+
+## [v0.1.2] - 2026-10-21
+
+> kafka 연동 및 일정 생성 기능 kafka 이벤트 기반 비동기 처리 개발
+
+### Added
 - kafka 연동
 - 일정 생성 기능 kafka 이벤트 기반 비동기 처리 개발
 
