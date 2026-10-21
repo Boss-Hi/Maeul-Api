@@ -58,7 +58,7 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
   kafka:
-    bootstrap-servers: localhost:9092 # Kafka 서버 주소
+    bootstrap-servers: ${KAFKA_CFG_ADVERTISED_LISTENERS:} # Kafka 서버 주소
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
