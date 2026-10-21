@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -42,6 +44,10 @@ public class AuthService {
             throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        return jwtTokenProvider.generateToken(user.getEmail());
+        return jwtTokenProvider.generateToken(user.getEmail(), Map.of(
+                "authType", user.getAuthType(),
+                "authId", user.getAuthId(),
+                "userId", user.getId()
+        ));
     }
 }

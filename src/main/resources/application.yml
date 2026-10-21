@@ -91,7 +91,7 @@ server:
 
 jwt:
   secret: ${JWT_SECRET_KEY}
-  expiration: 3600000
+  expiration: ${JWT_EXPIRATION_MS:3600000}
 
 open-api:
   korea-tourism:

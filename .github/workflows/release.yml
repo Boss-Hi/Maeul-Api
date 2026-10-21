@@ -12,10 +12,11 @@ jobs:
       contents: write # Release 생성을 위한 권한 설정
 
     steps:
+      # 1. 저장소 체크아웃 (name과 uses를 들여쓰기로 올바르게 연결)
       - name: Checkout repository
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
-      # 1. 공식 actions/github-script를 사용하여 CHANGELOG.md에서 현재 태그 버전 내용만 안전하게 추출
+      # 2. 공식 actions/github-script를 사용하여 CHANGELOG.md에서 현재 태그 버전 내용만 안전하게 추출
       - name: Extract Release Notes from CHANGELOG
         id: extract_changelog
         uses: actions/github-script@v7
@@ -33,7 +34,7 @@ jobs:
             const releaseNotes = match ? match[1].trim() : `Release notes for ${tagName}`;
             core.setOutput('release_notes', releaseNotes);
 
-      # 2. Java 26 환경 세팅 및 빌드 (JAR 파일 첨부용)
+      # 3. Java 26 환경 세팅 및 빌드 (JAR 파일 첨부용)
       - name: Set up JDK 26
         uses: actions/setup-java@v4
         with:
@@ -46,7 +47,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew bootJar -x test
 
-      # 3. 추출한 CHANGELOG 내용으로 Release 자동 생성 + JAR 파일 첨부
+      # 4. 추출한 CHANGELOG 내용으로 Release 자동 생성 + JAR 파일 첨부
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

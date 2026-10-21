@@ -1,6 +1,5 @@
 package com.bosshi.maeul.kafka;
 
-import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -13,11 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -40,7 +35,7 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
         // 최신 버전 JsonSerializer 필수 설정: 패키지 신뢰 및 타입 헤더 비활성화(또는 필요시 활성화)
-        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
 
         // ObjectMapper bean 유무와 관계없이 Kafka 직렬화 전용 Mapper를 구성
         ObjectMapper kafkaObjectMapper = new ObjectMapper();
@@ -59,27 +54,30 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, ItineraryGenerateDTO> itineraryGenerateConsumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "maeul-group");
-        configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        JsonDeserializer<ItineraryGenerateDTO> jsonDeserializer = new JsonDeserializer<>(ItineraryGenerateDTO.class);
-        jsonDeserializer.addTrustedPackages("com.bosshi.maeul.itinerary.dto");
-        jsonDeserializer.setUseTypeHeaders(false);
+        // 신뢰할 패키지 범위를 넓게 설정 (예: 프로젝트 루트 패키지)
+        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.bosshi.maeul.*");
 
-        return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), jsonDeserializer);
+        // 핵심: 헤더를 사용하여 타입을 동적으로 판별 (true로 설정)
+        configProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, true);
+
+        // 단일 VALUE_DEFAULT_TYPE 설정은 제거하거나 공통 부모/Object로 지정
+
+        return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), new JsonDeserializer<>());
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ItineraryGenerateDTO> kafkaListenerContainerFactory(
-            ConsumerFactory<String, ItineraryGenerateDTO> itineraryGenerateConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, ItineraryGenerateDTO> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(itineraryGenerateConsumerFactory);
+    @Bean(name = "kafkaListenerContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
+            ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
         return factory;
     }
+
 }

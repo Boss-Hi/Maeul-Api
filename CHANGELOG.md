@@ -9,6 +9,19 @@
 
 ### In Progress
 
+## [v0.1.3] - 2026-10-21
+
+> kafka 연동 후 websocket (STOMP) 연동
+
+### Added
+- websocket (STOMP) 연동
+
+### Fix
+- kafka 연동 설정 변경
+- jwt
+  - 만료 시간 변경
+  - 토근 정보 수정
+- git action 수정
 
 ## [v0.1.2] - 2026-10-21
 
