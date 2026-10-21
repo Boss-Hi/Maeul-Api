@@ -38,7 +38,7 @@ public class ItineraryGenerateConsumer {
 
             // 3. STOMP 웹소켓을 통해 해당 사용자에게 실시간 결과 전송
             // 프론트엔드 구독 경로: /private/queue/itinerary-generate
-            messageSender.sendToUser(dto.getUserId(), "/queue/" + ItineraryTopic.ItineraryGenerate, itinerary.getId());
+            messageSender.sendToUser(dto.getUserId(), ItineraryTopic.ItineraryGenerate, itinerary.getId());
         } catch (Exception e) {
             log.error("일정 생성 비동기 처리 중 오류 발생: {}", e.getMessage(), e);
             // TODO: 실패 시 보상 트랜잭션(Saga) 또는 Dead Letter Queue(DLQ) 처리

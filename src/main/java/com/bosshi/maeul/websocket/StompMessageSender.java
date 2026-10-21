@@ -31,7 +31,7 @@ public class StompMessageSender implements MessageSender {
                     "server-id", "maeul-server-01"
             );
 
-            messagingTemplate.convertAndSendToUser(userId.toString(), destination, payload, headers);
+            messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/" + destination, payload, headers);
 
         } catch (Exception e) {
             log.error("[WebSocket 전송 실패] 대상 사용자: {}, 오류: {}", userId, e.getMessage(), e);
