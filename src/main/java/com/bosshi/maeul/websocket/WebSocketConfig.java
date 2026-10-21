@@ -27,7 +27,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // 1. 브로드캐스트 토픽 프리픽스
-        config.enableSimpleBroker("/sub");
+        // convertAndSendToUser는 내부적으로 /queue/* 형태의 목적지를 사용하므로 함께 활성화
+        config.enableSimpleBroker("/sub", "/queue");
 
         // 2. 클라이언트 -> 서버 메시지 송신 프리픽스
         config.setApplicationDestinationPrefixes("/pub");
@@ -73,13 +74,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                                 accessor.setUser(authentication);
                                 log.info("[WebSocket 인증 성공] User ID: {}", userId);
                             } else {
-                                log.warn("[WebSocket 인증 실패] 유효하지 않은 토큰입니다.");
+                                throw new IllegalArgumentException("WebSocket 인증 실패: 유효하지 않은 토큰입니다.");
                             }
                         } catch (Exception e) {
-                            log.error("[WebSocket 인증 오류] 토큰 파싱 실패: {}", e.getMessage());
+                            throw new IllegalArgumentException("WebSocket 인증 실패: " + e.getMessage());
                         }
                     } else {
-                        log.warn("[WebSocket 인증 실패] Authorization 헤더가 없거나 형식이 잘못되었습니다.");
+                        throw new IllegalArgumentException("WebSocket 인증 실패: Authorization 헤더가 없거나 형식이 잘못되었습니다.");
                     }
                 }
                 return message;
