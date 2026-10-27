@@ -24,7 +24,8 @@ public class SurveyResponseService {
     private final SurveyQuestionOptionRepository optionRepository;
 
     public SurveyResponse getCurrentResponsesByUserId(Long userId, Long surveyId) {
-        return responseRepository.findByUserIdAndSurveyId(userId, surveyId);
+        return responseRepository.findFirstByUserIdAndSurveyIdOrderByCreatedAtDesc(userId, surveyId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 설문 응답입니다. UserID: " + userId + ", SurveyID: " + surveyId));
     }
 
     @Transactional
