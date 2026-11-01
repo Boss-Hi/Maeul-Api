@@ -28,12 +28,14 @@ public class SurveyResResponse {
     @Getter
     @Builder
     public static class SurveyAnswerResponse {
+        private Long id;
         private Long questionId;
         private Long optionId;
 
         public static SurveyAnswerResponse from(SurveyAnswer surveyAnswer) {
             SurveyQuestion question = surveyAnswer.getQuestion();
             return SurveyAnswerResponse.builder()
+                    .id(surveyAnswer.getId())
                     .questionId(question.getId())
                     .optionId(surveyAnswer.getOption() != null ? surveyAnswer.getOption().getId() : null)
                     .build();
