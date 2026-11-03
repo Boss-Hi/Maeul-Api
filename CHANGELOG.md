@@ -9,6 +9,12 @@
 
 ### In Progress
 
+- 설문 답변 수정 api 수정
+  - questionId, optionId 로 설문 답변을 재생성
+  - answerId 로 설문 답변을 수정하는 api 는 삭제
+- 축제 목록
+  - 진행 중, 종료된, 모든 축제 보기 필터 추가
+
 ## [v0.1.5] - 2026-11-01
 
 > 저장한 설문 response 에 id 값 추가
