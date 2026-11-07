@@ -118,6 +118,14 @@ ai:
     retry-max-attempts: ${GEMINI_RETRY_MAX_ATTEMPTS:3}
     retry-initial-backoff-ms: ${GEMINI_RETRY_INITIAL_BACKOFF_MS:1000}
     fallback-model: ${GEMINI_FALLBACK_MODEL:}
+  claude:
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: ${CLAUDE_MODEL:claude-opus-5-5}
+    max-tokens: ${CLAUDE_MAX_TOKENS:16000}
+    effort: ${CLAUDE_EFFORT:medium}
+    refusal-fallback-enabled: ${CLAUDE_REFUSAL_FALLBACK_ENABLED:true}
+  # 일정 생성 시 시도할 AI 제공자 순서 (claude, gemini, test)
+  providers: ${AI_PROVIDERS:claude,gemini}
 
 kakao:
     rest-api:

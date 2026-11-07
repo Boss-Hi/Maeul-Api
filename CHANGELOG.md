@@ -9,6 +9,14 @@
 
 ### In Progress
 
+- Claude AI 추가 및 일정 생성 AI 제공자 다중화 (ADR 0006)
+  - 제공자 순서(`AI_PROVIDERS`, 기본 `claude,gemini`)대로 시도하고 실패하면 다음 제공자로 대체
+  - Claude: 공식 Java SDK, 기본 모델 `claude-opus-5-5`(effort medium), structured outputs, 거절 시 서버 측 대체(`fallbacks: default`)
+  - Claude 키도 `ai_api_keys`(provider_type=CLAUDE)로 관리, 401/403 거부 키 자동 비활성화
+  - 키 조회를 제공자별로 분리 (기존에는 다른 제공자의 키도 Gemini 가 사용할 수 있었음)
+  - 테스트 생성기를 `test` 제공자로 전환 (`@Qualifier` 하드코딩 제거)
+  - 일정 생성 요청 API 는 모든 제공자에 활성 키가 없을 때만 503
+
 - 설문 답변 수정 api 수정
   - questionId, optionId 로 설문 답변을 재생성
   - answerId 로 설문 답변을 수정하는 api 는 삭제

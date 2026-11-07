@@ -83,11 +83,16 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
     }
 
     @Override
+    public String providerName() {
+        return "test";
+    }
+
+    @Override
     public Itinerary generateItinerary(ItineraryGenerateDTO dto) throws JsonProcessingException {
         String cleanedJson = getTestResultFromDB(dto.getStartDate(), dto.getEndDate());
         com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
 
-        List<ItineraryGenerator.ItineraryDayJson> daysJson = objectMapper.readValue(
+        List<ItineraryDayJson> daysJson = objectMapper.readValue(
                 cleanedJson, new TypeReference<>() {
                 }
         );
@@ -100,7 +105,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
                 .build();
 
         List<ItineraryDay> itineraryDays = new ArrayList<>();
-        for (ItineraryGenerator.ItineraryDayJson dayJson : daysJson) {
+        for (ItineraryDayJson dayJson : daysJson) {
             ItineraryDay day = ItineraryDay.builder()
                     .itinerary(itinerary)
                     .date(LocalDate.parse(dayJson.date()))
@@ -109,7 +114,7 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
                     .build();
 
             if (dayJson.items() != null) {
-                for (ItineraryGenerator.ItineraryTourJson item : dayJson.items()) {
+                for (ItineraryTourJson item : dayJson.items()) {
                     // DB 조회를 하지 않고 프록시(참조) 객체만 생성 (테스트 데이터는 DB 의 실제 contentId 만 사용)
                     ItineraryScheduleMapper.toSchedule(day, item, contentId -> entityManager.getReference(Tour.class, contentId))
                             .ifPresent(day.getItinerarySchedules()::add);

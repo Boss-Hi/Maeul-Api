@@ -154,7 +154,9 @@ AI(Gemini)가 생성한 Trip에 대한 구체적인 추천 일정.
 | 설문 | Survey | 질문(SurveyQuestion) 묶음 |
 | 응답 | SurveyResponse | 사용자 한 명이 설문 하나에 제출한 결과 전체 |
 | 답변 | SurveyAnswer | 선택한 옵션 1개 (질문 단위 아님) |
-| AI 키 | AiApiKey | 일정 생성에 쓰는 AI 제공자 API 키. 여러 개를 돌아가며 사용 |
+| AI 제공자 | AI Provider | 일정을 생성하는 외부 AI 서비스 (Gemini, Claude) |
+| 제공자 순서 | Provider Order | 일정 생성 시 시도할 AI 제공자 순서. 앞 제공자가 실패하면 다음 제공자로 넘어감 |
+| AI 키 | AiApiKey | 특정 AI 제공자에 속한 API 키. 같은 제공자의 키끼리만 돌아가며 사용 |
 | 활성 키 | Active AiApiKey | 사용 가능한 AI 키. AI 제공자가 거부한 키는 자동으로 비활성이 되며, 사람이 교체·재활성화해야 함 |
 | 일정 생성 결과 | Itinerary Generate Result | 비동기 일정 생성의 성공(일정 ID) 또는 실패(사유) 알림 |
 

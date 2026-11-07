@@ -1,7 +1,7 @@
 # ADR 0003: Gemini API for Itinerary Generation with Cost Optimization
 
 ## Status
-**Accepted** (2026-08-26)
+**Superseded by ADR 0006** (2026-11-07) — 원래 Accepted (2026-08-26)
 
 ## Context
 

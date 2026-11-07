@@ -3,14 +3,13 @@ package com.bosshi.maeul.itinerary.service;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.filter.TourFilteringService;
-import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
+import com.bosshi.maeul.itinerary.generator.ItineraryGeneratorRouter;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itinerary.request.ItineraryUpdateRequest;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +31,13 @@ public class ItineraryService {
     private final TourRepository tourRepository;
     private final TourFilteringService tourFilteringService;
     private final ItineraryRepository itineraryRepository;
-    private final ItineraryGeneratorImpl itineraryGenerator;
+    private final ItineraryGeneratorRouter itineraryGenerator;
 
-    // @RequiredArgsConstructor 대신 직접 생성자를 작성하고 파라미터에 @Qualifier 적용
     public ItineraryService(
             TourRepository tourRepository,
             TourFilteringService tourFilteringService,
             ItineraryRepository itineraryRepository,
-            @Qualifier("itineraryGenerator") ItineraryGeneratorImpl itineraryGenerator) {
+            ItineraryGeneratorRouter itineraryGenerator) {
 
         this.tourRepository = tourRepository;
         this.tourFilteringService = tourFilteringService;
@@ -57,7 +55,7 @@ public class ItineraryService {
         dto.setTour(tour);
         dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
 
-        Itinerary itinerary = itineraryGenerator.generateItinerary(dto);
+        Itinerary itinerary = itineraryGenerator.generate(dto);
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
         log.info(
                 "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()

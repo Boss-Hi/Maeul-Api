@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -20,10 +21,34 @@ public class KeySeeder implements CommandLineRunner {
     @Value("${ai.gemini.api-key}")
     private String key;
 
+    @Value("${ai.claude.api-key:}")
+    private String claudeKey;
+
     @Override
     @Transactional
     public void run(String... args) {
-        if (repository.count() > 0) {
+        seedGemini();
+        seedClaude();
+    }
+
+    /**
+     * CLAUDE 키가 하나도 없고 설정 키가 있으면 1회 등록한다.
+     */
+    private void seedClaude() {
+        if (!StringUtils.hasText(claudeKey) || repository.existsByProviderType(AiProviderType.CLAUDE)) {
+            return;
+        }
+
+        repository.save(AiApiKey.builder()
+                .apiKey(claudeKey)
+                .providerType(AiProviderType.CLAUDE)
+                .active(true)
+                .name("Claude API Key")
+                .build());
+    }
+
+    private void seedGemini() {
+        if (repository.existsByProviderType(AiProviderType.GEMINI)) {
             return;
         }
 

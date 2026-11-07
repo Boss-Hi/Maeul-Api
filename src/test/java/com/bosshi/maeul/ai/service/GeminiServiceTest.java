@@ -2,6 +2,7 @@ package com.bosshi.maeul.ai.service;
 
 import com.bosshi.maeul.ai.config.GeminiConfig;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
+import com.bosshi.maeul.ai.type.AiProviderType;
 import com.bosshi.maeul.common.exception.ServiceUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,14 +40,14 @@ class GeminiServiceTest {
             {"candidates":[{"content":{"parts":[{"text":"{}"}]}}]}""";
 
     private MockRestServiceServer server;
-    private GeminiApiKeyProvider keyProvider;
+    private AiApiKeyProvider keyProvider;
     private GeminiService service;
 
     @BeforeEach
     void setUp() {
         RestClient.Builder builder = RestClient.builder();
         server = MockRestServiceServer.bindTo(builder).build();
-        keyProvider = mock(GeminiApiKeyProvider.class);
+        keyProvider = mock(AiApiKeyProvider.class);
 
         GeminiConfig config = new GeminiConfig();
         config.setBaseUrl("https://gemini.test");
@@ -68,7 +69,7 @@ class GeminiServiceTest {
     @Test
     @DisplayName("503 high demand 는 백오프 후 재시도해서 성공한다")
     void retriesOnHighDemand() {
-        when(keyProvider.acquire()).thenReturn(Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "k")));
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "k")));
         server.expect(requestTo(containsString("models/m:")))
                 .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE).contentType(MediaType.APPLICATION_JSON).body(HIGH_DEMAND_BODY));
         server.expect(requestTo(containsString("models/m:")))
@@ -86,7 +87,7 @@ class GeminiServiceTest {
     @DisplayName("기본 모델 재시도가 모두 실패하면 대체 모델로 호출한다")
     void fallsBackToAnotherModel() {
         config.setFallbackModel("lite");
-        when(keyProvider.acquire()).thenReturn(Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "k")));
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "k")));
         for (int i = 0; i < 3; i++) {
             server.expect(requestTo(containsString("models/m:")))
                     .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE).contentType(MediaType.APPLICATION_JSON).body(HIGH_DEMAND_BODY));
@@ -101,7 +102,7 @@ class GeminiServiceTest {
     @Test
     @DisplayName("재시도가 모두 실패하면 503 예외(사용량 과다 메시지)를 던진다")
     void throwsServiceUnavailableWhenRetriesExhausted() {
-        when(keyProvider.acquire()).thenReturn(Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "k")));
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "k")));
         for (int i = 0; i < 3; i++) {
             server.expect(requestTo(containsString("models/m:")))
                     .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE).contentType(MediaType.APPLICATION_JSON).body(HIGH_DEMAND_BODY));
@@ -116,9 +117,9 @@ class GeminiServiceTest {
     @Test
     @DisplayName("API_KEY_INVALID 이면 키를 비활성화하고 다음 키로 재시도한다")
     void deactivatesInvalidKeyAndRetries() {
-        when(keyProvider.acquire()).thenReturn(
-                Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "bad")),
-                Optional.of(new GeminiApiKeyProvider.UsableKey(2L, "B", "good")));
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(
+                Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "bad")),
+                Optional.of(new AiApiKeyProvider.UsableKey(2L, "B", "good")));
         server.expect(queryParam("key", "bad"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(INVALID_KEY_BODY));
         server.expect(queryParam("key", "good"))
@@ -134,8 +135,8 @@ class GeminiServiceTest {
     @Test
     @DisplayName("모든 키가 거부되면 503 예외를 던진다")
     void throwsServiceUnavailableWhenKeysExhausted() {
-        when(keyProvider.acquire()).thenReturn(
-                Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "bad")),
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(
+                Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "bad")),
                 Optional.empty());
         server.expect(queryParam("key", "bad"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(INVALID_KEY_BODY));
@@ -147,8 +148,8 @@ class GeminiServiceTest {
     @Test
     @DisplayName("같은 키가 다시 나오면 무한 재시도하지 않는다")
     void stopsWhenSameKeyReturnedAgain() {
-        GeminiApiKeyProvider.UsableKey key = new GeminiApiKeyProvider.UsableKey(1L, "A", "bad");
-        when(keyProvider.acquire()).thenReturn(Optional.of(key));
+        AiApiKeyProvider.UsableKey key = new AiApiKeyProvider.UsableKey(1L, "A", "bad");
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(key));
         server.expect(queryParam("key", "bad"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(INVALID_KEY_BODY));
 
@@ -158,7 +159,7 @@ class GeminiServiceTest {
     @Test
     @DisplayName("429 는 키를 끄지 않고 그대로 실패한다")
     void doesNotDeactivateOnRateLimit() {
-        when(keyProvider.acquire()).thenReturn(Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "k")));
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "k")));
         server.expect(queryParam("key", "k"))
                 .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS).contentType(MediaType.APPLICATION_JSON)
                         .body("{\"error\":{\"status\":\"RESOURCE_EXHAUSTED\"}}"));
@@ -170,8 +171,8 @@ class GeminiServiceTest {
     @Test
     @DisplayName("403 PERMISSION_DENIED 이면 키를 비활성화한다")
     void deactivatesOnPermissionDenied() {
-        when(keyProvider.acquire()).thenReturn(
-                Optional.of(new GeminiApiKeyProvider.UsableKey(1L, "A", "denied")),
+        when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(
+                Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "denied")),
                 Optional.empty());
         server.expect(queryParam("key", "denied"))
                 .andRespond(withStatus(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON)

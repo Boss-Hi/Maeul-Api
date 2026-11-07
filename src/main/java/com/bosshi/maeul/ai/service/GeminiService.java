@@ -3,6 +3,7 @@ package com.bosshi.maeul.ai.service;
 import com.bosshi.maeul.ai.config.GeminiConfig;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
+import com.bosshi.maeul.ai.type.AiProviderType;
 import com.bosshi.maeul.common.exception.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class GeminiService {
 
     private final RestClient.Builder restClientBuilder;
     private final GeminiConfig config;
-    private final GeminiApiKeyProvider keyProvider;
+    private final AiApiKeyProvider keyProvider;
 
     // 테스트에서 대기 없이 검증할 수 있도록 교체 가능
     Sleeper sleeper = Thread::sleep;
@@ -46,7 +47,7 @@ public class GeminiService {
      * 사용 가능한(활성) API 키가 하나라도 있는지 확인한다.
      */
     public boolean hasAvailableApiKey() {
-        return keyProvider.hasAvailableKey();
+        return keyProvider.hasAvailableKey(AiProviderType.GEMINI);
     }
 
     /**
@@ -91,7 +92,7 @@ public class GeminiService {
     private GeminiGenerateResponse callWithAvailableKey(String model, GeminiGenerateRequest request) {
         Set<Long> triedKeyIds = new HashSet<>();
         while (true) {
-            GeminiApiKeyProvider.UsableKey key = keyProvider.acquire()
+            AiApiKeyProvider.UsableKey key = keyProvider.acquire(AiProviderType.GEMINI)
                     .filter(k -> triedKeyIds.add(k.id()))
                     .orElseThrow(() -> {
                         log.error("사용 가능한 Gemini API key 가 없습니다.");

@@ -1,11 +1,13 @@
-# AI Gemini Package
+# AI Package (Gemini, Claude)
 
 ## 구성
 - `config/GeminiProperties`: Gemini API 설정 바인딩
 - `request/GeminiGenerateRequest`: `generateContent` 요청 DTO
 - `response/GeminiGenerateResponse`: `generateContent` 응답 DTO
 - `service/GeminiService`: Gemini API 호출 서비스. 거부된 키(API_KEY_INVALID, PERMISSION_DENIED)는 비활성화 후 다음 키로 재시도
-- `service/GeminiApiKeyProvider`: 키 선택/비활성화 (별도 트랜잭션)
+- `service/AiApiKeyProvider`: 제공자별 키 선택/비활성화 (별도 트랜잭션)
+- `service/ClaudeService`: Anthropic Claude 호출 (공식 Java SDK, structured outputs). 401/403 거부 키는 비활성화 후 다음 키로 재시도
+- `config/ClaudeConfig`: Claude 설정 바인딩
 - `batch/GeminiHealthBatch`: 주기적 헬스 체크 배치
 - `json/GeminiJsonQuantifier`: JSON 구조 정량화 유틸
 
@@ -21,6 +23,16 @@
 - `GEMINI_RETRY_MAX_ATTEMPTS`: 일시적 오류(500/503/504) 시 모델당 최대 시도 횟수, 기본 `3`
 - `GEMINI_RETRY_INITIAL_BACKOFF_MS`: 첫 재시도 대기(ms), 이후 2배씩 증가, 기본 `1000`
 - `GEMINI_FALLBACK_MODEL`: 기본 모델 재시도 소진 시 사용할 대체 모델, 기본 없음
+
+## Claude 환경 변수
+- `ANTHROPIC_API_KEY`: `ai_api_keys` 에 CLAUDE 키가 없을 때 최초 기동 시 seed 되는 키
+- `CLAUDE_MODEL`: 기본 `claude-opus-5-5`
+- `CLAUDE_MAX_TOKENS`: 기본 `16000`
+- `CLAUDE_EFFORT`: `low` | `medium` | `high` | `xhigh` | `max`, 기본 `medium`
+- `CLAUDE_REFUSAL_FALLBACK_ENABLED`: 거절 시 서버 측 다른 Claude 모델로 재처리, 기본 `true`
+
+## 일정 생성 제공자 순서
+- `AI_PROVIDERS`: 시도 순서, 기본 `claude,gemini`. 로컬 무비용 테스트는 `test`
 
 ## 사용 예시
 ```java
