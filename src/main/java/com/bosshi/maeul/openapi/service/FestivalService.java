@@ -6,6 +6,7 @@ import com.bosshi.maeul.openapi.repository.TourCategoryRepository;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.bosshi.maeul.openapi.request.SearchFestivalRequest;
 import com.bosshi.maeul.openapi.type.FestivalCategory;
+import com.bosshi.maeul.openapi.type.FestivalStatus;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,9 @@ import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +30,7 @@ import java.util.List;
 public class FestivalService {
     private static final String FESTIVAL_CONTENT_TYPE_ID = "15";
     private static final int POPULAR_LIMIT = 10;
+    private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
 
     private final TourRepository festivalRepository;
     private final TourCategoryRepository tourCategoryRepository;
@@ -91,6 +96,18 @@ public class FestivalService {
             }
             if (request.getEventEndDate() != null && !request.getEventEndDate().isBlank()) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("eventStartDate"), request.getEventEndDate()));
+            }
+
+            // 진행 상태 필터링 (eventStartDate/eventEndDate 는 YYYYMMDD 문자열이므로 사전순 비교)
+            FestivalStatus status = request.getStatus() != null ? request.getStatus() : FestivalStatus.ALL;
+            String today = LocalDate.now(SEOUL).format(DateTimeFormatter.BASIC_ISO_DATE);
+            switch (status) {
+                case ONGOING -> {
+                    predicates.add(cb.lessThanOrEqualTo(root.get("eventStartDate"), today));
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("eventEndDate"), today));
+                }
+                case ENDED -> predicates.add(cb.lessThan(root.get("eventEndDate"), today));
+                case ALL -> { }
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

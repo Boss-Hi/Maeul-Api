@@ -1,7 +1,9 @@
 package com.bosshi.maeul.openapi.request;
 
 import com.bosshi.maeul.location.dto.LocationDTO;
+import com.bosshi.maeul.openapi.type.FestivalStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,4 +35,10 @@ public class SearchFestivalRequest {
      * 위치 정보
      */
     private LocationDTO location;
+
+    /**
+     * 진행 상태 (ALL, ONGOING, ENDED). 기본값 ALL
+     */
+    @Builder.Default
+    private FestivalStatus status = FestivalStatus.ALL;
 }
