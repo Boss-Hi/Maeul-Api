@@ -17,6 +17,13 @@
   - 로그인 사용자 본인 기록만 다룸
   - 수집 주기 기본 1분, `TIMELINE_COLLECTION_INTERVAL` 로 변경 (주기보다 촘촘한 기록은 저장하지 않음)
   - `timeline_points` 테이블 추가 (V9)
+- 점령 (위치 기록 기반 시군구별 누적 시간, ADR 0008)
+  - `GET /api/territory/me?month=YYYY-MM`: 현재 방문(currentVisit), 시군구별 누적 점령 시간·개인 순서·월간 순위, 포인트 적립 진행
+  - `GET /api/territory/regions?parentRegionId=`: 지역 목록 (전국 `KR` / 시도 2자리 / 시군구 5자리)
+  - `GET /api/territory/regions/{regionId}/ranking?month=`: 시군구 월간 점령 순위
+  - `GET /api/points`: 포인트 잔액과 내역. 점령 1시간마다 100P (`TERRITORY_REWARD_UNIT`, `TERRITORY_REWARD_POINTS`)
+  - 시군구 판정은 카카오 역지오코딩 + 약 100m 격자 캐시, 기록이 3분(`TERRITORY_MAX_GAP`) 넘게 끊긴 시간은 점령 시간에서 제외
+  - `territory_region_cells`, `territory_daily_stays`, `point_transactions` 테이블 추가 (V10)
 - 필수 파라미터 누락, 파라미터 형식 오류, 읽을 수 없는 요청 본문을 500 대신 400 으로 응답
 
 ## [v0.2.0] - 2026-11-07

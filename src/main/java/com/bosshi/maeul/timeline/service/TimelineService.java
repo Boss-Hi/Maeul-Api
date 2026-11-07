@@ -2,6 +2,7 @@ package com.bosshi.maeul.timeline.service;
 
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import com.bosshi.maeul.timeline.entity.TimelinePoint;
+import com.bosshi.maeul.timeline.event.TimelinePointsChangedEvent;
 import com.bosshi.maeul.timeline.repository.TimelinePointRepository;
 import com.bosshi.maeul.timeline.request.TimelinePointsRequest;
 import com.bosshi.maeul.timeline.response.TimelineDeleteResponse;
@@ -9,6 +10,7 @@ import com.bosshi.maeul.timeline.response.TimelineRecordResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse.TimelinePosition;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class TimelineService {
 
     private final TimelinePointRepository pointRepository;
     private final TimelineProperties properties;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 위치 기록 저장. 수집 주기보다 촘촘한 기록, 이미 저장된 시각, 미래 시각의 기록은 버린다.
@@ -58,6 +63,10 @@ public class TimelineService {
         List<TimelinePoint> accepted = TimelinePointSampler.sample(
                 incoming, TimelinePoint::getRecordedAt, stored, minimumGap, latestAllowed);
         pointRepository.saveAll(accepted);
+        if (!accepted.isEmpty()) {
+            Set<LocalDate> dates = accepted.stream().map(point -> point.getRecordedAt().toLocalDate()).collect(Collectors.toSet());
+            eventPublisher.publishEvent(new TimelinePointsChangedEvent(userId, dates));
+        }
 
         return new TimelineRecordResponse(accepted.size(), incoming.size() - accepted.size());
     }
@@ -83,6 +92,9 @@ public class TimelineService {
     @Transactional
     public TimelineDeleteResponse deleteDay(Long userId, LocalDate date) {
         int deleted = pointRepository.deleteByUserIdAndRange(userId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+        if (deleted > 0) {
+            eventPublisher.publishEvent(new TimelinePointsChangedEvent(userId, Set.of(date)));
+        }
         return new TimelineDeleteResponse(date, deleted);
     }
 }

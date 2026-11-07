@@ -135,6 +135,13 @@ timeline:
   min-stay-duration: ${TIMELINE_MIN_STAY_DURATION:5m}
   zone: ${TZ:Asia/Seoul}
 
+# 점령 (위치 기록 기반 시군구별 누적 시간, 월간 순위, 포인트)
+territory:
+  max-gap: ${TERRITORY_MAX_GAP:3m} # 기록이 이보다 오래 끊기면 그 사이 시간은 점령 시간에서 뺌
+  reward-unit: ${TERRITORY_REWARD_UNIT:1h}
+  reward-points: ${TERRITORY_REWARD_POINTS:100}
+  ranking-max-size: ${TERRITORY_RANKING_MAX_SIZE:100}
+
 kakao:
     rest-api:
         key: ${KAKAO_REST_API_KEY:}

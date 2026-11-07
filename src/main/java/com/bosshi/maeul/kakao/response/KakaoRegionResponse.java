@@ -15,6 +15,9 @@ public class KakaoRegionResponse {
         @JsonProperty("region_type")
         private String regionType;
 
+        @JsonProperty("code")
+        private String code; // 법정동(B)/행정동(H) 코드 10자리
+
         @JsonProperty("address_name")
         private String addressName;
 
