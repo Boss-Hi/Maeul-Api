@@ -4,7 +4,6 @@ import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import com.bosshi.maeul.timeline.request.TimelinePointsRequest;
-import com.bosshi.maeul.timeline.response.TimelineDeleteResponse;
 import com.bosshi.maeul.timeline.response.TimelineRecordResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse;
 import com.bosshi.maeul.timeline.service.TimelineService;
@@ -52,15 +51,4 @@ public class TimelineController {
         return ApiResponse.success(timelineService.getDay(userDetails.getId(), date));
     }
 
-    /**
-     * 하루 위치 기록 삭제
-     */
-    @DeleteMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<TimelineDeleteResponse>> delete(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        return ApiResponse.success(timelineService.deleteDay(userDetails.getId(), date));
-    }
 }
