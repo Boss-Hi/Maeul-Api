@@ -9,6 +9,8 @@
 
 ### In Progress
 
+## [v0.3.0] - 2026-11-07
+
 - 위치 기록 타임라인 (Google 타임라인 방식, ADR 0007)
   - `GET /api/timeline/settings`: 수집 주기 등 앱 설정 조회
   - `POST /api/timeline/points`: 위치 기록 업로드 (최대 1440개, 오프라인 동안 쌓인 기록 일괄 전송)
