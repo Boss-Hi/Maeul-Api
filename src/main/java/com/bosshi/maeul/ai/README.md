@@ -18,6 +18,9 @@
 - `GEMINI_BATCH_ENABLED`: 기본 `false`
 - `GEMINI_BATCH_PROMPT`: 배치 호출용 프롬프트
 - `GEMINI_BATCH_CRON`: 기본 `0 0/30 * * * *`
+- `GEMINI_RETRY_MAX_ATTEMPTS`: 일시적 오류(500/503/504) 시 모델당 최대 시도 횟수, 기본 `3`
+- `GEMINI_RETRY_INITIAL_BACKOFF_MS`: 첫 재시도 대기(ms), 이후 2배씩 증가, 기본 `1000`
+- `GEMINI_FALLBACK_MODEL`: 기본 모델 재시도 소진 시 사용할 대체 모델, 기본 없음
 
 ## 사용 예시
 ```java

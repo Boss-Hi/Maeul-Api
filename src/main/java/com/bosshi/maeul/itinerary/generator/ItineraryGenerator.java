@@ -5,13 +5,11 @@ import com.bosshi.maeul.ai.service.GeminiService;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
-import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 일정 생성 서비스
@@ -31,7 +31,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ItineraryGenerator implements ItineraryGeneratorImpl {
-    private final EntityManager entityManager;
     private final GeminiService geminiService;
 
     /**
@@ -108,7 +107,10 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
         prompt.append("\n");
         prompt.append("[지시사항]\n");
         prompt.append("1. 주축제를 중심으로 일정을 짜세요.\n");
-        prompt.append("2. 각 날짜별로 3-5개의 관광지를 추천하세요.\n");
+        prompt.append("2. 각 날짜별로 3-5개의 일정을 추천하세요.\n");
+        prompt.append("   - 위 추천 관광지 목록의 장소를 쓸 때는 해당 contentId 를 그대로 넣으세요.\n");
+        prompt.append("   - 목록에 없는 장소나 활동(식사, 휴식, 이동 등)은 contentId 를 null 로 두고 title 과 description 을 작성하세요.\n");
+        prompt.append("   - 목록에 없는 contentId 를 임의로 만들지 마세요.\n");
         prompt.append("3. 출력은 설명, 인사말, 마크다운(```json) 없이 오직 아래 지정된 규격의 JSON 데이터만 반환하세요.\n");
         prompt.append("[응답 JSON 스키마]\n");
         prompt.append("[\n");
@@ -117,8 +119,10 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
         prompt.append("      \"dayNumber\": 1,\n");
         prompt.append("      \"items\": [\n");
         prompt.append("        {\n");
-        prompt.append("          \"contentId\": \"관광지_contentId\",\n");
-        prompt.append("          \"sequence\": 1\n");
+        prompt.append("          \"contentId\": \"관광지_contentId 또는 null\",\n");
+        prompt.append("          \"sequence\": 1,\n");
+        prompt.append("          \"title\": \"contentId 가 null 일 때 일정 제목\",\n");
+        prompt.append("          \"description\": \"contentId 가 null 일 때 일정 설명\"\n");
         prompt.append("        }\n");
         prompt.append("      ]\n");
         prompt.append("    }\n");
@@ -150,6 +154,13 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
                 .userId(dto.getUserId())
                 .build();
 
+        // 프롬프트에 넘긴 관광지(+주축제)만 TOUR 로 연결하고, 그 외 항목은 NORMAL 일정으로 저장
+        Map<String, Tour> knownTours = new HashMap<>();
+        dto.getRecommendableTours().forEach(t -> knownTours.put(t.getContentId(), t));
+        if (dto.getTour() != null) {
+            knownTours.put(dto.getTour().getContentId(), dto.getTour());
+        }
+
         List<ItineraryDay> itineraryDays = new ArrayList<>();
         for (ItineraryDayJson dayJson : daysJson) {
             ItineraryDay day = ItineraryDay.builder()
@@ -160,16 +171,9 @@ public class ItineraryGenerator implements ItineraryGeneratorImpl {
                     .build();
 
             if (dayJson.items() != null) {
-                for (ItineraryTourJson tourJson : dayJson.items()) {
-                    // DB 조회를 하지 않고 프록시(참조) 객체만 생성
-                    Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
-
-                    ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
-                            .itineraryDay(day)
-                            .tour(tourProxy)
-                            .sequence(tourJson.sequence())
-                            .build();
-                    day.getItinerarySchedules().add(itineraryTour);
+                for (ItineraryTourJson item : dayJson.items()) {
+                    ItineraryScheduleMapper.toSchedule(day, item, knownTours::get)
+                            .ifPresent(day.getItinerarySchedules()::add);
                 }
             }
             itineraryDays.add(day);

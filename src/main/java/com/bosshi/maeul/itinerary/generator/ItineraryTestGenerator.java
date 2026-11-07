@@ -3,7 +3,6 @@ package com.bosshi.maeul.itinerary.generator;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
-import com.bosshi.maeul.itinerary.entity.ItinerarySchedule;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
@@ -110,16 +109,10 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
                     .build();
 
             if (dayJson.items() != null) {
-                for (ItineraryGenerator.ItineraryTourJson tourJson : dayJson.items()) {
-                    // DB 조회를 하지 않고 프록시(참조) 객체만 생성
-                    Tour tourProxy = entityManager.getReference(Tour.class, tourJson.contentId());
-
-                    ItinerarySchedule itineraryTour = ItinerarySchedule.builder()
-                            .itineraryDay(day)
-                            .tour(tourProxy)
-                            .sequence(tourJson.sequence())
-                            .build();
-                    day.getItinerarySchedules().add(itineraryTour);
+                for (ItineraryGenerator.ItineraryTourJson item : dayJson.items()) {
+                    // DB 조회를 하지 않고 프록시(참조) 객체만 생성 (테스트 데이터는 DB 의 실제 contentId 만 사용)
+                    ItineraryScheduleMapper.toSchedule(day, item, contentId -> entityManager.getReference(Tour.class, contentId))
+                            .ifPresent(day.getItinerarySchedules()::add);
                 }
             }
             itineraryDays.add(day);

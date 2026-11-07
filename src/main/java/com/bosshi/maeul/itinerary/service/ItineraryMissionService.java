@@ -26,10 +26,15 @@ public class ItineraryMissionService {
      * 일정이 생성되었을 때, 일정 내의 관광지(Tour) 카테고리를 분석하여
      * 관련된 미션을 찾아 Itinerary와 연관(매핑)시켜 저장합니다.
      *
-     * @param itinerary 생성된(또는 저장된) 일정 엔티티
+     * 전달받은 일정은 다른 트랜잭션에서 저장되어 detached 상태일 수 있으므로(LAZY 프록시 접근 불가)
+     * 현재 트랜잭션에서 다시 조회한 영속 엔티티로 작업한다.
+     *
+     * @param source 생성된(또는 저장된) 일정 엔티티
      */
     @Transactional
-    public void generateMissionsForItinerary(Itinerary itinerary) {
+    public void generateMissionsForItinerary(Itinerary source) {
+        Itinerary itinerary = itineraryRepository.findById(source.getId())
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + source.getId()));
         log.info("[ItineraryMissionService] 일정 ID [{}]에 대한 미션 생성 시작...", itinerary.getId());
 
         // 1. 일정에 포함된 모든 Tour 객체의 카테고리 코드(cat1, cat2, cat3) 수집

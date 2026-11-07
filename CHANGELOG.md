@@ -21,6 +21,11 @@
   - 일정 생성 결과 웹소켓 메시지 형식 변경 (`{ status, itineraryId }` / `{ status, message }`), 실패 시에도 알림
   - 에러 로그의 API 키 마스킹
   - AI 키가 업데이트(lastUsedAt, active)마다 중첩 암호화되던 버그 수정 (EntityListener → `@Convert`)
+  - Gemini 일시적 오류(500, 503 high demand, 504) 지수 백오프 재시도 및 대체 모델(`GEMINI_FALLBACK_MODEL`) 지원
+- 일정 생성 후 미션 생성 시 LazyInitializationException 수정 (미션 생성 트랜잭션에서 일정 재조회)
+- AI 일정 생성 시 contentId 를 선택 사항으로 변경
+  - 추천 목록의 contentId 는 TOUR 상세 일정, 그 외(contentId 없음/알 수 없음)는 title·description 으로 NORMAL 상세 일정 생성
+  - 프롬프트 응답 스키마에 title, description 추가
 
 ## [v0.1.5] - 2026-11-01
 
