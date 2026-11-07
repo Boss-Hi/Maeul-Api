@@ -127,6 +127,14 @@ ai:
   # 일정 생성 시 시도할 AI 제공자 순서 (claude, gemini, test)
   providers: ${AI_PROVIDERS:claude,gemini}
 
+# 위치 기록 타임라인 (Duration 형식: 30s, 1m, 2m ...)
+timeline:
+  collection-interval: ${TIMELINE_COLLECTION_INTERVAL:1m}
+  collection-tolerance: ${TIMELINE_COLLECTION_TOLERANCE:5s}
+  stay-radius-meters: ${TIMELINE_STAY_RADIUS_METERS:100}
+  min-stay-duration: ${TIMELINE_MIN_STAY_DURATION:5m}
+  zone: ${TZ:Asia/Seoul}
+
 kakao:
     rest-api:
         key: ${KAKAO_REST_API_KEY:}

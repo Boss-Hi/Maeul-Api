@@ -9,6 +9,16 @@
 
 ### In Progress
 
+- 위치 기록 타임라인 (Google 타임라인 방식, ADR 0007)
+  - `GET /api/timeline/settings`: 수집 주기 등 앱 설정 조회
+  - `POST /api/timeline/points`: 위치 기록 업로드 (최대 1440개, 오프라인 동안 쌓인 기록 일괄 전송)
+  - `GET /api/timeline?date=YYYY-MM-DD`: 하루 타임라인 (머문 장소 `STAY` / 이동 `MOVE` 구간)
+  - `DELETE /api/timeline?date=YYYY-MM-DD`: 하루 위치 기록 삭제
+  - 로그인 사용자 본인 기록만 다룸
+  - 수집 주기 기본 1분, `TIMELINE_COLLECTION_INTERVAL` 로 변경 (주기보다 촘촘한 기록은 저장하지 않음)
+  - `timeline_points` 테이블 추가 (V9)
+- 필수 파라미터 누락, 파라미터 형식 오류, 읽을 수 없는 요청 본문을 500 대신 400 으로 응답
+
 ## [v0.2.0] - 2026-11-07
 
 > AI 일정 생성 기능 개선 및 제공자 다중화
