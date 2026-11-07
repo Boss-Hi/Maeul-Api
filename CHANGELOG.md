@@ -9,6 +9,10 @@
 
 ### In Progress
 
+## [v0.2.0] - 2026-11-07
+
+> AI 일정 생성 기능 개선 및 제공자 다중화
+ 
 - Claude AI 추가 및 일정 생성 AI 제공자 다중화 (ADR 0006)
   - 제공자 순서(`AI_PROVIDERS`, 기본 `claude,gemini`)대로 시도하고 실패하면 다음 제공자로 대체
   - Claude: 공식 Java SDK, 기본 모델 `claude-opus-5-5`(effort medium), structured outputs, 거절 시 서버 측 대체(`fallbacks: default`)
