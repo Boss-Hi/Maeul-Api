@@ -119,6 +119,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 503 Service Unavailable 처리 (외부 의존 서비스 일시 사용 불가)
+     */
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailableException(ServiceUnavailableException e) {
+        log.warn("ServiceUnavailable: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                ErrorResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                        .error("Service Unavailable")
+                        .message(e.getMessage())
+                        .build()
+        );
+    }
+
+    /**
      * RuntimeException 처리
      */
     @ExceptionHandler(RuntimeException.class)

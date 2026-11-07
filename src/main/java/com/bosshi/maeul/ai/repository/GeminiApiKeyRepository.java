@@ -16,6 +16,8 @@ public interface GeminiApiKeyRepository extends JpaRepository<AiApiKey, Long> {
            "ORDER BY CASE WHEN k.lastUsedAt IS NULL THEN 0 ELSE 1 END, k.lastUsedAt ASC, k.id ASC")
     List<AiApiKey> findActiveKeysOrderLastUsed(Pageable pageable);
 
+    boolean existsByActiveTrueAndDeletedAtIsNull();
+
     default Optional<AiApiKey> findNextApiKey() {
         List<AiApiKey> keys = findActiveKeysOrderLastUsed(Pageable.ofSize(1));
         return keys.isEmpty() ? Optional.empty() : Optional.of(keys.get(0));

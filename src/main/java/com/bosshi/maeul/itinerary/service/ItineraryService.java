@@ -39,7 +39,7 @@ public class ItineraryService {
             TourRepository tourRepository,
             TourFilteringService tourFilteringService,
             ItineraryRepository itineraryRepository,
-            @Qualifier("itineraryTestGenerator") ItineraryGeneratorImpl itineraryGenerator) {
+            @Qualifier("itineraryGenerator") ItineraryGeneratorImpl itineraryGenerator) {
 
         this.tourRepository = tourRepository;
         this.tourFilteringService = tourFilteringService;

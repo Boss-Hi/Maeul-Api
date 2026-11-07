@@ -14,6 +14,13 @@
   - answerId 로 설문 답변을 수정하는 api 는 삭제
 - 축제 목록
   - 진행 중, 종료된, 모든 축제 보기 필터 추가
+- 일정 생성 AI 키 오류 대응
+  - 사용 가능한 AI 키가 없으면 일정 생성 요청 시 즉시 503 응답
+  - Gemini 가 거부한 키(API_KEY_INVALID, PERMISSION_DENIED)는 자동 비활성화 후 다음 키로 재시도
+  - 설정 파일 키로의 fallback 제거 (DB `ai_api_keys` 만 사용)
+  - 일정 생성 결과 웹소켓 메시지 형식 변경 (`{ status, itineraryId }` / `{ status, message }`), 실패 시에도 알림
+  - 에러 로그의 API 키 마스킹
+  - AI 키가 업데이트(lastUsedAt, active)마다 중첩 암호화되던 버그 수정 (EntityListener → `@Convert`)
 
 ## [v0.1.5] - 2026-11-01
 

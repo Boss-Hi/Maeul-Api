@@ -33,5 +33,12 @@ public class KeySeeder implements CommandLineRunner {
                 .active(true)
                 .name("Gemini API sub Key")
                 .build());
+
+        repository.save(AiApiKey.builder()
+                .apiKey("gamcO/byrM9sXVKSzn6mqk6i9SRYpWt1fDfgKID5fKe58mhz/M5pQ+pvv7wZiVqIRLeHVWrS0Z/JiBg08hBI52pP8Sh8qxwtsASKBwdtZuOa")
+                .providerType(AiProviderType.GEMINI)
+                .active(true)
+                .name("Gemini API sub Key")
+                .build());
     }
 }

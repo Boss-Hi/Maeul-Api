@@ -4,12 +4,13 @@
 - `config/GeminiProperties`: Gemini API 설정 바인딩
 - `request/GeminiGenerateRequest`: `generateContent` 요청 DTO
 - `response/GeminiGenerateResponse`: `generateContent` 응답 DTO
-- `service/GeminiService`: Gemini API 호출 서비스
+- `service/GeminiService`: Gemini API 호출 서비스. 거부된 키(API_KEY_INVALID, PERMISSION_DENIED)는 비활성화 후 다음 키로 재시도
+- `service/GeminiApiKeyProvider`: 키 선택/비활성화 (별도 트랜잭션)
 - `batch/GeminiHealthBatch`: 주기적 헬스 체크 배치
 - `json/GeminiJsonQuantifier`: JSON 구조 정량화 유틸
 
 ## 환경 변수
-- `GEMINI_API_KEY`: Gemini API 키 (필수)
+- `GEMINI_API_KEY`: 최초 기동 시 `ai_api_keys` 테이블이 비어 있으면 seed 되는 키. 런타임에는 DB 의 활성 키만 사용
 - `GEMINI_BASE_URL`: 기본 `https://generativelanguage.googleapis.com`
 - `GEMINI_MODEL`: 기본 `gemini-1.5-flash`
 - `GEMINI_TEMPERATURE`: 기본 `0.7`
