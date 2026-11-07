@@ -3,6 +3,7 @@ package com.bosshi.maeul.timeline.controller;
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
+import com.bosshi.maeul.timeline.entity.TimelinePoint;
 import com.bosshi.maeul.timeline.request.TimelinePointsRequest;
 import com.bosshi.maeul.timeline.response.TimelineRecordResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 위치 기록 타임라인. 로그인 사용자 본인의 기록만 다룬다.
@@ -36,7 +38,8 @@ public class TimelineController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody TimelinePointsRequest request
     ) {
-        return ApiResponse.success(timelineService.record(userDetails.getId(), request));
+        List<TimelinePoint> accepted = timelineService.record(userDetails.getId(), request);
+        return ApiResponse.success(new TimelineRecordResponse(accepted.size(), request.points().size() - accepted.size()));
     }
 
     /**
@@ -48,7 +51,7 @@ public class TimelineController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return ApiResponse.success(timelineService.getDay(userDetails.getId(), date));
+        return ApiResponse.success(new TimelineResponse(date, timelineService.getDay(userDetails.getId(), date)));
     }
 
 }

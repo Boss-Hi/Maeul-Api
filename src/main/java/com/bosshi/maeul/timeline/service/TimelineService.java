@@ -5,10 +5,8 @@ import com.bosshi.maeul.timeline.entity.TimelinePoint;
 import com.bosshi.maeul.timeline.event.TimelinePointsChangedEvent;
 import com.bosshi.maeul.timeline.repository.TimelinePointRepository;
 import com.bosshi.maeul.timeline.request.TimelinePointsRequest;
-import com.bosshi.maeul.timeline.response.TimelineDeleteResponse;
-import com.bosshi.maeul.timeline.response.TimelineRecordResponse;
-import com.bosshi.maeul.timeline.response.TimelineResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse.TimelinePosition;
+import com.bosshi.maeul.timeline.response.TimelineResponse.TimelineSegment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -36,9 +34,11 @@ public class TimelineService {
 
     /**
      * 위치 기록 저장. 수집 주기보다 촘촘한 기록, 이미 저장된 시각, 미래 시각의 기록은 버린다.
+     *
+     * @return 저장한 위치 기록
      */
     @Transactional
-    public TimelineRecordResponse record(Long userId, TimelinePointsRequest request) {
+    public List<TimelinePoint> record(Long userId, TimelinePointsRequest request) {
         List<TimelinePoint> incoming = request.points().stream()
                 .map(point -> TimelinePoint.builder()
                         .userId(userId)
@@ -68,13 +68,13 @@ public class TimelineService {
             eventPublisher.publishEvent(new TimelinePointsChangedEvent(userId, dates));
         }
 
-        return new TimelineRecordResponse(accepted.size(), incoming.size() - accepted.size());
+        return accepted;
     }
 
     /**
-     * 하루 타임라인 조회
+     * 하루 타임라인 구간 (머문 장소 / 이동) 조회
      */
-    public TimelineResponse getDay(Long userId, LocalDate date) {
+    public List<TimelineSegment> getDay(Long userId, LocalDate date) {
         List<TimelinePosition> positions = pointRepository
                 .findByUserIdAndRecordedAtGreaterThanEqualAndRecordedAtLessThanOrderByRecordedAtAsc(
                         userId, date.atStartOfDay(), date.plusDays(1).atStartOfDay())
@@ -82,19 +82,20 @@ public class TimelineService {
                 .map(point -> new TimelinePosition(point.getLatitude(), point.getLongitude(), point.getRecordedAt()))
                 .toList();
 
-        return new TimelineResponse(date, TimelineSegmenter.segment(
-                positions, properties.getStayRadiusMeters(), properties.getMinStayDuration()));
+        return TimelineSegmenter.segment(positions, properties.getStayRadiusMeters(), properties.getMinStayDuration());
     }
 
     /**
      * 하루 위치 기록 삭제 (복구 불가)
+     *
+     * @return 삭제한 위치 기록 수
      */
     @Transactional
-    public TimelineDeleteResponse deleteDay(Long userId, LocalDate date) {
+    public int deleteDay(Long userId, LocalDate date) {
         int deleted = pointRepository.deleteByUserIdAndRange(userId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
         if (deleted > 0) {
             eventPublisher.publishEvent(new TimelinePointsChangedEvent(userId, Set.of(date)));
         }
-        return new TimelineDeleteResponse(date, deleted);
+        return deleted;
     }
 }
