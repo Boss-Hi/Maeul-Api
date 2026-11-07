@@ -7,7 +7,6 @@ import com.bosshi.maeul.timeline.request.TimelinePointsRequest;
 import com.bosshi.maeul.timeline.response.TimelineDeleteResponse;
 import com.bosshi.maeul.timeline.response.TimelineRecordResponse;
 import com.bosshi.maeul.timeline.response.TimelineResponse;
-import com.bosshi.maeul.timeline.response.TimelineSettingsResponse;
 import com.bosshi.maeul.timeline.service.TimelineService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +27,6 @@ import java.time.LocalDate;
 public class TimelineController {
     private final TimelineService timelineService;
     private final TimelineProperties timelineProperties;
-
-    /**
-     * 위치 수집 설정 (수집 주기 등) 조회
-     */
-    @GetMapping("/settings")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<TimelineSettingsResponse>> settings() {
-        return ApiResponse.success(TimelineSettingsResponse.from(timelineProperties));
-    }
 
     /**
      * 위치 기록 업로드
