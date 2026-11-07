@@ -8,6 +8,7 @@ import com.bosshi.maeul.survey.request.SurveyResponseUpdateRequest;
 import com.bosshi.maeul.survey.response.SurveyResResponse;
 import com.bosshi.maeul.survey.service.SurveyResponseService;
 import com.bosshi.maeul.survey.service.SurveyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +34,13 @@ public class SurveyResponseController {
     }
 
     /**
-     * 등록한 설문 수정
+     * 현재 응답의 답변 전체 교체
      */
-    @PutMapping("/responses/{id}")
+    @PutMapping("/responses/current")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<SurveyResResponse>> updateStoredResponse(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id, @RequestBody SurveyResponseUpdateRequest request) {
-        SurveyResponse surveyResponse = surveyResponseService.updateBySurveyResponseId(id, request);
+    public ResponseEntity<ApiResponse<SurveyResResponse>> updateStoredResponse(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody SurveyResponseUpdateRequest request) {
+        Survey survey = surveyService.getFirst();
+        SurveyResponse surveyResponse = surveyResponseService.replaceCurrentAnswers(userDetails.getId(), survey.getId(), request);
         return ApiResponse.success(SurveyResResponse.from(surveyResponse));
     }
 }

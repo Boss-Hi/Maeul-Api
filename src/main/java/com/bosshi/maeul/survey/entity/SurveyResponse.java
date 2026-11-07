@@ -38,4 +38,9 @@ public class SurveyResponse extends BaseEntity {
         answer.setSurveyResponse(this);
     }
 
+    public void replaceAnswers(List<SurveyAnswer> newAnswers) {
+        this.answers.clear();
+        newAnswers.forEach(this::addAnswer);
+    }
+
 }

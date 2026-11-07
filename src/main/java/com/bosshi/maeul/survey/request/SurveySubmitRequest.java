@@ -1,5 +1,6 @@
 package com.bosshi.maeul.survey.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -11,6 +12,7 @@ public class SurveySubmitRequest {
     @NotNull(message = "surveyId는 필수입니다.")
     private Long surveyId;
 
+    @Valid
     @NotEmpty(message = "답변 항목은 최소 1개 이상이어야 합니다.")
     private List<AnswerRequest> answers;
 
