@@ -7,18 +7,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 
 /**
- * 일정 생성기 (AI 제공자 1개에 대응). 제공자 순서(ai.providers)에 따라 {@code ItineraryGeneratorRouter} 가 선택한다.
+ * 일정 생성기. {@code itinerary.generator} 설정(ai, test)으로 하나가 선택된다.
  */
 public interface ItineraryGeneratorImpl {
     Itinerary generateItinerary(ItineraryGenerateDTO dto) throws JsonProcessingException;
 
     /**
-     * ai.providers 에서 사용하는 제공자 이름 (claude, gemini, test)
-     */
-    String providerName();
-
-    /**
-     * 지금 호출 가능한지 (예: 활성 키 존재 여부)
+     * 지금 호출 가능한지 (예: 사용 가능한 AI 제공자 존재 여부)
      */
     default boolean isAvailable() {
         return true;

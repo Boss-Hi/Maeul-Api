@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "itinerary.generator", havingValue = "test")
 @Transactional
 @RequiredArgsConstructor
 public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
@@ -80,11 +82,6 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
 
         // 4. Map 구조를 JSON String 형태로 변환
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(itineraryResult);
-    }
-
-    @Override
-    public String providerName() {
-        return "test";
     }
 
     @Override

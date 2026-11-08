@@ -5,7 +5,7 @@ import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
-import com.bosshi.maeul.itineraries.itinerary.generator.ItineraryGeneratorRouter;
+import com.bosshi.maeul.itineraries.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itineraries.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itineraries.itinerary.request.ItineraryUpdateRequest;
 import com.bosshi.maeul.itineraries.itinerary.type.Pace;
@@ -36,14 +36,14 @@ public class ItineraryService {
     private final TourRepository tourRepository;
     private final TourFilteringService tourFilteringService;
     private final ItineraryRepository itineraryRepository;
-    private final ItineraryGeneratorRouter itineraryGenerator;
+    private final ItineraryGeneratorImpl itineraryGenerator;
     private final SurveyAnswerClient surveyAnswerClient;
 
     public ItineraryService(
             TourRepository tourRepository,
             TourFilteringService tourFilteringService,
             ItineraryRepository itineraryRepository,
-            ItineraryGeneratorRouter itineraryGenerator,
+            ItineraryGeneratorImpl itineraryGenerator,
             SurveyAnswerClient surveyAnswerClient) {
 
         this.tourRepository = tourRepository;
@@ -64,7 +64,7 @@ public class ItineraryService {
         applyPersonalization(dto);
         dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
 
-        Itinerary itinerary = itineraryGenerator.generate(dto);
+        Itinerary itinerary = itineraryGenerator.generateItinerary(dto);
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
         log.info(
                 "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()

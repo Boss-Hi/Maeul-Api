@@ -6,7 +6,7 @@ import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
-import com.bosshi.maeul.itineraries.itinerary.generator.ItineraryGeneratorRouter;
+import com.bosshi.maeul.itineraries.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itineraries.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itineraries.itinerary.type.Pace;
 import com.bosshi.maeul.itineraries.openapi.entity.Tour;
@@ -33,18 +33,18 @@ import static org.mockito.Mockito.when;
 class ItineraryServiceTest {
 
     private final SurveyAnswerClient surveyAnswerClient = mock(SurveyAnswerClient.class);
-    private final ItineraryGeneratorRouter router = mock(ItineraryGeneratorRouter.class);
+    private final ItineraryGeneratorImpl router = mock(ItineraryGeneratorImpl.class);
     private ItineraryService service;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         TourRepository tourRepository = mock(TourRepository.class);
         when(tourRepository.findByContentId("1")).thenReturn(Optional.of(Tour.builder().contentId("1").build()));
         TourFilteringService filtering = mock(TourFilteringService.class);
         when(filtering.filterTourByCategories(any())).thenReturn(List.of());
         ItineraryRepository repository = mock(ItineraryRepository.class);
         when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(router.generate(any())).thenReturn(Itinerary.builder().itineraryDays(new ArrayList<>()).build());
+        when(router.generateItinerary(any())).thenReturn(Itinerary.builder().itineraryDays(new ArrayList<>()).build());
         service = new ItineraryService(tourRepository, filtering, repository, router, surveyAnswerClient);
     }
 
@@ -91,12 +91,12 @@ class ItineraryServiceTest {
 
     @Test
     @DisplayName("설문 답변을 가져오지 못하면 일정 생성을 시작하지 않고 실패한다")
-    void surveyFailureStopsGeneration() {
+    void surveyFailureStopsGeneration() throws Exception {
         when(surveyAnswerClient.findAnswers(7L)).thenThrow(new ServiceUnavailableException("설문 조회 실패"));
 
         assertThatThrownBy(() -> service.generateItinerary(dto(null, null, null)))
                 .isInstanceOf(ServiceUnavailableException.class);
-        verify(router, never()).generate(any());
+        verify(router, never()).generateItinerary(any());
     }
 
     private static SurveyAnswerInfo answer(String optionValue) {
