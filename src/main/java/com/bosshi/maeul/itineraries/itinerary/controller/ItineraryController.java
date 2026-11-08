@@ -5,6 +5,7 @@ import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itineraries.itinerary.request.ItineraryGenerateRequest;
+import com.bosshi.maeul.itineraries.itinerary.response.ItinerarySettingsResponse;
 import com.bosshi.maeul.itineraries.itinerary.response.ItineraryResponse;
 import com.bosshi.maeul.itineraries.itinerary.service.ItineraryMissionService;
 import com.bosshi.maeul.itineraries.itinerary.service.ItineraryService;
@@ -36,6 +37,15 @@ public class ItineraryController {
     public ResponseEntity<ApiResponse<ItineraryResponse>> show(@PathVariable Long id) {
         Itinerary itinerary = itineraryService.findById(id);
         return ApiResponse.success(ItineraryResponse.from(itinerary));
+    }
+
+    /**
+     * 일정 설정 화면의 페이스 선택지와 시간대 기본값. 미리 선택해 둘 페이스는 사용자의 설문 일정 템포를 따른다.
+     */
+    @GetMapping("/settings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ItinerarySettingsResponse>> settings(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.success(ItinerarySettingsResponse.from(itineraryService.getSettings(userDetails.getId())));
     }
 
     /**

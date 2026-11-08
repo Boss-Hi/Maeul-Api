@@ -2,6 +2,7 @@ package com.bosshi.maeul.itineraries.itinerary.service;
 
 import com.bosshi.maeul.itineraries.itinerary.client.SurveyAnswerClient;
 import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itineraries.itinerary.dto.ItinerarySettings;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
@@ -81,12 +82,7 @@ public class ItineraryService {
         List<SurveyAnswerInfo> answers = surveyAnswerClient.findAnswers(dto.getUserId());
         dto.setSurveyAnswers(answers);
 
-        Pace pace = Optional.ofNullable(dto.getPace())
-                .or(() -> answers.stream()
-                        .map(answer -> Pace.fromSurveyValue(answer.optionValue()))
-                        .flatMap(Optional::stream)
-                        .findFirst())
-                .orElse(Pace.MODERATE);
+        Pace pace = resolvePace(dto.getPace(), answers);
         dto.setPace(pace);
         if (dto.getFilterSettings() != null) {
             dto.getFilterSettings().setMaxVenuesPerDay(pace.maxVenuesPerDay());
@@ -97,6 +93,26 @@ public class ItineraryService {
         if (dto.getDayEndTime() == null) {
             dto.setDayEndTime(ItineraryGenerateDTO.DEFAULT_DAY_END);
         }
+    }
+
+    /**
+     * 일정 설정 화면에서 미리 선택해 둘 값. 요청하지 않았을 때 {@link #generateItinerary} 가 쓰는 값과 같다.
+     *
+     * @throws com.bosshi.maeul.common.exception.ServiceUnavailableException 설문 답변을 가져오지 못했을 때
+     */
+    public ItinerarySettings getSettings(Long userId) {
+        Pace pace = resolvePace(null, surveyAnswerClient.findAnswers(userId));
+        return new ItinerarySettings(pace, ItineraryGenerateDTO.DEFAULT_DAY_START, ItineraryGenerateDTO.DEFAULT_DAY_END);
+    }
+
+    /** 요청한 페이스, 설문의 일정 템포, MODERATE 순 */
+    private static Pace resolvePace(Pace requested, List<SurveyAnswerInfo> answers) {
+        return Optional.ofNullable(requested)
+                .or(() -> answers.stream()
+                        .map(answer -> Pace.fromSurveyValue(answer.optionValue()))
+                        .flatMap(Optional::stream)
+                        .findFirst())
+                .orElse(Pace.MODERATE);
     }
 
     public Itinerary findById(Long id) {

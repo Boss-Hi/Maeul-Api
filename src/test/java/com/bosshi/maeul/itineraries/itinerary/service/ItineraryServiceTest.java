@@ -99,6 +99,27 @@ class ItineraryServiceTest {
         verify(router, never()).generateItinerary(any());
     }
 
+    @Test
+    @DisplayName("설정 화면의 기본 페이스는 설문 일정 템포를, 없으면 MODERATE 를 쓰고 시간대는 09:30~22:30 이다")
+    void settingsDefaults() {
+        when(surveyAnswerClient.findAnswers(7L)).thenReturn(List.of(answer("coffee"), answer("packed")));
+        assertThat(service.getSettings(7L).defaultPace()).isEqualTo(Pace.PACKED);
+
+        when(surveyAnswerClient.findAnswers(8L)).thenReturn(List.of());
+        var settings = service.getSettings(8L);
+        assertThat(settings.defaultPace()).isEqualTo(Pace.MODERATE);
+        assertThat(settings.defaultDayStartTime()).isEqualTo(LocalTime.of(9, 30));
+        assertThat(settings.defaultDayEndTime()).isEqualTo(LocalTime.of(22, 30));
+    }
+
+    @Test
+    @DisplayName("설정 화면도 설문 답변을 가져오지 못하면 실패한다")
+    void settingsFailWhenSurveyUnavailable() {
+        when(surveyAnswerClient.findAnswers(7L)).thenThrow(new ServiceUnavailableException("설문 조회 실패"));
+
+        assertThatThrownBy(() -> service.getSettings(7L)).isInstanceOf(ServiceUnavailableException.class);
+    }
+
     private static SurveyAnswerInfo answer(String optionValue) {
         return new SurveyAnswerInfo("질문", "라벨", null, optionValue);
     }

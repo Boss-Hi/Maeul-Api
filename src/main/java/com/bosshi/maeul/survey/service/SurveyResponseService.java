@@ -1,15 +1,19 @@
 package com.bosshi.maeul.survey.service;
 
+import com.bosshi.maeul.survey.dto.PreferenceSummary;
+import com.bosshi.maeul.survey.dto.PreferenceSummary.Choice;
 import com.bosshi.maeul.survey.entity.Survey;
 import com.bosshi.maeul.survey.entity.SurveyAnswer;
 import com.bosshi.maeul.survey.entity.SurveyResponse;
 import com.bosshi.maeul.survey.repository.SurveyRepository;
 import com.bosshi.maeul.survey.repository.SurveyResponseRepository;
 import com.bosshi.maeul.survey.request.SurveyResponseUpdateRequest;
+import com.bosshi.maeul.survey.type.StepBadge;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,6 +40,26 @@ public class SurveyResponseService {
                 .flatMap(survey -> responseRepository.findFirstByUserIdAndSurveyIdOrderByCreatedAtDesc(userId, survey.getId()))
                 .map(SurveyResponse::getAnswers)
                 .orElse(List.of());
+    }
+
+    /**
+     * 현재 설문 답변 중 나이대, 직업, 선호 숙소, 테마를 질문의 배지({@link StepBadge})로 골라 돌려준다.
+     */
+    public PreferenceSummary currentPreferenceSummary(Long userId) {
+        List<SurveyAnswer> answers = findCurrentAnswers(userId);
+        return new PreferenceSummary(
+                choices(answers, StepBadge.AGE).stream().findFirst().orElse(null),
+                choices(answers, StepBadge.OCCUPATION).stream().findFirst().orElse(null),
+                choices(answers, StepBadge.STAY),
+                choices(answers, StepBadge.THEME));
+    }
+
+    private static List<Choice> choices(List<SurveyAnswer> answers, StepBadge badge) {
+        return answers.stream()
+                .filter(answer -> badge.name().equals(answer.getQuestion().getStepBadge()))
+                .sorted(Comparator.comparing(answer -> answer.getOption().getOptionOrder()))
+                .map(answer -> new Choice(answer.getOption().getLabel(), answer.getOption().getValue()))
+                .toList();
     }
 
     /**

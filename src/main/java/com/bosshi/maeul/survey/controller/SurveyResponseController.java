@@ -5,6 +5,7 @@ import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.survey.entity.Survey;
 import com.bosshi.maeul.survey.entity.SurveyResponse;
 import com.bosshi.maeul.survey.request.SurveyResponseUpdateRequest;
+import com.bosshi.maeul.survey.response.PreferenceSummaryResponse;
 import com.bosshi.maeul.survey.response.SurveyResResponse;
 import com.bosshi.maeul.survey.service.SurveyResponseService;
 import com.bosshi.maeul.survey.service.SurveyService;
@@ -31,6 +32,16 @@ public class SurveyResponseController {
         Survey survey = surveyService.getFirst();
         SurveyResponse surveyResponse = surveyResponseService.getCurrentResponsesByUserId(userDetails.getId(), survey.getId());
         return ApiResponse.success(SurveyResResponse.from(surveyResponse));
+    }
+
+    /**
+     * 일정 설정 화면의 "사전 등록 정보" 카드 (나이대, 직업, 선호 숙소, 선호 테마).
+     * 설문에 답한 적이 없으면 비어 있는 값으로 200 을 돌려준다.
+     */
+    @GetMapping("/responses/current/summary")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<PreferenceSummaryResponse>> showPreferenceSummary(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.success(PreferenceSummaryResponse.from(surveyResponseService.currentPreferenceSummary(userDetails.getId())));
     }
 
     /**
