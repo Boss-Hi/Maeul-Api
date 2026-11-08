@@ -1,8 +1,8 @@
 package com.bosshi.maeul.timeline.service;
 
 import com.bosshi.maeul.location.service.GeoService;
-import com.bosshi.maeul.timeline.response.TimelineResponse.TimelineSegment;
-import com.bosshi.maeul.timeline.response.TimelineResponse.TimelinePosition;
+import com.bosshi.maeul.timeline.dto.TimelinePosition;
+import com.bosshi.maeul.timeline.dto.TimelineSegment;
 import com.bosshi.maeul.timeline.type.TimelineSegmentType;
 
 import java.time.Duration;

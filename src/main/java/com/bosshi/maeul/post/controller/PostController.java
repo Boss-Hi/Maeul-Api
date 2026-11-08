@@ -19,23 +19,23 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestParam Long userId,
                                                    @RequestBody PostCreateRequest request) {
-        return ResponseEntity.ok(postService.createPost(userId, request));
+        return ResponseEntity.ok(PostResponse.from(postService.createPost(userId, request)));
     }
 
     @GetMapping
     public ResponseEntity<List<PostResponse>> getPosts() {
-        return ResponseEntity.ok(postService.getPosts());
+        return ResponseEntity.ok(postService.getPosts().stream().map(PostResponse::from).toList());
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getPost(postId));
+        return ResponseEntity.ok(PostResponse.from(postService.getPost(postId)));
     }
 
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponse> updatePost(@PathVariable Long postId,
                                                  @RequestBody PostUpdateRequest request) {
-        return ResponseEntity.ok(postService.updatePost(postId, request));
+        return ResponseEntity.ok(PostResponse.from(postService.updatePost(postId, request)));
     }
 
     @DeleteMapping("/{postId}")

@@ -1,7 +1,7 @@
 package com.bosshi.maeul.openapi.service;
 
+import com.bosshi.maeul.openapi.entity.TourCategoryType;
 import com.bosshi.maeul.openapi.repository.TourCategoryTypeRepository;
-import com.bosshi.maeul.openapi.response.TourCategoryTypeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
@@ -19,9 +19,7 @@ public class TourCategoryTypeService {
     /**
      * 모든 관광 카테고리 목록을 조회합니다.
      */
-    public List<TourCategoryTypeResponse> all() {
-        return tourCategoryTypeRepository.findAll().stream()
-                .map(TourCategoryTypeResponse::from)
-                .toList();
+    public List<TourCategoryType> all() {
+        return tourCategoryTypeRepository.findAll();
     }
 }

@@ -1,5 +1,6 @@
 package com.bosshi.maeul.openapi.controller;
 
+import com.bosshi.maeul.openapi.response.TourCategoryTypeResponse;
 import com.bosshi.maeul.openapi.service.TourCategoryTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,6 @@ public class TourCategoryTypeController {
 
     @GetMapping
     public ResponseEntity<?> index() {
-        return ResponseEntity.ok(tourCategoryTypeService.all());
+        return ResponseEntity.ok(tourCategoryTypeService.all().stream().map(TourCategoryTypeResponse::from).toList());
     }
 }
