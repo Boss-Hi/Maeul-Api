@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class RoutingAiGenerator implements AiGenerator {
-    static final String UNAVAILABLE_MESSAGE = "일정 생성 서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.";
-
     private final List<AiProvider> orderedProviders;
 
     public RoutingAiGenerator(List<AiProvider> providers,
@@ -76,7 +74,7 @@ public class RoutingAiGenerator implements AiGenerator {
         }
 
         if (lastFailure == null) {
-            throw new ServiceUnavailableException(UNAVAILABLE_MESSAGE);
+            throw new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE);
         }
         throw lastFailure;
     }

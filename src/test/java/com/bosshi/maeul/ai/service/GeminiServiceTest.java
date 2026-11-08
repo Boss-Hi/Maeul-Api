@@ -67,6 +67,13 @@ class GeminiServiceTest {
             {"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}""";
 
     @Test
+    @DisplayName("빈 프롬프트는 키를 쓰기 전에 거부한다")
+    void rejectsBlankPrompt() {
+        assertThatThrownBy(() -> service.generate(" ")).isInstanceOf(IllegalArgumentException.class);
+        verify(keyProvider, never()).acquire(AiProviderType.GEMINI);
+    }
+
+    @Test
     @DisplayName("503 high demand 는 백오프 후 재시도해서 성공한다")
     void retriesOnHighDemand() {
         when(keyProvider.acquire(AiProviderType.GEMINI)).thenReturn(Optional.of(new AiApiKeyProvider.UsableKey(1L, "A", "k")));
@@ -110,7 +117,7 @@ class GeminiServiceTest {
 
         assertThatThrownBy(() -> service.generate("prompt"))
                 .isInstanceOf(ServiceUnavailableException.class)
-                .hasMessage(GeminiService.OVERLOADED_MESSAGE);
+                .hasMessage(ServiceUnavailableException.OVERLOADED_MESSAGE);
         server.verify();
     }
 

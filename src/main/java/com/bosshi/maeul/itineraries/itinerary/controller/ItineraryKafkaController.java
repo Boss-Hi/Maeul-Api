@@ -41,7 +41,7 @@ public class ItineraryKafkaController {
     ) {
         // 제공자 순서의 모든 AI 제공자에 사용 가능한 키가 없으면 비동기 처리로 넘기지 않고 즉시 503 응답
         if (!itineraryGenerator.isAvailable()) {
-            throw new ServiceUnavailableException("일정 생성 서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.");
+            throw new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE);
         }
 
         ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()

@@ -23,23 +23,12 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class GeminiService {
-    static final String UNAVAILABLE_MESSAGE = "일정 생성 서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.";
-    static final String OVERLOADED_MESSAGE = "현재 AI 사용량이 많아 일정을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.";
-
     private final RestClient.Builder restClientBuilder;
     private final GeminiConfig config;
     private final AiApiKeyProvider keyProvider;
 
     // 테스트에서 대기 없이 검증할 수 있도록 교체 가능
     Sleeper sleeper = Thread::sleep;
-
-    public GeminiGenerateResponse generateText(String prompt) {
-        if (!StringUtils.hasText(prompt)) {
-            throw new IllegalArgumentException("Prompt must not be blank.");
-        }
-
-        return generate(prompt);
-    }
 
     /**
      * 사용 가능한(활성) API 키가 하나라도 있는지 확인한다.
@@ -60,6 +49,9 @@ public class GeminiService {
      * @throws ServiceUnavailableException 사용 가능한 키가 없거나, 일시적 오류 재시도가 모두 실패했을 때
      */
     public GeminiGenerateResponse generate(String prompt) {
+        if (!StringUtils.hasText(prompt)) {
+            throw new IllegalArgumentException("Prompt must not be blank.");
+        }
         GeminiGenerateRequest request = buildPrompt(
                 prompt,
                 config.getTemperature(),
@@ -84,7 +76,7 @@ public class GeminiService {
             }
             log.error("Gemini 재시도 소진 - model={}", model);
         }
-        throw new ServiceUnavailableException(OVERLOADED_MESSAGE);
+        throw new ServiceUnavailableException(ServiceUnavailableException.OVERLOADED_MESSAGE);
     }
 
     private GeminiGenerateResponse callWithAvailableKey(String model, GeminiGenerateRequest request) {
@@ -94,7 +86,7 @@ public class GeminiService {
                     .filter(k -> triedKeyIds.add(k.id()))
                     .orElseThrow(() -> {
                         log.error("사용 가능한 Gemini API key 가 없습니다.");
-                        return new ServiceUnavailableException(UNAVAILABLE_MESSAGE);
+                        return new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE);
                     });
 
             URI uri = buildGenerateUri(model, key.value());
@@ -142,7 +134,7 @@ public class GeminiService {
             sleeper.sleep(delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceUnavailableException(OVERLOADED_MESSAGE);
+            throw new ServiceUnavailableException(ServiceUnavailableException.OVERLOADED_MESSAGE);
         }
     }
 
@@ -184,11 +176,7 @@ public class GeminiService {
                 .toUri();
     }
 
-    public GeminiGenerateRequest buildPrompt(String prompt, Double temperature, Integer maxOutputTokens) {
-        if (prompt == null || prompt.isBlank()) {
-            throw new IllegalArgumentException("Can not create GeminiGenerateRequest with null or blank prompt");
-        }
-
+    private GeminiGenerateRequest buildPrompt(String prompt, Double temperature, Integer maxOutputTokens) {
         GeminiGenerateRequest.Part part = new GeminiGenerateRequest.Part(prompt);
         GeminiGenerateRequest.Content content = new GeminiGenerateRequest.Content("user", List.of(part));
         GeminiGenerateRequest.GenerationConfig config = new GeminiGenerateRequest.GenerationConfig(temperature, maxOutputTokens, "application/json");

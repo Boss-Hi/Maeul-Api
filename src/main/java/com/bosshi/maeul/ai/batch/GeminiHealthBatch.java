@@ -30,7 +30,7 @@ public class GeminiHealthBatch {
             return;
         }
 
-        GeminiGenerateResponse response = geminiService.generateText(config.getBatchPrompt());
+        GeminiGenerateResponse response = geminiService.generate(config.getBatchPrompt());
         GeminiJsonMetrics metrics = geminiJsonQuantifier.quantify(response);
 
         log.info(

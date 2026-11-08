@@ -70,7 +70,7 @@ public class ClaudeService {
                     .filter(k -> triedKeyIds.add(k.id()))
                     .orElseThrow(() -> {
                         log.error("사용 가능한 Claude API key 가 없습니다.");
-                        return new ServiceUnavailableException(GeminiService.UNAVAILABLE_MESSAGE);
+                        return new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE);
                     });
 
             try {

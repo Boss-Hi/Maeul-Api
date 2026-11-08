@@ -1,7 +1,11 @@
 package com.bosshi.maeul.ai.provider;
 
 import com.bosshi.maeul.ai.AiRequest;
+import com.anthropic.errors.AnthropicIoException;
+import com.anthropic.errors.InternalServerException;
+import com.anthropic.errors.RateLimitException;
 import com.bosshi.maeul.ai.service.ClaudeService;
+import com.bosshi.maeul.common.exception.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +29,13 @@ public class ClaudeAiProvider implements AiProvider {
 
     @Override
     public <T> T generate(AiRequest<T> request) {
-        return claudeService.generate(request.prompt(), request.responseType());
+        try {
+            return claudeService.generate(request.prompt(), request.responseType());
+        } catch (RateLimitException | InternalServerException e) {
+            // SDK 재시도(429, 5xx)까지 소진. 제공자 순서와 무관하게 Gemini 과 같은 503 으로 알린다
+            throw new ServiceUnavailableException(ServiceUnavailableException.OVERLOADED_MESSAGE, e);
+        } catch (AnthropicIoException e) {
+            throw new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE, e);
+        }
     }
 }
