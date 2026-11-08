@@ -54,6 +54,12 @@ public class Itinerary extends BaseEntity {
     private ItineraryStatus status = ItineraryStatus.READY;
 
     /**
+     * 일정 생성에 적용한 설정. 이 설정이 생기기 전에 만든 일정은 null
+     */
+    @OneToOne(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ItineraryGenerationSettings generationSettings;
+
+    /**
      * 주축제 (사용자가 선택한 중심 축제)
      */
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

@@ -5,6 +5,7 @@ import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itineraries.itinerary.dto.ItinerarySettings;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itineraries.itinerary.entity.ItineraryGenerationSettings;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itineraries.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itineraries.itinerary.repository.ItineraryRepository;
@@ -66,6 +67,13 @@ public class ItineraryService {
         dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
 
         Itinerary itinerary = itineraryGenerator.generateItinerary(dto);
+        // 생성에 실제로 적용한 값 (요청, 설문, 기본값으로 채워진 뒤의 값)
+        itinerary.setGenerationSettings(ItineraryGenerationSettings.builder()
+                .itinerary(itinerary)
+                .pace(dto.getPace())
+                .dayStartTime(dto.getDayStartTime())
+                .dayEndTime(dto.getDayEndTime())
+                .build());
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
         log.info(
                 "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()

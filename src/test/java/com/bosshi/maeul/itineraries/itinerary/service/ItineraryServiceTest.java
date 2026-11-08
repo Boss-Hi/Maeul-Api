@@ -63,6 +63,23 @@ class ItineraryServiceTest {
     }
 
     @Test
+    @DisplayName("생성에 적용한 페이스와 하루 시간대를 일정에 담아 저장한다")
+    void savesAppliedSettings() throws Exception {
+        when(surveyAnswerClient.findAnswers(7L)).thenReturn(List.of(answer("relaxed")));
+
+        Itinerary explicit = service.generateItinerary(dto(Pace.PACKED, LocalTime.of(8, 0), LocalTime.of(20, 0)));
+        assertThat(explicit.getGenerationSettings().getItinerary()).isSameAs(explicit);
+        assertThat(explicit.getGenerationSettings().getPace()).isEqualTo(Pace.PACKED);
+        assertThat(explicit.getGenerationSettings().getDayStartTime()).isEqualTo(LocalTime.of(8, 0));
+        assertThat(explicit.getGenerationSettings().getDayEndTime()).isEqualTo(LocalTime.of(20, 0));
+
+        Itinerary resolved = service.generateItinerary(dto(null, null, null));
+        assertThat(resolved.getGenerationSettings().getPace()).isEqualTo(Pace.RELAXED);
+        assertThat(resolved.getGenerationSettings().getDayStartTime()).isEqualTo(LocalTime.of(9, 30));
+        assertThat(resolved.getGenerationSettings().getDayEndTime()).isEqualTo(LocalTime.of(22, 30));
+    }
+
+    @Test
     @DisplayName("요청에 페이스가 없으면 설문의 일정 템포를 쓴다")
     void surveyTempoFillsMissingPace() throws Exception {
         when(surveyAnswerClient.findAnswers(7L)).thenReturn(List.of(answer("coffee"), answer("relaxed")));
