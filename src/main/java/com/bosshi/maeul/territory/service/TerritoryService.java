@@ -1,6 +1,6 @@
 package com.bosshi.maeul.territory.service;
 
-import com.bosshi.maeul.openapi.repository.LDongRegionRepository;
+import com.bosshi.maeul.itineraries.openapi.repository.LDongRegionRepository;
 import com.bosshi.maeul.point.service.PointService;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
 import com.bosshi.maeul.territory.dto.MyTerritory;
@@ -119,11 +119,11 @@ public class TerritoryService {
         List<TerritoryRegion> regions = new ArrayList<>();
         regions.add(new TerritoryRegion(COUNTRY_ID, "전국", null, TerritoryRegionType.COUNTRY));
         regionRepository.findAllWithSigungus().stream()
-                .sorted(Comparator.comparing(com.bosshi.maeul.openapi.entity.Region::getCode))
+                .sorted(Comparator.comparing(com.bosshi.maeul.itineraries.openapi.entity.Region::getCode))
                 .forEach(region -> {
                     regions.add(new TerritoryRegion(region.getCode(), region.getName(), COUNTRY_ID, TerritoryRegionType.PROVINCE));
                     region.getSigungus().stream()
-                            .sorted(Comparator.comparing(com.bosshi.maeul.openapi.entity.RegionSubdivisions::getCode))
+                            .sorted(Comparator.comparing(com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions::getCode))
                             .forEach(sigungu -> regions.add(new TerritoryRegion(
                                     region.getCode() + sigungu.getCode(), sigungu.getName(), region.getCode(), TerritoryRegionType.DISTRICT)));
                 });

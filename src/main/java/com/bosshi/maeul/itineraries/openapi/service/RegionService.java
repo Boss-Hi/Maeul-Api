@@ -1,0 +1,20 @@
+package com.bosshi.maeul.itineraries.openapi.service;
+
+import com.bosshi.maeul.itineraries.openapi.entity.Region;
+import com.bosshi.maeul.itineraries.openapi.repository.LDongRegionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class RegionService {
+    private final LDongRegionRepository regionRepository;
+
+    @Transactional(readOnly = true)
+    public List<Region> getRegionsWithSigungus() {
+        return regionRepository.findAllWithSigungus();
+    }
+}
