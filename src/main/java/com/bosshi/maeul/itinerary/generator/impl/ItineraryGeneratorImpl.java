@@ -39,7 +39,10 @@ public interface ItineraryGeneratorImpl {
             String contentId,
             Integer sequence,
             String title,
-            String description
+            String description,
+            /** HH:mm. 하루 시간대 안의 방문 시간 */
+            String startTime,
+            String endTime
     ) {
     }
 }

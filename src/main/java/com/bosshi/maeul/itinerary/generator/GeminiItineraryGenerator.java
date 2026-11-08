@@ -58,7 +58,9 @@ public class GeminiItineraryGenerator extends AbstractAiItineraryGenerator {
                           "contentId": "관광지_contentId 또는 null",
                           "sequence": 1,
                           "title": "contentId 가 null 일 때 일정 제목",
-                          "description": "contentId 가 null 일 때 일정 설명"
+                          "description": "contentId 가 null 일 때 일정 설명",
+                          "startTime": "09:30",
+                          "endTime": "11:00"
                         }
                       ]
                     }

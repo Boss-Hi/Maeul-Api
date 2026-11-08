@@ -1,18 +1,23 @@
 package com.bosshi.maeul.itinerary.generator;
 
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.entity.ItineraryDay;
 import com.bosshi.maeul.itinerary.generator.impl.ItineraryGeneratorImpl;
+import com.bosshi.maeul.itinerary.type.Pace;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * AI 제공자 공통 일정 생성 흐름: 프롬프트 구성 → 제공자 호출 → 일정 엔티티 조립.
@@ -71,8 +76,23 @@ public abstract class AbstractAiItineraryGenerator implements ItineraryGenerator
                     .append("\n\n");
         }
 
+        // 사용자 설문 답변
+        if (dto.getSurveyAnswers() != null && !dto.getSurveyAnswers().isEmpty()) {
+            prompt.append("\n[여행객 정보 (사용자가 설문에 직접 입력한 값)]\n");
+            surveyAnswerLines(dto.getSurveyAnswers()).forEach(line -> prompt.append(line).append("\n"));
+            prompt.append("※ 일정 템포를 답했더라도, 아래 [일정 설정]의 페이스를 우선하세요.\n");
+        }
+
+        // 일정 설정
+        Pace pace = dto.getPace() != null ? dto.getPace() : Pace.MODERATE;
+        LocalTime dayStart = dto.getDayStartTime() != null ? dto.getDayStartTime() : ItineraryGenerateDTO.DEFAULT_DAY_START;
+        LocalTime dayEnd = dto.getDayEndTime() != null ? dto.getDayEndTime() : ItineraryGenerateDTO.DEFAULT_DAY_END;
+        prompt.append("\n[일정 설정]\n");
+        prompt.append("페이스: ").append(pace.name()).append(" (").append(pace.venueRange()).append(")\n");
+        prompt.append("하루 시간대: ").append(dayStart).append(" ~ ").append(dayEnd).append("\n");
+
         // 추천 관광지 목록
-        prompt.append("[추천 가능한 관광지]\n");
+        prompt.append("\n[추천 가능한 관광지]\n");
         List<Tour> filteredVenues = dto.getRecommendableTours();
         for (int i = 0; i < filteredVenues.size() && i < 20; i++) {
             Tour tour = filteredVenues.get(i);
@@ -88,13 +108,31 @@ public abstract class AbstractAiItineraryGenerator implements ItineraryGenerator
         prompt.append("\n");
         prompt.append("[지시사항]\n");
         prompt.append("1. 주축제를 중심으로 일정을 짜세요.\n");
-        prompt.append("2. 각 날짜별로 3-5개의 일정을 추천하세요.\n");
+        prompt.append("2. 각 날짜별로 ").append(pace.venueRange()).append("의 일정을 추천하세요.\n");
+        prompt.append("   - 모든 일정의 방문 시간(startTime, endTime)은 ").append(dayStart).append(" ~ ").append(dayEnd)
+                .append(" 안에서 HH:mm 형식으로 정하고, 같은 날 일정끼리 시간이 겹치지 않게 하세요.\n");
         prompt.append("   - 위 추천 관광지 목록의 장소를 쓸 때는 해당 contentId 를 그대로 넣으세요.\n");
         prompt.append("   - 목록에 없는 장소나 활동(식사, 휴식, 이동 등)은 contentId 를 비워 두고 title 과 description 을 작성하세요.\n");
         prompt.append("   - 목록에 없는 contentId 를 임의로 만들지 마세요.\n");
         prompt.append(outputInstruction());
 
         return prompt.toString();
+    }
+
+    /**
+     * 질문별로 답변을 묶어 "질문: 옵션(설명), 옵션" 형태의 줄로 만든다. 질문 순서는 입력 순서를 따른다.
+     */
+    private static List<String> surveyAnswerLines(List<SurveyAnswerInfo> answers) {
+        Map<String, List<String>> byQuestion = new LinkedHashMap<>();
+        for (SurveyAnswerInfo answer : answers) {
+            String option = answer.optionSubLabel() == null || answer.optionSubLabel().isBlank()
+                    ? answer.optionLabel()
+                    : answer.optionLabel() + "(" + answer.optionSubLabel() + ")";
+            byQuestion.computeIfAbsent(answer.questionTitle(), key -> new ArrayList<>()).add(option);
+        }
+        return byQuestion.entrySet().stream()
+                .map(entry -> "- " + entry.getKey() + ": " + String.join(", ", entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -126,7 +164,7 @@ public abstract class AbstractAiItineraryGenerator implements ItineraryGenerator
 
             if (dayJson.items() != null) {
                 for (ItineraryTourJson item : dayJson.items()) {
-                    ItineraryScheduleMapper.toSchedule(day, item, knownTours::get)
+                    ItineraryScheduleMapper.toSchedule(day, item, knownTours::get, dto.getDayStartTime(), dto.getDayEndTime())
                             .ifPresent(day.getItinerarySchedules()::add);
                 }
             }

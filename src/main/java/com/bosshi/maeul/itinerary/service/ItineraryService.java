@@ -1,11 +1,14 @@
 package com.bosshi.maeul.itinerary.service;
 
+import com.bosshi.maeul.itinerary.client.SurveyAnswerClient;
 import com.bosshi.maeul.itinerary.dto.ItineraryGenerateDTO;
+import com.bosshi.maeul.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itinerary.generator.ItineraryGeneratorRouter;
 import com.bosshi.maeul.itinerary.repository.ItineraryRepository;
 import com.bosshi.maeul.itinerary.request.ItineraryUpdateRequest;
+import com.bosshi.maeul.itinerary.type.Pace;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.bosshi.maeul.openapi.repository.TourRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 여행 추천 시스템의 핵심 조율 서비스
@@ -32,17 +37,20 @@ public class ItineraryService {
     private final TourFilteringService tourFilteringService;
     private final ItineraryRepository itineraryRepository;
     private final ItineraryGeneratorRouter itineraryGenerator;
+    private final SurveyAnswerClient surveyAnswerClient;
 
     public ItineraryService(
             TourRepository tourRepository,
             TourFilteringService tourFilteringService,
             ItineraryRepository itineraryRepository,
-            ItineraryGeneratorRouter itineraryGenerator) {
+            ItineraryGeneratorRouter itineraryGenerator,
+            SurveyAnswerClient surveyAnswerClient) {
 
         this.tourRepository = tourRepository;
         this.tourFilteringService = tourFilteringService;
         this.itineraryRepository = itineraryRepository;
         this.itineraryGenerator = itineraryGenerator;
+        this.surveyAnswerClient = surveyAnswerClient;
     }
     /**
      * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
@@ -53,6 +61,7 @@ public class ItineraryService {
         Tour tour = tourRepository.findByContentId(dto.getTourId())
                 .orElseThrow(() -> new IllegalArgumentException("관광 정보를 찾을 수 없습니다: " + dto.getTourId()));
         dto.setTour(tour);
+        applyPersonalization(dto);
         dto.setRecommendableTours(tourFilteringService.filterTourByCategories(dto));
 
         Itinerary itinerary = itineraryGenerator.generate(dto);
@@ -62,6 +71,32 @@ public class ItineraryService {
                         .size()
         );
         return savedItinerary;
+    }
+
+    /**
+     * 설문 답변을 가져오고, 페이스와 하루 시간대의 빈 값을 채운다.
+     * 페이스는 요청, 설문의 일정 템포, MODERATE 순으로 정한다.
+     */
+    private void applyPersonalization(ItineraryGenerateDTO dto) {
+        List<SurveyAnswerInfo> answers = surveyAnswerClient.findAnswers(dto.getUserId());
+        dto.setSurveyAnswers(answers);
+
+        Pace pace = Optional.ofNullable(dto.getPace())
+                .or(() -> answers.stream()
+                        .map(answer -> Pace.fromSurveyValue(answer.optionValue()))
+                        .flatMap(Optional::stream)
+                        .findFirst())
+                .orElse(Pace.MODERATE);
+        dto.setPace(pace);
+        if (dto.getFilterSettings() != null) {
+            dto.getFilterSettings().setMaxVenuesPerDay(pace.maxVenuesPerDay());
+        }
+        if (dto.getDayStartTime() == null) {
+            dto.setDayStartTime(ItineraryGenerateDTO.DEFAULT_DAY_START);
+        }
+        if (dto.getDayEndTime() == null) {
+            dto.setDayEndTime(ItineraryGenerateDTO.DEFAULT_DAY_END);
+        }
     }
 
     public Itinerary findById(Long id) {

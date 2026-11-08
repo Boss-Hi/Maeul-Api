@@ -39,8 +39,8 @@ class ClaudeItineraryGeneratorTest {
         ClaudeService claudeService = mock(ClaudeService.class);
         when(claudeService.generate(anyString(), eq(ClaudeItineraryOutput.class))).thenReturn(new ClaudeItineraryOutput(List.of(
                 new ItineraryDayJson("2026-11-10", 1, List.of(
-                        new ItineraryTourJson("123", 1, "", ""),
-                        new ItineraryTourJson("", 2, "점심", "국밥"))))));
+                        new ItineraryTourJson("123", 1, "", "", null, null),
+                        new ItineraryTourJson("", 2, "점심", "국밥", null, null))))));
 
         Tour tour = Tour.builder().contentId("123").title("축제").build();
         ItineraryGenerateDTO dto = ItineraryGenerateDTO.builder()

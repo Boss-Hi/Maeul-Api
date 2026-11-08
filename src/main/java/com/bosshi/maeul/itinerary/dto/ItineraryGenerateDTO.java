@@ -1,10 +1,12 @@
 package com.bosshi.maeul.itinerary.dto;
 
+import com.bosshi.maeul.itinerary.type.Pace;
 import com.bosshi.maeul.openapi.entity.Tour;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -13,6 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ItineraryGenerateDTO {
+    /** 하루 시작·마감 시간을 요청하지 않았을 때의 기본값 */
+    public static final LocalTime DEFAULT_DAY_START = LocalTime.of(9, 30);
+    public static final LocalTime DEFAULT_DAY_END = LocalTime.of(22, 30);
+
     @JsonProperty("tour_id")
     private String tourId;
 
@@ -45,6 +51,30 @@ public class ItineraryGenerateDTO {
      */
     @JsonProperty("selectedCategories")
     private List<String> selectedCategories;
+
+    /**
+     * 하루 일정 페이스. 요청 값이며, 비어 있으면 일정 생성 서비스가 채운다.
+     */
+    @JsonProperty("pace")
+    private Pace pace;
+
+    /**
+     * 하루 시작 시간. 요청 값이며, 비어 있으면 일정 생성 서비스가 채운다.
+     */
+    @JsonProperty("dayStartTime")
+    private LocalTime dayStartTime;
+
+    /**
+     * 하루 마감 시간. 요청 값이며, 비어 있으면 일정 생성 서비스가 채운다.
+     */
+    @JsonProperty("dayEndTime")
+    private LocalTime dayEndTime;
+
+    /**
+     * 사용자의 설문 답변 (일정 생성 서비스가 채운다)
+     */
+    @JsonProperty("surveyAnswers")
+    private List<SurveyAnswerInfo> surveyAnswers;
 
     /**
      * 필터 설정 (선택사항)

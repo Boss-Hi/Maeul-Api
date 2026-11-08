@@ -116,7 +116,8 @@ public class ItineraryTestGenerator implements ItineraryGeneratorImpl {
             if (dayJson.items() != null) {
                 for (ItineraryTourJson item : dayJson.items()) {
                     // DB 조회를 하지 않고 프록시(참조) 객체만 생성 (테스트 데이터는 DB 의 실제 contentId 만 사용)
-                    ItineraryScheduleMapper.toSchedule(day, item, contentId -> entityManager.getReference(Tour.class, contentId))
+                    ItineraryScheduleMapper.toSchedule(day, item, contentId -> entityManager.getReference(Tour.class, contentId),
+                            dto.getDayStartTime(), dto.getDayEndTime())
                             .ifPresent(day.getItinerarySchedules()::add);
                 }
             }

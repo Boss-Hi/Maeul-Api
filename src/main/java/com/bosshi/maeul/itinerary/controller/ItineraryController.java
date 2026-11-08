@@ -53,6 +53,9 @@ public class ItineraryController {
                 .endDate(request.getEndDate())
                 .tourId(request.getTourId())
                 .userId(userDetails.getId())
+                .pace(request.getPace())
+                .dayStartTime(request.getDayStartTime())
+                .dayEndTime(request.getDayEndTime())
                 .selectedCategories(List.of("VE06", "EV02", "AC01"))
                 .filterSettings(new ItineraryGenerateDTO.FilterSettingsRequest(
                         5,
