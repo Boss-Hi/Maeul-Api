@@ -3,12 +3,10 @@ package com.bosshi.maeul.ai.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.modulith.NamedInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@NamedInterface
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,6 +27,14 @@ public class GeminiGenerateResponse {
         }
 
         return candidate.getContent().getParts().get(0).getText();
+    }
+
+    /** 첫 후보의 종료 사유 (STOP, MAX_TOKENS, SAFETY 등). 후보가 없으면 null */
+    public String getFirstFinishReason() {
+        if (candidates == null || candidates.isEmpty() || candidates.get(0) == null) {
+            return null;
+        }
+        return candidates.get(0).getFinishReason();
     }
 
     @Getter

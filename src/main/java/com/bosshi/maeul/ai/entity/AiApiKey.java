@@ -5,11 +5,9 @@ import com.bosshi.maeul.common.entity.BaseEntity;
 import com.bosshi.maeul.crypt.AesCryptoConverter;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.modulith.NamedInterface;
 
 import java.time.LocalDateTime;
 
-@NamedInterface
 @Entity
 @Table(name = "ai_api_keys")
 @Getter

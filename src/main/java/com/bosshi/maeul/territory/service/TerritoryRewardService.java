@@ -4,7 +4,7 @@ import com.bosshi.maeul.point.service.PointService;
 import com.bosshi.maeul.point.type.PointReason;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
 import com.bosshi.maeul.territory.repository.TerritoryDailyStayRepository;
-import com.bosshi.maeul.territory.response.MyTerritoryResponse.RewardProgress;
+import com.bosshi.maeul.territory.dto.MyTerritory.RewardProgress;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

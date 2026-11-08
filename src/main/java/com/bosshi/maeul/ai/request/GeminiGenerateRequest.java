@@ -5,11 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.modulith.NamedInterface;
 
 import java.util.List;
 
-@NamedInterface
 @Getter
 @Setter
 @NoArgsConstructor

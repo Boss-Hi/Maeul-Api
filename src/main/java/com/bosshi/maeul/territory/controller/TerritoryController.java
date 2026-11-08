@@ -34,7 +34,8 @@ public class TerritoryController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month
     ) {
-        return ApiResponse.success(territoryService.myTerritory(userDetails.getId(), month == null ? territoryService.currentMonth() : month));
+        return ApiResponse.success(MyTerritoryResponse.from(
+                territoryService.myTerritory(userDetails.getId(), month == null ? territoryService.currentMonth() : month)));
     }
 
     /**
@@ -43,7 +44,7 @@ public class TerritoryController {
     @GetMapping("/regions")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<TerritoryRegionResponse>>> regions(@RequestParam(required = false) String parentRegionId) {
-        return ApiResponse.success(territoryService.regions(parentRegionId));
+        return ApiResponse.success(territoryService.regions(parentRegionId).stream().map(TerritoryRegionResponse::from).toList());
     }
 
     /**
@@ -57,7 +58,7 @@ public class TerritoryController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month,
             @RequestParam(defaultValue = "50") int size
     ) {
-        return ApiResponse.success(territoryService.ranking(userDetails.getId(), regionId,
-                month == null ? territoryService.currentMonth() : month, size));
+        return ApiResponse.success(TerritoryRankingResponse.from(territoryService.ranking(userDetails.getId(), regionId,
+                month == null ? territoryService.currentMonth() : month, size)));
     }
 }

@@ -1,5 +1,6 @@
 package com.bosshi.maeul.territory.response;
 
+import com.bosshi.maeul.territory.dto.TerritoryRegion;
 import com.bosshi.maeul.territory.type.TerritoryRegionType;
 
 /**
@@ -11,4 +12,7 @@ public record TerritoryRegionResponse(
         String parentRegionId,
         TerritoryRegionType regionType
 ) {
+    public static TerritoryRegionResponse from(TerritoryRegion region) {
+        return new TerritoryRegionResponse(region.regionId(), region.name(), region.parentRegionId(), region.regionType());
+    }
 }

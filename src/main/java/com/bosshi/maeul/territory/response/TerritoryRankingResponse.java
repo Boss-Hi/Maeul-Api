@@ -1,5 +1,8 @@
 package com.bosshi.maeul.territory.response;
 
+import com.bosshi.maeul.territory.dto.TerritoryRankingResult;
+import com.bosshi.maeul.territory.dto.TerritoryRankingResult.Entry;
+
 import java.time.YearMonth;
 import java.util.List;
 
@@ -17,6 +20,8 @@ public record TerritoryRankingResponse(
         List<Entry> rankings,
         Entry myRank
 ) {
-    public record Entry(int rank, String nickname, long staySeconds, boolean me) {
+    public static TerritoryRankingResponse from(TerritoryRankingResult result) {
+        return new TerritoryRankingResponse(result.regionId(), result.regionName(), result.rankingMonth(),
+                result.participantCount(), result.rankings(), result.myRank());
     }
 }

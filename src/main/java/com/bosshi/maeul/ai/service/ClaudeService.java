@@ -16,7 +16,6 @@ import com.bosshi.maeul.ai.type.AiProviderType;
 import com.bosshi.maeul.common.exception.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -34,7 +33,6 @@ import java.util.function.Function;
  *   <li>structured outputs 로 응답을 지정한 타입의 JSON 스키마에 맞춰 받음</li>
  * </ul>
  */
-@NamedInterface
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -72,7 +70,7 @@ public class ClaudeService {
                     .filter(k -> triedKeyIds.add(k.id()))
                     .orElseThrow(() -> {
                         log.error("사용 가능한 Claude API key 가 없습니다.");
-                        return new ServiceUnavailableException(GeminiService.UNAVAILABLE_MESSAGE);
+                        return new ServiceUnavailableException(ServiceUnavailableException.UNAVAILABLE_MESSAGE);
                     });
 
             try {

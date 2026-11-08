@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class ClaudeConfig {
     /** 최초 기동 시 ai_api_keys 에 CLAUDE 키가 없으면 seed 되는 키. 런타임에는 DB 의 활성 키만 사용 */
     private String apiKey;
-    private String model = "claude-opus-5-5";
+    private String model = "claude-sonnet-5-5";
     private long maxTokens = 16000;
     /** low, medium, high, xhigh, max */
     private String effort = "medium";

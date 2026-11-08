@@ -1,17 +1,17 @@
 package com.bosshi.maeul.territory.service;
 
-import com.bosshi.maeul.openapi.repository.LDongRegionRepository;
+import com.bosshi.maeul.itineraries.openapi.repository.LDongRegionRepository;
 import com.bosshi.maeul.point.service.PointService;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
+import com.bosshi.maeul.territory.dto.MyTerritory;
+import com.bosshi.maeul.territory.dto.MyTerritory.CurrentVisit;
+import com.bosshi.maeul.territory.dto.MyTerritory.RegionStat;
+import com.bosshi.maeul.territory.dto.TerritoryRankingResult;
+import com.bosshi.maeul.territory.dto.TerritoryRegion;
 import com.bosshi.maeul.territory.entity.TerritoryRegionCell;
 import com.bosshi.maeul.territory.repository.TerritoryDailyStayRepository;
 import com.bosshi.maeul.territory.repository.TerritoryRegionCellRepository;
 import com.bosshi.maeul.territory.repository.dto.RegionStay;
-import com.bosshi.maeul.territory.response.MyTerritoryResponse;
-import com.bosshi.maeul.territory.response.MyTerritoryResponse.CurrentVisit;
-import com.bosshi.maeul.territory.response.MyTerritoryResponse.RegionStat;
-import com.bosshi.maeul.territory.response.TerritoryRankingResponse;
-import com.bosshi.maeul.territory.response.TerritoryRegionResponse;
 import com.bosshi.maeul.territory.type.TerritoryRegionType;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import com.bosshi.maeul.timeline.repository.TimelinePointRepository;
@@ -53,7 +53,7 @@ public class TerritoryService {
     }
 
     @Transactional
-    public MyTerritoryResponse myTerritory(Long userId, YearMonth month) {
+    public MyTerritory myTerritory(Long userId, YearMonth month) {
         Optional<OccupationCalculator.Visit> visit = currentVisit(userId);
 
         List<RegionStay> totals = dailyStayRepository.sumByRegion(userId).stream()
@@ -87,11 +87,10 @@ public class TerritoryService {
                     v.startedAt(), v.confirmedUntil(), v.confirmedStaySeconds(), v.live());
         }).orElse(null);
 
-        return new MyTerritoryResponse(month, currentVisit, regions, rewardService.progress(userId),
-                new MyTerritoryResponse.Points(pointService.balance(userId)));
+        return new MyTerritory(month, currentVisit, regions, rewardService.progress(userId), pointService.balance(userId));
     }
 
-    public TerritoryRankingResponse ranking(Long userId, String regionId, YearMonth month, int size) {
+    public TerritoryRankingResult ranking(Long userId, String regionId, YearMonth month, int size) {
         if (regionId == null || !regionId.matches("\\d{5}")) {
             throw new IllegalArgumentException("regionId 는 시군구 코드 5자리여야 합니다.");
         }
@@ -105,27 +104,27 @@ public class TerritoryService {
         mine.ifPresent(r -> userIds.add(r.userId()));
         Map<Long, String> nicknames = profileRepository.findByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(p -> p.getUser().getId(), Profile::getNickname, (a, b) -> a));
-        Function<TerritoryRanking.Ranked, TerritoryRankingResponse.Entry> entry = r -> new TerritoryRankingResponse.Entry(
+        Function<TerritoryRanking.Ranked, TerritoryRankingResult.Entry> entry = r -> new TerritoryRankingResult.Entry(
                 r.rank(), nicknames.get(r.userId()), r.seconds(), r.userId().equals(userId));
 
         TerritoryRegionCell name = names(List.of(regionId)).get(regionId);
-        return new TerritoryRankingResponse(regionId, name == null ? null : name.getRegionName(), month, ranking.size(),
+        return new TerritoryRankingResult(regionId, name == null ? null : name.getRegionName(), month, ranking.size(),
                 top.stream().map(entry).toList(), mine.map(entry).orElse(null));
     }
 
     /**
      * 지역 목록. parentRegionId 가 없으면 전체, 있으면 그 지역의 바로 아래 지역만.
      */
-    public List<TerritoryRegionResponse> regions(String parentRegionId) {
-        List<TerritoryRegionResponse> regions = new ArrayList<>();
-        regions.add(new TerritoryRegionResponse(COUNTRY_ID, "전국", null, TerritoryRegionType.COUNTRY));
+    public List<TerritoryRegion> regions(String parentRegionId) {
+        List<TerritoryRegion> regions = new ArrayList<>();
+        regions.add(new TerritoryRegion(COUNTRY_ID, "전국", null, TerritoryRegionType.COUNTRY));
         regionRepository.findAllWithSigungus().stream()
-                .sorted(Comparator.comparing(com.bosshi.maeul.openapi.entity.Region::getCode))
+                .sorted(Comparator.comparing(com.bosshi.maeul.itineraries.openapi.entity.Region::getCode))
                 .forEach(region -> {
-                    regions.add(new TerritoryRegionResponse(region.getCode(), region.getName(), COUNTRY_ID, TerritoryRegionType.PROVINCE));
+                    regions.add(new TerritoryRegion(region.getCode(), region.getName(), COUNTRY_ID, TerritoryRegionType.PROVINCE));
                     region.getSigungus().stream()
-                            .sorted(Comparator.comparing(com.bosshi.maeul.openapi.entity.RegionSubdivisions::getCode))
-                            .forEach(sigungu -> regions.add(new TerritoryRegionResponse(
+                            .sorted(Comparator.comparing(com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions::getCode))
+                            .forEach(sigungu -> regions.add(new TerritoryRegion(
                                     region.getCode() + sigungu.getCode(), sigungu.getName(), region.getCode(), TerritoryRegionType.DISTRICT)));
                 });
         if (parentRegionId == null || parentRegionId.isBlank()) {
