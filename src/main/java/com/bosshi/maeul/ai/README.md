@@ -26,7 +26,7 @@
 
 ## Claude 환경 변수
 - `ANTHROPIC_API_KEY`: `ai_api_keys` 에 CLAUDE 키가 없을 때 최초 기동 시 seed 되는 키
-- `CLAUDE_MODEL`: 기본 `claude-opus-5-5`
+- `CLAUDE_MODEL`: 기본 `claude-sonnet-5-5`
 - `CLAUDE_MAX_TOKENS`: 기본 `16000`
 - `CLAUDE_EFFORT`: `low` | `medium` | `high` | `xhigh` | `max`, 기본 `medium`
 - `CLAUDE_REFUSAL_FALLBACK_ENABLED`: 거절 시 서버 측 다른 Claude 모델로 재처리, 기본 `true`

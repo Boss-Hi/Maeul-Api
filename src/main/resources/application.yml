@@ -120,7 +120,7 @@ ai:
     fallback-model: ${GEMINI_FALLBACK_MODEL:}
   claude:
     api-key: ${ANTHROPIC_API_KEY:}
-    model: ${CLAUDE_MODEL:claude-opus-5-5}
+    model: ${CLAUDE_MODEL:claude-sonnet-5-5}
     max-tokens: ${CLAUDE_MAX_TOKENS:16000}
     effort: ${CLAUDE_EFFORT:medium}
     refusal-fallback-enabled: ${CLAUDE_REFUSAL_FALLBACK_ENABLED:true}

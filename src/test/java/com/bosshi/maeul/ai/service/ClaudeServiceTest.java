@@ -52,7 +52,7 @@ class ClaudeServiceTest {
     void buildsRequestWithDefaults() {
         StructuredMessageCreateParams<Answer> params = service.buildParams("prompt", Answer.class);
 
-        assertThat(params.rawParams().model().asString()).isEqualTo("claude-opus-5-5");
+        assertThat(params.rawParams().model().asString()).isEqualTo("claude-sonnet-5-5");
         assertThat(params.rawParams().maxTokens()).isEqualTo(16000L);
         OutputConfig outputConfig = params.rawParams().outputConfig().orElseThrow();
         assertThat(outputConfig.effort()).contains(OutputConfig.Effort.MEDIUM);
