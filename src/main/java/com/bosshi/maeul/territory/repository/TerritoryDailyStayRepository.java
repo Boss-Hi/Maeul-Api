@@ -34,6 +34,21 @@ public interface TerritoryDailyStayRepository extends JpaRepository<TerritoryDai
             "from TerritoryDailyStay d where d.regionId = :regionId and d.stayDate >= :from and d.stayDate < :to group by d.userId")
     List<UserStay> sumByUserBetween(@Param("regionId") String regionId, @Param("from") LocalDate from, @Param("to") LocalDate to);
 
+    /** 사용자가 한 시군구에 [from, to) 기간 동안 쌓은 점령 시간 */
+    @Query("select coalesce(sum(d.staySeconds), 0) from TerritoryDailyStay d " +
+            "where d.userId = :userId and d.regionId = :regionId and d.stayDate >= :from and d.stayDate < :to")
+    long sumByUserAndRegionBetween(@Param("userId") Long userId, @Param("regionId") String regionId,
+                                   @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** 사용자가 한 시군구에 from 날짜부터 쌓은 점령 시간 */
+    @Query("select coalesce(sum(d.staySeconds), 0) from TerritoryDailyStay d " +
+            "where d.userId = :userId and d.regionId = :regionId and d.stayDate >= :from")
+    long sumByUserAndRegionFrom(@Param("userId") Long userId, @Param("regionId") String regionId, @Param("from") LocalDate from);
+
+    /** 사용자가 그날 점령 시간이 있는 시군구 */
+    @Query("select d.regionId from TerritoryDailyStay d where d.userId = :userId and d.stayDate = :date and d.staySeconds > 0")
+    List<String> findRegionIdsByUserAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
+
     /** 사용자의 전체 점령 시간 */
     @Query("select coalesce(sum(d.staySeconds), 0) from TerritoryDailyStay d where d.userId = :userId")
     long sumByUser(@Param("userId") Long userId);
