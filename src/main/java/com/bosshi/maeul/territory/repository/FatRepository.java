@@ -12,25 +12,25 @@ import java.util.Optional;
 @Repository
 public interface FatRepository extends JpaRepository<Fat, Long> {
 
-    /** 키우는 중인 병아리 (분양 순) */
+    /** 키우는 중인 펫 (분양 순) */
     List<Fat> findByUserIdAndGraduatedAtIsNullOrderByAdoptedAtAsc(Long userId);
 
-    /** 졸업한 병아리 (최근 졸업 순) */
+    /** 졸업한 펫 (최근 졸업 순) */
     List<Fat> findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(Long userId);
 
-    /** [from, to) 에 분양받아 아직 키우는 중인 병아리 */
+    /** [from, to) 에 분양받아 아직 키우는 중인 펫 */
     List<Fat> findByUserIdAndGraduatedAtIsNullAndAdoptedAtGreaterThanEqualAndAdoptedAtLessThan(
             Long userId, LocalDateTime from, LocalDateTime to);
 
     long countByUserIdAndGraduatedAtIsNull(Long userId);
 
-    /** 사용자들의 모든 병아리 (키우는 중, 졸업) */
+    /** 사용자들의 모든 펫 (키우는 중, 졸업) */
     List<Fat> findByUserIdIn(Collection<Long> userIds);
 
-    /** 시군구들에서 키우는 중인 병아리 */
+    /** 시군구들에서 키우는 중인 펫 */
     List<Fat> findByGraduatedAtIsNullAndRegionSubdivisionIdIn(Collection<Long> regionSubdivisionIds);
 
-    /** 시군구들에서 키우는 중이거나 졸업한 병아리 */
+    /** 시군구들에서 키우는 중이거나 졸업한 펫 */
     List<Fat> findByRegionSubdivisionIdIn(Collection<Long> regionSubdivisionIds);
 
     Optional<Fat> findByIdAndUserId(Long id, Long userId);

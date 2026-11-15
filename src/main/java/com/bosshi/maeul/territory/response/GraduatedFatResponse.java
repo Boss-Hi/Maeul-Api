@@ -5,7 +5,7 @@ import com.bosshi.maeul.territory.dto.GraduatedFat;
 import java.time.LocalDateTime;
 
 /**
- * 졸업한 병아리. level, exp 는 졸업 때 값이다.
+ * 졸업한 펫. level, exp 는 졸업 때 값이다.
  */
 public record GraduatedFatResponse(
         Long fatId,

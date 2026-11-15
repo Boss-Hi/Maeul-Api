@@ -5,9 +5,9 @@ import com.bosshi.maeul.territory.dto.MasterRanking;
 import java.util.List;
 
 /**
- * 지역별 주인 순위. 그 지역에서 병아리를 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세운다.
+ * 지역별 주인 순위. 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세운다.
  *
- * @param mine 내 순위 (그 지역 병아리가 없으면 null)
+ * @param mine 내 순위 (그 지역 펫이 없으면 null)
  */
 public record MasterRankingResponse(String regionCode, String code, String regionName, int participantCount,
                                     List<MasterRanking.Entry> entries, MasterRanking.Entry mine) {

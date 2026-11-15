@@ -3,7 +3,7 @@ package com.bosshi.maeul.territory.dto;
 import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
 
 /**
- * 병아리를 키우는 시군구 (region_subdivisions 의 한 행)
+ * 펫을 키우는 시군구 (region_subdivisions 의 한 행)
  *
  * @param regionCode 시도 코드 (region_subdivisions.region_code)
  * @param code       시군구 코드 (region_subdivisions.code)

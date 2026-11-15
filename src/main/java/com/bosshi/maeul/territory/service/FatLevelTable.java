@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 병아리 레벨표로 경험치에서 레벨을 정한다.
+ * 펫 레벨표로 경험치에서 레벨을 정한다.
  * <p>
  * 가장 낮은 레벨에서 시작해 각 레벨의 requiredExp 를 채울 때마다 다음 레벨로 오른다. 가장 높은 레벨이 최대 레벨이며,
  * 최대 레벨에서는 경험치가 더 쌓여도 레벨이 오르지 않는다. founding 이 켜진 가장 낮은 레벨이 건국 레벨이다.
@@ -35,7 +35,7 @@ public final class FatLevelTable {
 
     public static FatLevelTable of(List<Step> steps) {
         if (steps.isEmpty()) {
-            throw new IllegalStateException("병아리 레벨표가 비어 있습니다.");
+            throw new IllegalStateException("펫 레벨표가 비어 있습니다.");
         }
         return new FatLevelTable(steps.stream().sorted(Comparator.comparingInt(Step::level)).toList());
     }

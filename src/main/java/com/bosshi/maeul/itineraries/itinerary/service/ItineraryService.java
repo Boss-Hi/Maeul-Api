@@ -164,7 +164,7 @@ public class ItineraryService {
         return saved;
     }
 
-    /** 일정 기간(병아리 경험치)을 쓰는 쪽에 일정의 시군구(주축제 기준)와 기간을 알린다 */
+    /** 일정 기간(펫 경험치)을 쓰는 쪽에 일정의 시군구(주축제 기준)와 기간을 알린다 */
     private void publishPeriodChanged(Itinerary itinerary) {
         Tour tour = itinerary.getTour();
         boolean hasRegion = tour != null && hasText(tour.getLDongRegnCd()) && hasText(tour.getLDongSignguCd());

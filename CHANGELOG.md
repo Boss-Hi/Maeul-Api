@@ -9,26 +9,40 @@
 
 ### In Progress
 
-- 병아리 (시군구마다 점령 시간으로 키우는 캐릭터, ADR 0010)
-  - `GET /api/fats`: 키우는 중인 병아리(레벨, 단계 이름, 경험치, 다음 레벨까지, 교환 가능 여부), 동시에 키울 수 있는 수(`maxActiveFats`), 추천 분양 지역(`suggestedAdoptionRegions`: 오늘 머물렀거나 오늘 졸업한, 병아리 없는 시군구. 기존 `adoptableRegions` 대체)
-  - `GET /api/fats/regions`: 분양받을 수 있는 시군구 전체 (`regionSubdivisionId`, `regionCode`, `code`, `sidoName`, `sigunguName`). 아래에 구가 있는 시(수원시 등 13곳)는 제외
-  - `POST /api/fats` (`{ regionCode, code }`): 분양. `region_subdivisions` 의 `region_code` 와 `code` 를 각각 받음(이어 붙이지 않음, 세종은 `36110`/`36110`). 가 본 적이 없어도 전국 어느 시군구에서나 미리 받을 수 있음(ADR 0011). 사용자마다 시군구당 1마리, 최대 마리 수에 이르거나 없는 시군구, 구가 있는 시면 400
-  - 병아리의 시군구는 `region_subdivisions` 의 한 행 (ADR 0012). 점령 시간과는 카카오가 판정한 시도·시군구 이름(`territory_region_cells`)을 `regions.name`·`region_subdivisions.name` 과 맞춰 연결. 병아리 응답의 시군구 필드는 `regionSubdivisionId`, `regionCode`, `code`, `sidoName`, `sigunguName`
+- 펫(fat) (시군구마다 머문 시간으로 키우는 캐릭터, ADR 0010)
+  - `GET /api/fats`: 키우는 중인 펫(레벨, 단계 이름, 경험치, 다음 레벨까지, 교환 가능 여부), 동시에 키울 수 있는 수(`maxActiveFats`), 추천 분양 지역(`suggestedAdoptionRegions`)
+    - 추천 분양 지역: 오늘 머물렀거나, 오늘 펫이 졸업했거나, 아직 끝나지 않은 내 일정의 시군구 중 펫이 없는 곳
+  - `GET /api/fats/regions`: 분양받을 수 있는 시군구 전체. 아래에 구가 있는 시(수원시 등 13곳)는 제외
+  - `POST /api/fats` (`{ regionCode, code }`): 분양
+    - 가 본 적이 없어도 전국 어느 시군구에서나 미리 받을 수 있음 (ADR 0011)
+    - 사용자마다 시군구당 1마리. 최대 마리 수에 이르렀거나, 없는 시군구이거나, 구가 있는 시면 400
   - `POST /api/fats/{fatId}/graduate`: 졸업(상품 교환). 건국 레벨부터 가능, 되돌리지 않음
-  - `GET /api/fats/graduated`: 졸업한 병아리 (졸업 때 레벨·경험치)
-  - 경험치 = 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1) + 방문일(하루 1회, 기본 60, `fat_settings.visit_day_exp`) (ADR 0013). 일정 기간은 그 시군구(주축제 기준)로 만든 일정의 시작일 0시~종료일 24시이고, 일정 밖에서 머문 시간은 세지 않음. 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
+  - `GET /api/fats/graduated`: 졸업한 펫 (졸업 때 레벨·경험치)
+  - `GET /api/fats/ranking?regionCode=&code=&size=`: 지역별 펫 순위 (키우는 중인 펫의 지금 경험치 순)
+    - `regionCode`+`code` 는 시군구, `regionCode` 만 있으면 시도, 둘 다 없으면 전국
+    - 같은 경험치는 같은 순위(1, 1, 3), 닉네임만 노출, `mine` 은 내 펫 중 가장 높은 순위
+- 펫 시군구 (ADR 0012)
+  - `region_subdivisions` 의 한 행. `region_code` 와 `code` 를 각각 받고 이어 붙이지 않음 (세종은 `36110`/`36110`)
+  - 응답의 시군구 필드: `regionSubdivisionId`, `regionCode`, `code`, `sidoName`, `sigunguName`
+  - 점령 시간과는 카카오가 판정한 시도·시군구 이름(`territory_region_cells`)을 `regions.name`·`region_subdivisions.name` 과 맞춰 연결
+- 펫 경험치 (ADR 0013)
+  - 경험치 = 분양 이후, 그 시군구 일정 기간 안의 머문 시간(1분 = 1) + 방문일(하루 1회, 기본 60, `fat_settings.visit_day_exp`)
+  - 일정 기간은 그 시군구(주축제 기준)로 만든 일정의 시작일 0시~종료일 24시. 일정 밖에서 머문 시간은 세지 않음
+  - 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
   - 일정을 만들거나 날짜·주축제를 바꾸면 일정 모듈이 `ItineraryPeriodChangedEvent` 를 보내고, 점령 모듈이 `fat_itinerary_periods` 에 기간 복사본을 저장
-  - 추천 분양 지역에 아직 끝나지 않은 내 일정의 시군구도 포함
-  - 레벨표(`fat_levels`)는 관리자 화면(KraftAdmin `FatLevel`)에서 레벨별 필요 경험치·단계 이름·건국 여부를 수정. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
-  - 동시에 키울 수 있는 병아리 수는 `fat_settings.max_active_fats`(기본 3, 관리자 화면 KraftAdmin `FatSetting`)에서 관리. 줄여도 이미 키우는 병아리는 그대로
-  - `fat_levels`, `fat_settings`, `fats` 테이블 추가 (V12 하나로 정리. 이전 V12~V15 를 적용한 DB 는 병아리 테이블과 `kakao_legal_dong_codes` 를 지우고 `flyway_schema_history` 의 12 이상 기록을 지운 뒤 다시 migrate)
-  - `fat_itinerary_periods` 테이블과 `fat_settings.visit_day_exp` 추가 (V13)
-  - `GET /api/fats/ranking?regionCode=&code=&size=`: 지역별 병아리 순위 (키우는 중인 병아리의 지금 경험치 순). `regionCode`+`code` 는 시군구, `regionCode` 만 있으면 시도, 둘 다 없으면 전국. 같은 경험치는 같은 순위(1, 1, 3), 닉네임만 노출, `mine` 은 내 병아리 중 가장 높은 순위
-  - 주인(Master): 사용자마다 1명, 주인 경험치 = 모든 병아리 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율(`fat_settings.master_exp_ratio`, 기본 1.0). 별도 레벨표 `master_levels`(기본 Lv.1~100, 레벨마다 1,008, KraftAdmin `MasterLevel`)
+- 주인 (Master)
+  - 사용자마다 1명. 주인 경험치 = 모든 펫 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율(`fat_settings.master_exp_ratio`, 기본 1.0)
   - `GET /api/master`: 내 주인의 레벨·경험치
-  - `GET /api/master/ranking?regionCode=&code=&size=`: 지역별 주인 순위. 그 지역에서 병아리를 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세움
+  - `GET /api/master/ranking?regionCode=&code=&size=`: 지역별 주인 순위. 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세움
+- 관리자 설정 (KraftAdmin)
+  - `FatLevel`: 펫 레벨표(`fat_levels`)의 레벨별 필요 경험치·단계 이름·건국 여부. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
+  - `MasterLevel`: 주인 레벨표(`master_levels`). 기본 Lv.1~100, 레벨마다 1,008
+  - `FatSetting`: 동시에 키울 수 있는 펫 수(`max_active_fats`, 기본 3. 줄여도 이미 키우는 펫은 그대로), 방문일 경험치, 주인 비율
+- DB
+  - `fat_levels`, `fat_settings`, `fats` 테이블 추가 (V12)
+  - `fat_itinerary_periods` 테이블과 `fat_settings.visit_day_exp` 추가 (V13)
   - `master_levels` 테이블과 `fat_settings.master_exp_ratio` 추가 (V14)
-  - 영문 이름을 chick 에서 fat 으로 변경 (API 경로 `/api/chicks` -> `/api/fats`, 응답 필드 `chickId` -> `fatId`)
+  - 이전 V12~V15 를 적용한 개발 DB 는 펫 테이블과 `kakao_legal_dong_codes` 를 지우고, `flyway_schema_history` 의 12 이상 기록을 지운 뒤 다시 migrate
 
 ## [v0.3.1] - 2026-11-08
 

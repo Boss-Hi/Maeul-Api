@@ -33,7 +33,7 @@ class FatServiceAdoptLimitTest {
     }
 
     @Test
-    @DisplayName("키우는 병아리가 DB 설정의 최대 마리 수에 이르면 분양을 거부하고 저장하지 않는다")
+    @DisplayName("키우는 펫이 DB 설정의 최대 마리 수에 이르면 분양을 거부하고 저장하지 않는다")
     void rejectsAtLimit() {
         when(settingRepository.findFirstByDeletedAtIsNullOrderByIdAsc())
                 .thenReturn(Optional.of(FatSetting.builder().maxActiveFats(2).build()));
@@ -64,7 +64,7 @@ class FatServiceAdoptLimitTest {
 
         assertThatThrownBy(() -> service.adopt(7L, "41", "110"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("수원시에서는 병아리를 키울 수 없습니다");
+                .hasMessageContaining("수원시에서는 펫을 키울 수 없습니다");
         verify(fatRepository, never()).saveAndFlush(any());
     }
 

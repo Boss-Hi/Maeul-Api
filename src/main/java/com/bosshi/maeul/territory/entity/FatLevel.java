@@ -6,7 +6,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * 병아리 레벨표의 한 줄. 관리자 화면에서 조정한다.
+ * 펫 레벨표의 한 줄. 관리자 화면에서 조정한다.
  */
 @Entity
 @Table(

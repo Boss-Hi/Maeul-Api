@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 /**
- * 사용자가 시군구 하나에서 키우는 병아리. 시군구는 region_subdivisions 의 한 행이다 (ADR 0012).
+ * 사용자가 시군구 하나에서 키우는 펫. 시군구는 region_subdivisions 의 한 행이다 (ADR 0012).
  * 경험치는 저장하지 않고 분양 이후 점령 시간에서 계산한다. 졸업 때의 값만 남긴다.
  */
 @Entity

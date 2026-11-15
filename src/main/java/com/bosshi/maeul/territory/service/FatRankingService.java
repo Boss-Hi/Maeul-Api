@@ -17,8 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 지역별 병아리·주인 순위. 지역은 시군구(regionCode + code), 시도(regionCode), 전국(둘 다 없음) 중 하나다.
- * 경험치를 조회할 때마다 계산하므로 지역의 병아리가 많아지면 느려진다.
+ * 지역별 펫·주인 순위. 지역은 시군구(regionCode + code), 시도(regionCode), 전국(둘 다 없음) 중 하나다.
+ * 경험치를 조회할 때마다 계산하므로 지역의 펫이 많아지면 느려진다.
  */
 @Service
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class FatRankingService {
     private record Scope(String regionCode, String code, String name, Map<Long, RegionSubdivisions> subdivisions) {
     }
 
-    /** 키우는 중인 병아리의 지금 경험치 순 */
+    /** 키우는 중인 펫의 지금 경험치 순 */
     public FatRanking fatRanking(Long userId, String regionCode, String code, int size) {
         Scope scope = scope(regionCode, code);
         List<Fat> fats = fatRepository.findByGraduatedAtIsNullAndRegionSubdivisionIdIn(scope.subdivisions().keySet());
@@ -60,7 +60,7 @@ public class FatRankingService {
                 top.stream().map(entry).toList(), mine.map(entry).orElse(null));
     }
 
-    /** 그 지역에서 병아리를 키우는 중이거나 졸업시킨 사용자의 주인 경험치 전체 순 */
+    /** 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자의 주인 경험치 전체 순 */
     public MasterRanking masterRanking(Long userId, String regionCode, String code, int size) {
         Scope scope = scope(regionCode, code);
         Set<Long> userIds = fatRepository.findByRegionSubdivisionIdIn(scope.subdivisions().keySet()).stream()

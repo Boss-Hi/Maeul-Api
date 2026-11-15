@@ -6,7 +6,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * 주인 레벨표의 한 줄. 병아리 레벨표와 같은 구조이며 건국(교환) 레벨은 없다. 관리자 화면에서 조정한다.
+ * 주인 레벨표의 한 줄. 펫 레벨표와 같은 구조이며 건국(교환) 레벨은 없다. 관리자 화면에서 조정한다.
  */
 @Entity
 @Table(

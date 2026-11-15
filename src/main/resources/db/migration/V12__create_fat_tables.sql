@@ -1,4 +1,4 @@
--- 병아리 레벨표. 레벨마다 다음 레벨까지 필요한 경험치(1분 = 1)와 단계 이름. 관리자 화면에서 조정한다.
+-- 펫 레벨표. 레벨마다 다음 레벨까지 필요한 경험치(1분 = 1)와 단계 이름. 관리자 화면에서 조정한다.
 -- 가장 높은 레벨이 최대 레벨이고, founding 이 켜진 가장 낮은 레벨이 건국(상품 교환 가능) 레벨이다.
 CREATE TABLE IF NOT EXISTS `fat_levels`
 (
@@ -27,7 +27,7 @@ SELECT n,
        NOW(6)
 FROM seq;
 
--- 병아리. 시군구는 region_subdivisions 의 한 행이며, 사용자마다 시군구 하나에 키우는 중인(졸업하지 않은) 병아리는 1마리
+-- 펫. 시군구는 region_subdivisions 의 한 행이며, 사용자마다 시군구 하나에 키우는 중인(졸업하지 않은) 펫은 1마리
 CREATE TABLE IF NOT EXISTS `fats`
 (
     `id`                           BIGINT      NOT NULL AUTO_INCREMENT,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `fats`
     `graduated_at`                 DATETIME(6) NULL COMMENT '졸업(상품 교환) 시각. 되돌리지 않음',
     `graduated_level`              INT         NULL COMMENT '졸업 때 레벨',
     `graduated_exp`                BIGINT      NULL COMMENT '졸업 때 경험치',
-    `active_region_subdivision_id` BIGINT AS (IF(`graduated_at` IS NULL, `region_subdivision_id`, NULL)) STORED COMMENT '키우는 중인 병아리 중복 방지용',
+    `active_region_subdivision_id` BIGINT AS (IF(`graduated_at` IS NULL, `region_subdivision_id`, NULL)) STORED COMMENT '키우는 중인 펫 중복 방지용',
     `created_at`                   DATETIME(6) NOT NULL,
     `updated_at`                   DATETIME(6) NOT NULL,
     `deleted_at`                   DATETIME(6) NULL,
@@ -51,11 +51,11 @@ CREATE TABLE IF NOT EXISTS `fats`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- 병아리 설정. 1행만 쓰며 관리자 화면에서 고친다.
+-- 펫 설정. 1행만 쓰며 관리자 화면에서 고친다.
 CREATE TABLE IF NOT EXISTS `fat_settings`
 (
     `id`              BIGINT      NOT NULL AUTO_INCREMENT,
-    `max_active_fats` INT         NOT NULL COMMENT '사용자가 동시에 키울 수 있는 병아리 수. 줄여도 이미 키우는 병아리는 그대로',
+    `max_active_fats` INT         NOT NULL COMMENT '사용자가 동시에 키울 수 있는 펫 수. 줄여도 이미 키우는 펫은 그대로',
     `created_at`      DATETIME(6) NOT NULL,
     `updated_at`      DATETIME(6) NOT NULL,
     `deleted_at`      DATETIME(6) NULL,

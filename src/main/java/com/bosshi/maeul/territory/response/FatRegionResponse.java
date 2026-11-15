@@ -3,7 +3,7 @@ package com.bosshi.maeul.territory.response;
 import com.bosshi.maeul.territory.dto.FatRegion;
 
 /**
- * 병아리를 키울 수 있는 시군구 (region_subdivisions)
+ * 펫을 키울 수 있는 시군구 (region_subdivisions)
  *
  * @param regionCode 시도 코드. 분양할 때 code 와 함께 보낸다
  * @param code       시군구 코드. 분양할 때 regionCode 와 함께 보낸다

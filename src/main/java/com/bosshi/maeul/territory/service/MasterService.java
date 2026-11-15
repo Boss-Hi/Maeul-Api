@@ -15,8 +15,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 주인: 병아리를 키우는 사용자의 성장 기록. 사용자마다 1명이다.
- * 주인 경험치 = 모든 병아리 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율이고, 저장하지 않고 계산한다.
+ * 주인: 펫을 키우는 사용자의 성장 기록. 사용자마다 1명이다.
+ * 주인 경험치 = 모든 펫 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율이고, 저장하지 않고 계산한다.
  * 레벨은 주인 레벨표로 정한다.
  */
 @Service
@@ -48,7 +48,7 @@ public class MasterService {
                 .toList());
     }
 
-    /** 사용자별 병아리 경험치 합 (키우는 중은 지금 값, 졸업은 졸업 때 값) */
+    /** 사용자별 펫 경험치 합 (키우는 중은 지금 값, 졸업은 졸업 때 값) */
     private Map<Long, Long> fatExpSums(Collection<Long> userIds) {
         if (userIds.isEmpty()) {
             return Map.of();

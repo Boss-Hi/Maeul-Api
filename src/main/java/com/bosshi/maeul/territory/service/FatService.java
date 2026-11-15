@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 병아리: 전국 어느 시군구에서나 미리 분양받아 그 시군구에서 키운다 (ADR 0011).
+ * 펫: 전국 어느 시군구에서나 미리 분양받아 그 시군구에서 키운다 (ADR 0011).
  * 시군구는 region_subdivisions 의 한 행이다. 점령 시간과는 카카오가 위치 판정 때 준 시도·시군구 이름
  * (territory_region_cells)을 regions.name, region_subdivisions.name 과 맞춰 연결한다 (ADR 0012).
  * 경험치는 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1)과 방문일이고 (ADR 0013), 레벨은 지금 레벨표로 정한다.
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class FatService {
 
-    private static final String ACTIVE_FAT_EXISTS = "이 시군구에는 이미 키우는 병아리가 있습니다.";
+    private static final String ACTIVE_FAT_EXISTS = "이 시군구에는 이미 키우는 펫이 있습니다.";
 
     private final FatRepository fatRepository;
     private final FatLevelRepository levelRepository;
@@ -80,7 +80,7 @@ public class FatService {
         return fats.stream().map(fat -> graduated(fat, subdivisions.get(fat.getRegionSubdivisionId()))).toList();
     }
 
-    /** 병아리를 분양받을 수 있는 시군구: region_subdivisions 중 아래에 구가 있는 시를 뺀 곳 */
+    /** 펫을 분양받을 수 있는 시군구: region_subdivisions 중 아래에 구가 있는 시를 뺀 곳 */
     public List<FatRegion> regions() {
         List<RegionSubdivisions> all = sigunguRepository.findAllWithRegion();
         Set<String> parents = all.stream()
@@ -98,15 +98,15 @@ public class FatService {
 
     /**
      * 분양. region_subdivisions 의 region_code 와 code 를 각각 받는다.
-     * 가 본 적이 없어도 전국 어느 시군구에서나, 키우는 병아리가 없으면 받을 수 있다.
-     * 키우는 병아리가 최대 마리 수(fat_settings)에 이르렀으면 받을 수 없다.
+     * 가 본 적이 없어도 전국 어느 시군구에서나, 키우는 펫이 없으면 받을 수 있다.
+     * 키우는 펫이 최대 마리 수(fat_settings)에 이르렀으면 받을 수 없다.
      */
     @Transactional
     public FatStatus adopt(Long userId, String regionCode, String code) {
         RegionSubdivisions subdivision = sigunguRepository.findWithRegionByRegionCodeAndCode(regionCode, code)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시군구입니다. regionCode: " + regionCode + ", code: " + code));
         if (sigunguRepository.hasDistrictsUnder(regionCode, subdivision.getName())) {
-            throw new IllegalArgumentException(subdivision.getName() + "에서는 병아리를 키울 수 없습니다. 아래 구에서 분양받아 주세요.");
+            throw new IllegalArgumentException(subdivision.getName() + "에서는 펫을 키울 수 없습니다. 아래 구에서 분양받아 주세요.");
         }
         if (fatRepository.existsByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(userId, subdivision.getId())) {
             throw new IllegalArgumentException(ACTIVE_FAT_EXISTS);
@@ -114,7 +114,7 @@ public class FatService {
         FatSetting setting = setting();
         int maxActiveFats = setting.getMaxActiveFats();
         if (fatRepository.countByUserIdAndGraduatedAtIsNull(userId) >= maxActiveFats) {
-            throw new IllegalArgumentException("병아리는 동시에 " + maxActiveFats + "마리까지 키울 수 있습니다. 졸업하면 새로 분양받을 수 있습니다.");
+            throw new IllegalArgumentException("펫은 동시에 " + maxActiveFats + "마리까지 키울 수 있습니다. 졸업하면 새로 분양받을 수 있습니다.");
         }
 
         Fat fat;
@@ -132,14 +132,14 @@ public class FatService {
     }
 
     /**
-     * 졸업 (상품 교환). 건국 레벨 이상인 병아리만 할 수 있고, 어디서나 할 수 있으며 되돌리지 않는다.
+     * 졸업 (상품 교환). 건국 레벨 이상인 펫만 할 수 있고, 어디서나 할 수 있으며 되돌리지 않는다.
      */
     @Transactional
     public GraduatedFat graduate(Long userId, Long fatId) {
         Fat fat = fatRepository.findByIdAndUserId(fatId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("병아리를 찾을 수 없습니다. ID: " + fatId));
+                .orElseThrow(() -> new IllegalArgumentException("펫을 찾을 수 없습니다. ID: " + fatId));
         if (fat.isGraduated()) {
-            throw new IllegalArgumentException("이미 졸업한 병아리입니다.");
+            throw new IllegalArgumentException("이미 졸업한 펫입니다.");
         }
         RegionSubdivisions subdivision = subdivision(fat.getRegionSubdivisionId());
         FatLevelTable.Progress progress = levelTable().progress(exp(fat, subdivision, setting()));
@@ -153,7 +153,7 @@ public class FatService {
     }
 
     /**
-     * 위치 기록이 바뀐 날짜에 분양받은 병아리의 분양 시각 이후 점령 시간을 다시 계산한다.
+     * 위치 기록이 바뀐 날짜에 분양받은 펫의 분양 시각 이후 점령 시간을 다시 계산한다.
      *
      * @param points 그날의 시간순 위치 기록 (시군구 판정 포함)
      */
@@ -174,7 +174,7 @@ public class FatService {
         }
     }
 
-    /** 추천 분양 지역: 오늘 점령 시간이 있거나, 오늘 병아리가 졸업했거나, 끝나지 않은 내 일정의 시군구 중 병아리가 없는 곳 (분양 조건은 아님) */
+    /** 추천 분양 지역: 오늘 점령 시간이 있거나, 오늘 펫이 졸업했거나, 끝나지 않은 내 일정의 시군구 중 펫이 없는 곳 (분양 조건은 아님) */
     private List<FatRegion> suggestedAdoptionRegions(Long userId, List<Fat> activeFats) {
         LocalDate today = today();
         List<String> todayCodes = dailyStayRepository.findRegionIdsByUserAndDate(userId, today);
@@ -234,7 +234,7 @@ public class FatService {
 
     private RegionSubdivisions subdivision(Long id) {
         return subdivisions(List.of(id)).values().stream().findFirst()
-                .orElseThrow(() -> new IllegalStateException("병아리의 시군구(region_subdivisions)가 없습니다. ID: " + id));
+                .orElseThrow(() -> new IllegalStateException("펫의 시군구(region_subdivisions)가 없습니다. ID: " + id));
     }
 
     private Map<Long, RegionSubdivisions> subdivisions(List<Fat> fats) {
@@ -249,7 +249,7 @@ public class FatService {
                 .collect(Collectors.toMap(RegionSubdivisions::getId, subdivision -> subdivision));
     }
 
-    /** 병아리별 지금 경험치 (키우는 중인 병아리 기준으로 계산. 졸업한 병아리는 graduatedExp 를 쓴다) */
+    /** 펫별 지금 경험치 (키우는 중인 펫 기준으로 계산. 졸업한 펫은 graduatedExp 를 쓴다) */
     public Map<Long, Long> currentExps(List<Fat> fats) {
         if (fats.isEmpty()) {
             return Map.of();
@@ -262,7 +262,7 @@ public class FatService {
 
     public FatSetting setting() {
         return settingRepository.findFirstByDeletedAtIsNullOrderByIdAsc()
-                .orElseThrow(() -> new IllegalStateException("병아리 설정(fat_settings)이 없습니다."));
+                .orElseThrow(() -> new IllegalStateException("펫 설정(fat_settings)이 없습니다."));
     }
 
     public FatLevelTable levelTable() {

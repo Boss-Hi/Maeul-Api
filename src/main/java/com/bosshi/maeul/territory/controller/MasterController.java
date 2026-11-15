@@ -13,7 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 주인: 병아리를 키우는 사용자의 성장 기록 (모든 병아리 경험치 합 x 주인 비율, 별도 레벨표)
+ * 주인: 펫을 키우는 사용자의 성장 기록 (모든 펫 경험치 합 x 주인 비율, 별도 레벨표)
  */
 @RestController
 @RequestMapping("/api/master")

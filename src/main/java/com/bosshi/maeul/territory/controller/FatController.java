@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 병아리: 전국 어느 시군구에서나 미리 분양받아 키우고, 건국 레벨부터 상품을 교환해 졸업한다
+ * 펫: 전국 어느 시군구에서나 미리 분양받아 키우고, 건국 레벨부터 상품을 교환해 졸업한다
  */
 @RestController
 @RequestMapping("/api/fats")
@@ -30,7 +30,7 @@ public class FatController {
     private final FatRankingService rankingService;
 
     /**
-     * 키우는 중인 병아리와 지금 분양받을 수 있는 시군구
+     * 키우는 중인 펫과 지금 분양받을 수 있는 시군구
      */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -39,7 +39,7 @@ public class FatController {
     }
 
     /**
-     * 병아리를 분양받을 수 있는 시군구 전체 (region_subdivisions 중 점령 시간이 쌓이는 곳)
+     * 펫을 분양받을 수 있는 시군구 전체 (region_subdivisions 중 점령 시간이 쌓이는 곳)
      */
     @GetMapping("/regions")
     @PreAuthorize("isAuthenticated()")
@@ -48,7 +48,7 @@ public class FatController {
     }
 
     /**
-     * 지역별 병아리 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
+     * 지역별 펫 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
      */
     @GetMapping("/ranking")
     @PreAuthorize("isAuthenticated()")
@@ -62,7 +62,7 @@ public class FatController {
     }
 
     /**
-     * 졸업한 병아리 (최근 졸업 순)
+     * 졸업한 펫 (최근 졸업 순)
      */
     @GetMapping("/graduated")
     @PreAuthorize("isAuthenticated()")
@@ -71,7 +71,7 @@ public class FatController {
     }
 
     /**
-     * 병아리 분양
+     * 펫 분양
      */
     @PostMapping
     @PreAuthorize("isAuthenticated()")

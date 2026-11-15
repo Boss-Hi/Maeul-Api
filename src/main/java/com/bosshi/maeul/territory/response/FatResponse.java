@@ -6,7 +6,7 @@ import com.bosshi.maeul.territory.service.FatLevelTable;
 import java.time.LocalDateTime;
 
 /**
- * 키우는 중인 병아리
+ * 키우는 중인 펫
  *
  * @param regionSubdivisionId 시군구 ID (region_subdivisions.id)
  * @param regionCode          시도 코드 (region_subdivisions.region_code)
