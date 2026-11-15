@@ -1,7 +1,7 @@
 package com.bosshi.maeul.territory.service;
 
-import com.bosshi.maeul.territory.service.ChickLevelTable.Progress;
-import com.bosshi.maeul.territory.service.ChickLevelTable.Step;
+import com.bosshi.maeul.territory.service.FatLevelTable.Progress;
+import com.bosshi.maeul.territory.service.FatLevelTable.Step;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,10 +10,10 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("ChickLevelTable 테스트")
-class ChickLevelTableTest {
+@DisplayName("FatLevelTable 테스트")
+class FatLevelTableTest {
 
-    private static final ChickLevelTable DEFAULT = ChickLevelTable.of(IntStream.rangeClosed(1, 100)
+    private static final FatLevelTable DEFAULT = FatLevelTable.of(IntStream.rangeClosed(1, 100)
             .mapToObj(level -> new Step(level, level < 100 ? 126 : 0, level == 81 ? "건국" : null, level == 81))
             .toList());
 
@@ -34,7 +34,7 @@ class ChickLevelTableTest {
     @Test
     @DisplayName("레벨마다 필요 경험치가 다르면 각 레벨의 값을 차례로 채우고, 단계 이름은 가까운 아래 레벨의 이름을 쓴다")
     void perLevelRequirement() {
-        ChickLevelTable table = ChickLevelTable.of(List.of(
+        FatLevelTable table = FatLevelTable.of(List.of(
                 new Step(3, 0, "병아리", true), new Step(1, 10, "알", false), new Step(2, 20, null, false)));
 
         assertThat(table.progress(0)).isEqualTo(new Progress(1, "알", 0, 0, 10L, false, 3, false));
@@ -45,7 +45,7 @@ class ChickLevelTableTest {
     @Test
     @DisplayName("건국 레벨이 없으면 어떤 레벨에서도 교환할 수 없다")
     void noFounding() {
-        ChickLevelTable table = ChickLevelTable.of(List.of(new Step(1, 5, null, false), new Step(2, 0, null, false)));
+        FatLevelTable table = FatLevelTable.of(List.of(new Step(1, 5, null, false), new Step(2, 0, null, false)));
 
         assertThat(table.progress(100)).isEqualTo(new Progress(2, null, 100, 95, null, true, null, false));
     }

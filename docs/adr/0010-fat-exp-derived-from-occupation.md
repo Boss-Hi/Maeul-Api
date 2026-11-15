@@ -1,4 +1,4 @@
-# ADR 0010: Chick EXP Derived from Occupation Time
+# ADR 0010: Fat EXP Derived from Occupation Time
 
 ## Status
 **Accepted** (2026-11-14)
@@ -30,7 +30,7 @@
 
 ### 부정적 영향
 - 위치 기록을 지우거나 레벨표를 바꾸면, 건국했던 병아리가 건국 아래로 내려가 교환할 수 없게 될 수 있다
-- 조회할 때마다 분양 이후 점령 시간을 합산한다. 날짜 단위 집계(`territory_daily_stays`)로는 분양 당일의 분양 시각 이후 시간만 골라낼 수 없다. 그래서 그 값은 `chicks.adoption_day_seconds` 에 따로 두고, 그날 위치 기록이 바뀔 때 점령 시간과 같은 트랜잭션에서 다시 계산한다. 경계에서 최대 1분(수집 주기)을 잃는다
+- 조회할 때마다 분양 이후 점령 시간을 합산한다. 날짜 단위 집계(`territory_daily_stays`)로는 분양 당일의 분양 시각 이후 시간만 골라낼 수 없다. 그래서 그 값은 `fats.adoption_day_seconds` 에 따로 두고, 그날 위치 기록이 바뀔 때 점령 시간과 같은 트랜잭션에서 다시 계산한다. 경계에서 최대 1분(수집 주기)을 잃는다
 - 앱이 밤사이 위치를 보내지 않으면 숙박 시간이 경험치에 들어가지 않는다. 이 경우 "7일이면 건국"이 성립하지 않는다
 
 ## Related ADRs

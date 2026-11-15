@@ -10,9 +10,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  */
 @Entity
 @Table(
-        name = "chick_levels",
+        name = "fat_levels",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_chick_levels_level", columnNames = {"level"})
+                @UniqueConstraint(name = "uk_fat_levels_level", columnNames = {"level"})
         }
 )
 @Getter
@@ -21,7 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class ChickLevel extends BaseEntity {
+public class FatLevel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

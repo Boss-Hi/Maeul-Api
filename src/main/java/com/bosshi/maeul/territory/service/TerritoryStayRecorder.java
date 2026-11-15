@@ -26,7 +26,7 @@ public class TerritoryStayRecorder {
     private final TerritoryDailyStayRepository dailyStayRepository;
     private final TerritoryPositionResolver positionResolver;
     private final TerritoryRewardService rewardService;
-    private final ChickService chickService;
+    private final FatService fatService;
     private final TerritoryProperties properties;
 
     @EventListener
@@ -52,6 +52,6 @@ public class TerritoryStayRecorder {
                         .staySeconds(entry.getValue())
                         .build())
                 .toList());
-        chickService.recomputeAdoptionDay(userId, date, points);
+        fatService.recomputeAdoptionDay(userId, date, points);
     }
 }

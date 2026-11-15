@@ -1,6 +1,6 @@
 -- 병아리 레벨표. 레벨마다 다음 레벨까지 필요한 경험치(1분 = 1)와 단계 이름. 관리자 화면에서 조정한다.
 -- 가장 높은 레벨이 최대 레벨이고, founding 이 켜진 가장 낮은 레벨이 건국(상품 교환 가능) 레벨이다.
-CREATE TABLE IF NOT EXISTS `chick_levels`
+CREATE TABLE IF NOT EXISTS `fat_levels`
 (
     `id`           BIGINT      NOT NULL AUTO_INCREMENT,
     `level`        INT         NOT NULL,
@@ -11,13 +11,13 @@ CREATE TABLE IF NOT EXISTS `chick_levels`
     `updated_at`   DATETIME(6) NOT NULL,
     `deleted_at`   DATETIME(6) NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_chick_levels_level` (`level`)
+    UNIQUE KEY `uk_fat_levels_level` (`level`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
 -- 기본 레벨표: Lv.1 ~ Lv.100, 레벨마다 126분. Lv.81 건국 (80 x 126 = 10,080분 = 숙박 포함 7일)
-INSERT INTO `chick_levels` (`level`, `required_exp`, `stage_name`, `founding`, `created_at`, `updated_at`)
+INSERT INTO `fat_levels` (`level`, `required_exp`, `stage_name`, `founding`, `created_at`, `updated_at`)
 WITH RECURSIVE seq (n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 100)
 SELECT n,
        IF(n < 100, 126, 0),
@@ -28,7 +28,7 @@ SELECT n,
 FROM seq;
 
 -- 병아리. 사용자마다 시군구 하나에 키우는 중인(졸업하지 않은) 병아리는 1마리
-CREATE TABLE IF NOT EXISTS `chicks`
+CREATE TABLE IF NOT EXISTS `fats`
 (
     `id`                   BIGINT      NOT NULL AUTO_INCREMENT,
     `user_id`              BIGINT      NOT NULL,
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS `chicks`
     `updated_at`           DATETIME(6) NOT NULL,
     `deleted_at`           DATETIME(6) NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_chicks_user_active_region` (`user_id`, `active_region_id`),
-    KEY `idx_chicks_user_region` (`user_id`, `region_id`),
-    CONSTRAINT `fk_chicks_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    UNIQUE KEY `uk_fats_user_active_region` (`user_id`, `active_region_id`),
+    KEY `idx_fats_user_region` (`user_id`, `region_id`),
+    CONSTRAINT `fk_fats_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

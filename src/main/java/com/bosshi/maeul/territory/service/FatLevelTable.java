@@ -9,7 +9,7 @@ import java.util.List;
  * 가장 낮은 레벨에서 시작해 각 레벨의 requiredExp 를 채울 때마다 다음 레벨로 오른다. 가장 높은 레벨이 최대 레벨이며,
  * 최대 레벨에서는 경험치가 더 쌓여도 레벨이 오르지 않는다. founding 이 켜진 가장 낮은 레벨이 건국 레벨이다.
  */
-public final class ChickLevelTable {
+public final class FatLevelTable {
 
     public record Step(int level, long requiredExp, String stageName, boolean founding) {
     }
@@ -28,16 +28,16 @@ public final class ChickLevelTable {
     private final List<Step> steps;
     private final Integer foundingLevel;
 
-    private ChickLevelTable(List<Step> steps) {
+    private FatLevelTable(List<Step> steps) {
         this.steps = steps;
         this.foundingLevel = steps.stream().filter(Step::founding).map(Step::level).findFirst().orElse(null);
     }
 
-    public static ChickLevelTable of(List<Step> steps) {
+    public static FatLevelTable of(List<Step> steps) {
         if (steps.isEmpty()) {
             throw new IllegalStateException("병아리 레벨표가 비어 있습니다.");
         }
-        return new ChickLevelTable(steps.stream().sorted(Comparator.comparingInt(Step::level)).toList());
+        return new FatLevelTable(steps.stream().sorted(Comparator.comparingInt(Step::level)).toList());
     }
 
     public Progress progress(long exp) {

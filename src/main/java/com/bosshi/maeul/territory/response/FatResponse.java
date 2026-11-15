@@ -1,7 +1,7 @@
 package com.bosshi.maeul.territory.response;
 
-import com.bosshi.maeul.territory.dto.ChickStatus;
-import com.bosshi.maeul.territory.service.ChickLevelTable;
+import com.bosshi.maeul.territory.dto.FatStatus;
+import com.bosshi.maeul.territory.service.FatLevelTable;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
  * @param foundingLevel 건국 레벨 (레벨표에 없으면 null)
  * @param exchangeable  건국 레벨 이상이라 상품 교환(졸업)이 가능한지
  */
-public record ChickResponse(
-        Long chickId,
+public record FatResponse(
+        Long fatId,
         String regionId,
         String regionName,
         LocalDateTime adoptedAt,
@@ -28,9 +28,9 @@ public record ChickResponse(
         Integer foundingLevel,
         boolean exchangeable
 ) {
-    public static ChickResponse from(ChickStatus chick) {
-        ChickLevelTable.Progress progress = chick.progress();
-        return new ChickResponse(chick.chickId(), chick.regionId(), chick.regionName(), chick.adoptedAt(),
+    public static FatResponse from(FatStatus fat) {
+        FatLevelTable.Progress progress = fat.progress();
+        return new FatResponse(fat.fatId(), fat.regionId(), fat.regionName(), fat.adoptedAt(),
                 progress.level(), progress.stageName(), progress.exp(), progress.levelExp(), progress.nextLevelExp(),
                 progress.maxLevel(), progress.foundingLevel(), progress.founded());
     }

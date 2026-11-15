@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
  * 경험치는 저장하지 않고 분양 이후 점령 시간에서 계산한다 (ADR 0010). 졸업 때의 값만 남긴다.
  */
 @Entity
-@Table(name = "chicks")
+@Table(name = "fats")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Chick extends BaseEntity {
+public class Fat extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

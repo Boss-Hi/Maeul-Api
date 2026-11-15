@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
  *
  * @param regionId 시군구 코드 5자리
  */
-public record AdoptChickRequest(
+public record AdoptFatRequest(
         @NotNull(message = "시군구 코드는 필수입니다.")
         @Pattern(regexp = "\\d{5}", message = "시군구 코드는 5자리 숫자여야 합니다.")
         String regionId
