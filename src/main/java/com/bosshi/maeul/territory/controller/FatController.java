@@ -61,13 +61,13 @@ public class FatController {
     }
 
     /**
-     * 졸업한 펫 (최근 졸업 순). page(0부터), size(기본 20)로 나눠 조회한다
+     * 졸업한 펫 (최근 졸업 순). page(0부터), size(기본 10)로 나눠 조회한다
      */
     @GetMapping("/graduated")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Page<GraduatedFatResponse>>> graduated(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 20) Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         return ApiResponse.success(fatService.graduated(userDetails.getId(), pageable).map(GraduatedFatResponse::from));
     }
