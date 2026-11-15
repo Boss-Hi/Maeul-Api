@@ -37,3 +37,6 @@ out/
 .vscode/
 .env
 kraftadmin
+
+### HTTP Client ###
+http-client.private.env.json
