@@ -5,6 +5,7 @@ import com.bosshi.maeul.itineraries.itinerary.client.SurveyAnswerClient;
 import com.bosshi.maeul.itineraries.itinerary.dto.ItineraryGenerateDTO;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
+import com.bosshi.maeul.itineraries.itinerary.event.ItineraryPeriodChangedEvent;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itineraries.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itineraries.itinerary.repository.ItineraryRepository;
@@ -14,6 +15,7 @@ import com.bosshi.maeul.itineraries.openapi.repository.TourRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,18 +36,24 @@ class ItineraryServiceTest {
 
     private final SurveyAnswerClient surveyAnswerClient = mock(SurveyAnswerClient.class);
     private final ItineraryGeneratorImpl router = mock(ItineraryGeneratorImpl.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private ItineraryService service;
 
     @BeforeEach
     void setUp() throws Exception {
         TourRepository tourRepository = mock(TourRepository.class);
-        when(tourRepository.findByContentId("1")).thenReturn(Optional.of(Tour.builder().contentId("1").build()));
+        when(tourRepository.findByContentId("1")).thenReturn(Optional.of(
+                Tour.builder().contentId("1").lDongRegnCd("11").lDongSignguCd("110").build()));
         TourFilteringService filtering = mock(TourFilteringService.class);
         when(filtering.filterTourByCategories(any())).thenReturn(List.of());
         ItineraryRepository repository = mock(ItineraryRepository.class);
         when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(router.generateItinerary(any())).thenReturn(Itinerary.builder().itineraryDays(new ArrayList<>()).build());
-        service = new ItineraryService(tourRepository, filtering, repository, router, surveyAnswerClient);
+        when(router.generateItinerary(any())).thenAnswer(invocation -> {
+            ItineraryGenerateDTO dto = invocation.getArgument(0);
+            return Itinerary.builder().id(5L).userId(dto.getUserId()).tour(dto.getTour())
+                    .startDate(dto.getStartDate()).endDate(dto.getEndDate()).itineraryDays(new ArrayList<>()).build();
+        });
+        service = new ItineraryService(tourRepository, filtering, repository, router, surveyAnswerClient, eventPublisher);
     }
 
     @Test
@@ -77,6 +85,17 @@ class ItineraryServiceTest {
         assertThat(resolved.getGenerationSettings().getPace()).isEqualTo(Pace.RELAXED);
         assertThat(resolved.getGenerationSettings().getDayStartTime()).isEqualTo(LocalTime.of(9, 30));
         assertThat(resolved.getGenerationSettings().getDayEndTime()).isEqualTo(LocalTime.of(22, 30));
+    }
+
+    @Test
+    @DisplayName("저장한 일정의 주축제 시도·시군구 코드와 기간으로 일정 기간 이벤트를 보낸다")
+    void publishesPeriodWithMainFestivalRegion() throws Exception {
+        when(surveyAnswerClient.findAnswers(7L)).thenReturn(List.of());
+        ItineraryGenerateDTO dto = dto(null, null, null);
+
+        service.generateItinerary(dto);
+
+        verify(eventPublisher).publishEvent(new ItineraryPeriodChangedEvent(5L, 7L, "11", "110", dto.getStartDate(), dto.getEndDate()));
     }
 
     @Test

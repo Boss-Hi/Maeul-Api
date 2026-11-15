@@ -6,6 +6,7 @@ import com.bosshi.maeul.itineraries.itinerary.dto.ItinerarySettings;
 import com.bosshi.maeul.itineraries.itinerary.dto.SurveyAnswerInfo;
 import com.bosshi.maeul.itineraries.itinerary.entity.Itinerary;
 import com.bosshi.maeul.itineraries.itinerary.entity.ItineraryGenerationSettings;
+import com.bosshi.maeul.itineraries.itinerary.event.ItineraryPeriodChangedEvent;
 import com.bosshi.maeul.itineraries.itinerary.filter.TourFilteringService;
 import com.bosshi.maeul.itineraries.itinerary.generator.impl.ItineraryGeneratorImpl;
 import com.bosshi.maeul.itineraries.itinerary.repository.ItineraryRepository;
@@ -15,6 +16,7 @@ import com.bosshi.maeul.itineraries.openapi.entity.Tour;
 import com.bosshi.maeul.itineraries.openapi.repository.TourRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,19 +42,22 @@ public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
     private final ItineraryGeneratorImpl itineraryGenerator;
     private final SurveyAnswerClient surveyAnswerClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ItineraryService(
             TourRepository tourRepository,
             TourFilteringService tourFilteringService,
             ItineraryRepository itineraryRepository,
             ItineraryGeneratorImpl itineraryGenerator,
-            SurveyAnswerClient surveyAnswerClient) {
+            SurveyAnswerClient surveyAnswerClient,
+            ApplicationEventPublisher eventPublisher) {
 
         this.tourRepository = tourRepository;
         this.tourFilteringService = tourFilteringService;
         this.itineraryRepository = itineraryRepository;
         this.itineraryGenerator = itineraryGenerator;
         this.surveyAnswerClient = surveyAnswerClient;
+        this.eventPublisher = eventPublisher;
     }
     /**
      * 사용자가 MainFestival을 선택하고 일정 생성을 요청합니다.
@@ -75,6 +80,7 @@ public class ItineraryService {
                 .dayEndTime(dto.getDayEndTime())
                 .build());
         Itinerary savedItinerary = itineraryRepository.save(itinerary);
+        publishPeriodChanged(savedItinerary);
         log.info(
                 "응답 파싱 및 DB 저장 완료: ID={}, 일수={}", savedItinerary.getId(), savedItinerary.getItineraryDays()
                         .size()
@@ -153,7 +159,26 @@ public class ItineraryService {
             itinerary.setTour(tour);
         }
 
-        return itineraryRepository.save(itinerary);
+        Itinerary saved = itineraryRepository.save(itinerary);
+        publishPeriodChanged(saved);
+        return saved;
+    }
+
+    /** 일정 기간(병아리 경험치)을 쓰는 쪽에 일정의 시군구(주축제 기준)와 기간을 알린다 */
+    private void publishPeriodChanged(Itinerary itinerary) {
+        Tour tour = itinerary.getTour();
+        boolean hasRegion = tour != null && hasText(tour.getLDongRegnCd()) && hasText(tour.getLDongSignguCd());
+        eventPublisher.publishEvent(new ItineraryPeriodChangedEvent(
+                itinerary.getId(),
+                itinerary.getUserId(),
+                hasRegion ? tour.getLDongRegnCd() : null,
+                hasRegion ? tour.getLDongSignguCd() : null,
+                itinerary.getStartDate(),
+                itinerary.getEndDate()));
+    }
+
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private Itinerary findOwnedItinerary(Long itineraryId, Long userId) {

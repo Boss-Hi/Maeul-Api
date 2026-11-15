@@ -16,10 +16,13 @@
   - 병아리의 시군구는 `region_subdivisions` 의 한 행 (ADR 0012). 점령 시간과는 카카오가 판정한 시도·시군구 이름(`territory_region_cells`)을 `regions.name`·`region_subdivisions.name` 과 맞춰 연결. 병아리 응답의 시군구 필드는 `regionSubdivisionId`, `regionCode`, `code`, `sidoName`, `sigunguName`
   - `POST /api/fats/{fatId}/graduate`: 졸업(상품 교환). 건국 레벨부터 가능, 되돌리지 않음
   - `GET /api/fats/graduated`: 졸업한 병아리 (졸업 때 레벨·경험치)
-  - 경험치 = 분양 이후 그 시군구의 점령 시간(1분 = 1). 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
+  - 경험치 = 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1) + 방문일(하루 1회, 기본 60, `fat_settings.visit_day_exp`) (ADR 0013). 일정 기간은 그 시군구(주축제 기준)로 만든 일정의 시작일 0시~종료일 24시이고, 일정 밖에서 머문 시간은 세지 않음. 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
+  - 일정을 만들거나 날짜·주축제를 바꾸면 일정 모듈이 `ItineraryPeriodChangedEvent` 를 보내고, 점령 모듈이 `fat_itinerary_periods` 에 기간 복사본을 저장
+  - 추천 분양 지역에 아직 끝나지 않은 내 일정의 시군구도 포함
   - 레벨표(`fat_levels`)는 관리자 화면(KraftAdmin `FatLevel`)에서 레벨별 필요 경험치·단계 이름·건국 여부를 수정. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
   - 동시에 키울 수 있는 병아리 수는 `fat_settings.max_active_fats`(기본 3, 관리자 화면 KraftAdmin `FatSetting`)에서 관리. 줄여도 이미 키우는 병아리는 그대로
   - `fat_levels`, `fat_settings`, `fats` 테이블 추가 (V12 하나로 정리. 이전 V12~V15 를 적용한 DB 는 병아리 테이블과 `kakao_legal_dong_codes` 를 지우고 `flyway_schema_history` 의 12 이상 기록을 지운 뒤 다시 migrate)
+  - `fat_itinerary_periods` 테이블과 `fat_settings.visit_day_exp` 추가 (V13)
   - 영문 이름을 chick 에서 fat 으로 변경 (API 경로 `/api/chicks` -> `/api/fats`, 응답 필드 `chickId` -> `fatId`)
 
 ## [v0.3.1] - 2026-11-08

@@ -25,4 +25,8 @@ public class FatSetting extends BaseEntity {
     /** 사용자가 동시에 키울 수 있는 병아리 수. 줄여도 이미 키우는 병아리는 그대로 두고 새 분양만 막는다. */
     @Column(name = "max_active_fats", nullable = false)
     private Integer maxActiveFats;
+
+    /** 방문일 하루에 주는 경험치 */
+    @Column(name = "visit_day_exp", nullable = false)
+    private Integer visitDayExp;
 }

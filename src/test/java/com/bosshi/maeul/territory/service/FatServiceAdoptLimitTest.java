@@ -24,7 +24,7 @@ class FatServiceAdoptLimitTest {
     private final FatSettingRepository settingRepository = mock(FatSettingRepository.class);
     private final LDongSigunguRepository sigunguRepository = mock(LDongSigunguRepository.class);
     private final FatService service = new FatService(fatRepository, mock(FatLevelRepository.class), settingRepository,
-            mock(TerritoryDailyStayRepository.class), mock(TerritoryRegionCellRepository.class), sigunguRepository,
+            mock(TerritoryDailyStayRepository.class), mock(TerritoryRegionCellRepository.class), mock(FatItineraryPeriodRepository.class), sigunguRepository,
             new TerritoryProperties(), new TimelineProperties());
 
     @BeforeEach

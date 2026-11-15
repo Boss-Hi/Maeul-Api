@@ -11,11 +11,13 @@ import com.bosshi.maeul.territory.entity.Fat;
 import com.bosshi.maeul.territory.entity.FatLevel;
 import com.bosshi.maeul.territory.entity.FatSetting;
 import com.bosshi.maeul.territory.entity.TerritoryRegionCell;
+import com.bosshi.maeul.territory.repository.FatItineraryPeriodRepository;
 import com.bosshi.maeul.territory.repository.FatLevelRepository;
 import com.bosshi.maeul.territory.repository.FatRepository;
 import com.bosshi.maeul.territory.repository.FatSettingRepository;
 import com.bosshi.maeul.territory.repository.TerritoryDailyStayRepository;
 import com.bosshi.maeul.territory.repository.TerritoryRegionCellRepository;
+import com.bosshi.maeul.territory.repository.dto.DateStay;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
  * 병아리: 전국 어느 시군구에서나 미리 분양받아 그 시군구에서 키운다 (ADR 0011).
  * 시군구는 region_subdivisions 의 한 행이다. 점령 시간과는 카카오가 위치 판정 때 준 시도·시군구 이름
  * (territory_region_cells)을 regions.name, region_subdivisions.name 과 맞춰 연결한다 (ADR 0012).
- * 경험치는 지금 분양 이후 그 시군구의 점령 시간(1분 = 1)이고, 레벨은 지금 레벨표로 정한다.
+ * 경험치는 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1)과 방문일이고 (ADR 0013), 레벨은 지금 레벨표로 정한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,7 @@ public class FatService {
     private final FatSettingRepository settingRepository;
     private final TerritoryDailyStayRepository dailyStayRepository;
     private final TerritoryRegionCellRepository cellRepository;
+    private final FatItineraryPeriodRepository periodRepository;
     private final LDongSigunguRepository sigunguRepository;
     private final TerritoryProperties properties;
     private final TimelineProperties timelineProperties;
@@ -62,11 +65,12 @@ public class FatService {
 
     public FatOverview overview(Long userId) {
         FatLevelTable table = levelTable();
+        FatSetting setting = setting();
         List<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNullOrderByAdoptedAtAsc(userId);
         Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
         return new FatOverview(
-                fats.stream().map(fat -> status(fat, subdivisions.get(fat.getRegionSubdivisionId()), table)).toList(),
-                maxActiveFats(),
+                fats.stream().map(fat -> status(fat, subdivisions.get(fat.getRegionSubdivisionId()), table, setting)).toList(),
+                setting.getMaxActiveFats(),
                 suggestedAdoptionRegions(userId, fats));
     }
 
@@ -107,7 +111,8 @@ public class FatService {
         if (fatRepository.existsByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(userId, subdivision.getId())) {
             throw new IllegalArgumentException(ACTIVE_FAT_EXISTS);
         }
-        int maxActiveFats = maxActiveFats();
+        FatSetting setting = setting();
+        int maxActiveFats = setting.getMaxActiveFats();
         if (fatRepository.countByUserIdAndGraduatedAtIsNull(userId) >= maxActiveFats) {
             throw new IllegalArgumentException("병아리는 동시에 " + maxActiveFats + "마리까지 키울 수 있습니다. 졸업하면 새로 분양받을 수 있습니다.");
         }
@@ -123,8 +128,7 @@ public class FatService {
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException(ACTIVE_FAT_EXISTS, e);
         }
-        return new FatStatus(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(),
-                levelTable().progress(exp(fat, occupationCodes(subdivision))));
+        return status(fat, subdivision, levelTable(), setting);
     }
 
     /**
@@ -138,7 +142,7 @@ public class FatService {
             throw new IllegalArgumentException("이미 졸업한 병아리입니다.");
         }
         RegionSubdivisions subdivision = subdivision(fat.getRegionSubdivisionId());
-        FatLevelTable.Progress progress = levelTable().progress(exp(fat, occupationCodes(subdivision)));
+        FatLevelTable.Progress progress = levelTable().progress(exp(fat, subdivision, setting()));
         if (!progress.founded()) {
             throw new IllegalArgumentException(progress.foundingLevel() == null
                     ? "레벨표에 건국 레벨이 없어 졸업할 수 없습니다."
@@ -170,7 +174,7 @@ public class FatService {
         }
     }
 
-    /** 추천 분양 지역: 오늘 점령 시간이 있거나 오늘 병아리가 졸업한 시군구 중 병아리가 없는 곳 (분양 조건은 아님) */
+    /** 추천 분양 지역: 오늘 점령 시간이 있거나, 오늘 병아리가 졸업했거나, 끝나지 않은 내 일정의 시군구 중 병아리가 없는 곳 (분양 조건은 아님) */
     private List<FatRegion> suggestedAdoptionRegions(Long userId, List<Fat> activeFats) {
         LocalDate today = today();
         List<String> todayCodes = dailyStayRepository.findRegionIdsByUserAndDate(userId, today);
@@ -182,21 +186,24 @@ public class FatService {
                 .filter(fat -> !fat.getGraduatedAt().isBefore(today.atStartOfDay()))
                 .map(Fat::getRegionSubdivisionId)
                 .collect(Collectors.toSet());
-        if (visited.isEmpty() && graduatedToday.isEmpty()) {
+        Set<String> upcoming = periodRepository.findByUserIdAndEndDateGreaterThanEqual(userId, today).stream()
+                .map(period -> period.getRegionCode() + "/" + period.getSubdivisionCode())
+                .collect(Collectors.toSet());
+        if (visited.isEmpty() && graduatedToday.isEmpty() && upcoming.isEmpty()) {
             return List.of();
         }
         Set<Long> raising = activeFats.stream().map(Fat::getRegionSubdivisionId).collect(Collectors.toSet());
         return sigunguRepository.findAllWithRegion().stream()
-                .filter(subdivision -> visited.contains(RegionNames.of(subdivision)) || graduatedToday.contains(subdivision.getId()))
+                .filter(subdivision -> visited.contains(RegionNames.of(subdivision)) || graduatedToday.contains(subdivision.getId())
+                        || upcoming.contains(subdivision.getRegion().getCode() + "/" + subdivision.getCode()))
                 .filter(subdivision -> !raising.contains(subdivision.getId()))
                 .map(FatRegion::from)
                 .sorted(Comparator.comparing(FatRegion::regionCode).thenComparing(FatRegion::code))
                 .toList();
     }
 
-    private FatStatus status(Fat fat, RegionSubdivisions subdivision, FatLevelTable table) {
-        return new FatStatus(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(),
-                table.progress(exp(fat, occupationCodes(subdivision))));
+    private FatStatus status(Fat fat, RegionSubdivisions subdivision, FatLevelTable table, FatSetting setting) {
+        return new FatStatus(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(), table.progress(exp(fat, subdivision, setting)));
     }
 
     private GraduatedFat graduated(Fat fat, RegionSubdivisions subdivision) {
@@ -204,13 +211,20 @@ public class FatService {
                 fat.getGraduatedAt(), fat.getGraduatedLevel(), fat.getGraduatedExp());
     }
 
-    /** 분양 이후 그 시군구의 점령 시간(분) */
-    private long exp(Fat fat, Set<String> occupationCodes) {
-        LocalDate from = fat.getAdoptedAt().toLocalDate().plusDays(1);
-        long seconds = fat.getAdoptionDaySeconds() + occupationCodes.stream()
-                .mapToLong(code -> dailyStayRepository.sumByUserAndRegionFrom(fat.getUserId(), code, from))
-                .sum();
-        return seconds / 60;
+    /** 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(분)과 방문일 경험치 */
+    private long exp(Fat fat, RegionSubdivisions subdivision, FatSetting setting) {
+        List<FatExpCalculator.Period> periods = periodRepository.findByUserIdAndRegionCodeAndSubdivisionCode(
+                        fat.getUserId(), subdivision.getRegion().getCode(), subdivision.getCode()).stream()
+                .map(period -> new FatExpCalculator.Period(period.getStartDate(), period.getEndDate()))
+                .toList();
+        if (periods.isEmpty()) {
+            return 0;
+        }
+        LocalDate adoptionDate = fat.getAdoptedAt().toLocalDate();
+        Set<String> codes = occupationCodes(subdivision);
+        Map<LocalDate, Long> daily = codes.isEmpty() ? Map.of() : dailyStayRepository.sumByDateFrom(fat.getUserId(), codes, adoptionDate.plusDays(1)).stream()
+                .collect(Collectors.toMap(DateStay::date, DateStay::seconds));
+        return FatExpCalculator.exp(adoptionDate, fat.getAdoptionDaySeconds(), daily, periods, setting.getVisitDayExp());
     }
 
     /** 시군구(region_subdivisions 행)와 시도·시군구 이름이 같은 카카오 판정 결과의 점령 regionId */
@@ -235,9 +249,8 @@ public class FatService {
                 .collect(Collectors.toMap(RegionSubdivisions::getId, subdivision -> subdivision));
     }
 
-    private int maxActiveFats() {
+    private FatSetting setting() {
         return settingRepository.findFirstByDeletedAtIsNullOrderByIdAsc()
-                .map(FatSetting::getMaxActiveFats)
                 .orElseThrow(() -> new IllegalStateException("병아리 설정(fat_settings)이 없습니다."));
     }
 
