@@ -1,7 +1,7 @@
 # ADR 0010: Fat EXP Derived from Occupation Time
 
 ## Status
-**Accepted** (2026-11-14)
+**Superseded** by ADR 0011 (2026-11-15). 머문 시간 경험치를 점령 시간에서 계산하는 결정은 0011 에서도 유지한다. (처음 Accepted: 2026-11-14)
 
 ## Context
 

@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
  */
 public record GraduatedFat(
         Long fatId,
-        String regionId,
-        String regionName,
+        FatRegion region,
         LocalDateTime adoptedAt,
         LocalDateTime graduatedAt,
         int level,

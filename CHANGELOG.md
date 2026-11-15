@@ -10,13 +10,16 @@
 ### In Progress
 
 - 병아리 (시군구마다 점령 시간으로 키우는 캐릭터, ADR 0010)
-  - `GET /api/fats`: 키우는 중인 병아리(레벨, 단계 이름, 경험치, 다음 레벨까지, 교환 가능 여부)와 지금 분양받을 수 있는 시군구
-  - `POST /api/fats` (`{ regionId }`): 분양. 오늘 점령 시간이 있거나 오늘 병아리가 졸업한 시군구에서, 사용자마다 시군구당 1마리
+  - `GET /api/fats`: 키우는 중인 병아리(레벨, 단계 이름, 경험치, 다음 레벨까지, 교환 가능 여부), 동시에 키울 수 있는 수(`maxActiveFats`), 추천 분양 지역(`suggestedAdoptionRegions`: 오늘 머물렀거나 오늘 졸업한, 병아리 없는 시군구. 기존 `adoptableRegions` 대체)
+  - `GET /api/fats/regions`: 분양받을 수 있는 시군구 전체 (`legalDongCodeId`, `legalDongCode`, `sidoName`, `sigunguName`)
+  - `POST /api/fats` (`{ legalDongCodeId }`): 분양. 가 본 적이 없어도 전국 어느 시군구에서나 미리 받을 수 있음(ADR 0011). 사용자마다 시군구당 1마리, 최대 마리 수에 이르거나 없는 시군구 ID 면 400
+  - 병아리의 시군구는 카카오 법정동 코드 표(`kakao_legal_dong_codes`, code.go.kr 법정동코드에서 현존 시군구 256개)의 한 행 (ADR 0012). 병아리 응답의 `regionId`/`regionName` 은 `legalDongCodeId`, `legalDongCode`, `sidoName`, `sigunguName` 으로 바뀜
   - `POST /api/fats/{fatId}/graduate`: 졸업(상품 교환). 건국 레벨부터 가능, 되돌리지 않음
   - `GET /api/fats/graduated`: 졸업한 병아리 (졸업 때 레벨·경험치)
   - 경험치 = 분양 이후 그 시군구의 점령 시간(1분 = 1). 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
   - 레벨표(`fat_levels`)는 관리자 화면(KraftAdmin `FatLevel`)에서 레벨별 필요 경험치·단계 이름·건국 여부를 수정. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
-  - `chick_levels`, `chicks` 테이블 추가 (V12), `fat_levels`, `fats` 로 이름 변경 (V13)
+  - 동시에 키울 수 있는 병아리 수는 `fat_settings.max_active_fats`(기본 3, 관리자 화면 KraftAdmin `FatSetting`)에서 관리. 줄여도 이미 키우는 병아리는 그대로
+  - `fat_levels`, `fats` 테이블 추가 (V12), `fat_settings` 테이블 추가 (V13), `kakao_legal_dong_codes` 추가와 `fats.region_id` 를 `legal_dong_code_id` 로 교체 (V14, 기존 병아리 행 삭제)
   - 영문 이름을 chick 에서 fat 으로 변경 (API 경로 `/api/chicks` -> `/api/fats`, 응답 필드 `chickId` -> `fatId`)
 
 ## [v0.3.1] - 2026-11-08

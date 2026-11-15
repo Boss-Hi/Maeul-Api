@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
  */
 public record FatStatus(
         Long fatId,
-        String regionId,
-        String regionName,
+        FatRegion region,
         LocalDateTime adoptedAt,
         FatLevelTable.Progress progress
 ) {

@@ -4,6 +4,7 @@ import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.territory.request.AdoptFatRequest;
 import com.bosshi.maeul.territory.response.FatOverviewResponse;
+import com.bosshi.maeul.territory.response.FatRegionResponse;
 import com.bosshi.maeul.territory.response.FatResponse;
 import com.bosshi.maeul.territory.response.GraduatedFatResponse;
 import com.bosshi.maeul.territory.service.FatService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 병아리: 시군구마다 점령 시간으로 키우고, 건국 레벨부터 상품을 교환해 졸업한다
+ * 병아리: 전국 어느 시군구에서나 미리 분양받아 키우고, 건국 레벨부터 상품을 교환해 졸업한다
  */
 @RestController
 @RequestMapping("/api/fats")
@@ -32,6 +33,15 @@ public class FatController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<FatOverviewResponse>> overview(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.success(FatOverviewResponse.from(fatService.overview(userDetails.getId())));
+    }
+
+    /**
+     * 병아리를 분양받을 수 있는 시군구 전체 (카카오 법정동 코드 순)
+     */
+    @GetMapping("/regions")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<FatRegionResponse>>> regions() {
+        return ApiResponse.success(fatService.regions().stream().map(FatRegionResponse::from).toList());
     }
 
     /**
@@ -52,7 +62,7 @@ public class FatController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody AdoptFatRequest request
     ) {
-        return ApiResponse.success(FatResponse.from(fatService.adopt(userDetails.getId(), request.regionId())));
+        return ApiResponse.success(FatResponse.from(fatService.adopt(userDetails.getId(), request.legalDongCodeId())));
     }
 
     /**

@@ -8,8 +8,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 /**
- * 사용자가 시군구 하나에서 점령 시간으로 키우는 병아리.
- * 경험치는 저장하지 않고 분양 이후 점령 시간에서 계산한다 (ADR 0010). 졸업 때의 값만 남긴다.
+ * 사용자가 시군구 하나에서 키우는 병아리. 시군구는 카카오 법정동 코드 표의 한 행이다 (ADR 0012).
+ * 경험치는 저장하지 않고 분양 이후 점령 시간에서 계산한다. 졸업 때의 값만 남긴다.
  */
 @Entity
 @Table(name = "fats")
@@ -28,8 +28,9 @@ public class Fat extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "region_id", nullable = false, length = 10)
-    private String regionId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "legal_dong_code_id", nullable = false)
+    private KakaoLegalDongCode legalDongCode;
 
     @Column(name = "adopted_at", nullable = false)
     private LocalDateTime adoptedAt;

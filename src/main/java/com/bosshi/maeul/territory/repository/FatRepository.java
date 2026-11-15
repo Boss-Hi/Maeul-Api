@@ -21,9 +21,10 @@ public interface FatRepository extends JpaRepository<Fat, Long> {
     List<Fat> findByUserIdAndGraduatedAtIsNullAndAdoptedAtGreaterThanEqualAndAdoptedAtLessThan(
             Long userId, LocalDateTime from, LocalDateTime to);
 
+    long countByUserIdAndGraduatedAtIsNull(Long userId);
+
     Optional<Fat> findByIdAndUserId(Long id, Long userId);
 
-    boolean existsByUserIdAndRegionIdAndGraduatedAtIsNull(Long userId, String regionId);
+    boolean existsByUserIdAndLegalDongCodeIdAndGraduatedAtIsNull(Long userId, Long legalDongCodeId);
 
-    boolean existsByUserIdAndRegionIdAndGraduatedAtGreaterThanEqual(Long userId, String regionId, LocalDateTime from);
 }

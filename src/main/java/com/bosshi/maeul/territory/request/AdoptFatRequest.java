@@ -1,16 +1,14 @@
 package com.bosshi.maeul.territory.request;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 /**
  * 병아리 분양
  *
- * @param regionId 시군구 코드 5자리
+ * @param legalDongCodeId 시군구 ID (GET /api/fats/regions 의 legalDongCodeId)
  */
 public record AdoptFatRequest(
-        @NotNull(message = "시군구 코드는 필수입니다.")
-        @Pattern(regexp = "\\d{5}", message = "시군구 코드는 5자리 숫자여야 합니다.")
-        String regionId
+        @NotNull(message = "시군구 ID 는 필수입니다.")
+        Long legalDongCodeId
 ) {
 }
