@@ -249,12 +249,23 @@ public class FatService {
                 .collect(Collectors.toMap(RegionSubdivisions::getId, subdivision -> subdivision));
     }
 
-    private FatSetting setting() {
+    /** 병아리별 지금 경험치 (키우는 중인 병아리 기준으로 계산. 졸업한 병아리는 graduatedExp 를 쓴다) */
+    public Map<Long, Long> currentExps(List<Fat> fats) {
+        if (fats.isEmpty()) {
+            return Map.of();
+        }
+        FatSetting setting = setting();
+        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
+        return fats.stream().collect(Collectors.toMap(Fat::getId,
+                fat -> exp(fat, subdivisions.get(fat.getRegionSubdivisionId()), setting)));
+    }
+
+    public FatSetting setting() {
         return settingRepository.findFirstByDeletedAtIsNullOrderByIdAsc()
                 .orElseThrow(() -> new IllegalStateException("병아리 설정(fat_settings)이 없습니다."));
     }
 
-    private FatLevelTable levelTable() {
+    public FatLevelTable levelTable() {
         List<FatLevel> levels = levelRepository.findByDeletedAtIsNullOrderByLevelAsc();
         return FatLevelTable.of(levels.stream()
                 .map(level -> new FatLevelTable.Step(level.getLevel(), level.getRequiredExp(), level.getStageName(),

@@ -23,6 +23,11 @@
   - 동시에 키울 수 있는 병아리 수는 `fat_settings.max_active_fats`(기본 3, 관리자 화면 KraftAdmin `FatSetting`)에서 관리. 줄여도 이미 키우는 병아리는 그대로
   - `fat_levels`, `fat_settings`, `fats` 테이블 추가 (V12 하나로 정리. 이전 V12~V15 를 적용한 DB 는 병아리 테이블과 `kakao_legal_dong_codes` 를 지우고 `flyway_schema_history` 의 12 이상 기록을 지운 뒤 다시 migrate)
   - `fat_itinerary_periods` 테이블과 `fat_settings.visit_day_exp` 추가 (V13)
+  - `GET /api/fats/ranking?regionCode=&code=&size=`: 지역별 병아리 순위 (키우는 중인 병아리의 지금 경험치 순). `regionCode`+`code` 는 시군구, `regionCode` 만 있으면 시도, 둘 다 없으면 전국. 같은 경험치는 같은 순위(1, 1, 3), 닉네임만 노출, `mine` 은 내 병아리 중 가장 높은 순위
+  - 주인(Master): 사용자마다 1명, 주인 경험치 = 모든 병아리 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율(`fat_settings.master_exp_ratio`, 기본 1.0). 별도 레벨표 `master_levels`(기본 Lv.1~100, 레벨마다 1,008, KraftAdmin `MasterLevel`)
+  - `GET /api/master`: 내 주인의 레벨·경험치
+  - `GET /api/master/ranking?regionCode=&code=&size=`: 지역별 주인 순위. 그 지역에서 병아리를 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세움
+  - `master_levels` 테이블과 `fat_settings.master_exp_ratio` 추가 (V14)
   - 영문 이름을 chick 에서 fat 으로 변경 (API 경로 `/api/chicks` -> `/api/fats`, 응답 필드 `chickId` -> `fatId`)
 
 ## [v0.3.1] - 2026-11-08

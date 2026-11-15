@@ -1,0 +1,13 @@
+package com.bosshi.maeul.territory.repository;
+
+import com.bosshi.maeul.territory.entity.MasterLevel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface MasterLevelRepository extends JpaRepository<MasterLevel, Long> {
+
+    List<MasterLevel> findByDeletedAtIsNullOrderByLevelAsc();
+}

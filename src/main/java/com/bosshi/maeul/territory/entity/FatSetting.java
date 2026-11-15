@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
+
 /**
  * 병아리 설정. 1행만 쓰며 관리자 화면에서 고친다.
  */
@@ -29,4 +31,8 @@ public class FatSetting extends BaseEntity {
     /** 방문일 하루에 주는 경험치 */
     @Column(name = "visit_day_exp", nullable = false)
     private Integer visitDayExp;
+
+    /** 주인 경험치 비율. 주인 경험치 = 모든 병아리 경험치 합 x 이 비율 */
+    @Column(name = "master_exp_ratio", nullable = false, precision = 6, scale = 3)
+    private BigDecimal masterExpRatio;
 }

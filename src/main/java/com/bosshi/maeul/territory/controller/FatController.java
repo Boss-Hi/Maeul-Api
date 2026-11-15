@@ -4,9 +4,11 @@ import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.territory.request.AdoptFatRequest;
 import com.bosshi.maeul.territory.response.FatOverviewResponse;
+import com.bosshi.maeul.territory.response.FatRankingResponse;
 import com.bosshi.maeul.territory.response.FatRegionResponse;
 import com.bosshi.maeul.territory.response.FatResponse;
 import com.bosshi.maeul.territory.response.GraduatedFatResponse;
+import com.bosshi.maeul.territory.service.FatRankingService;
 import com.bosshi.maeul.territory.service.FatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FatController {
     private final FatService fatService;
+    private final FatRankingService rankingService;
 
     /**
      * 키우는 중인 병아리와 지금 분양받을 수 있는 시군구
@@ -42,6 +45,20 @@ public class FatController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<FatRegionResponse>>> regions() {
         return ApiResponse.success(fatService.regions().stream().map(FatRegionResponse::from).toList());
+    }
+
+    /**
+     * 지역별 병아리 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
+     */
+    @GetMapping("/ranking")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<FatRankingResponse>> ranking(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) String regionCode,
+            @RequestParam(required = false) String code,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        return ApiResponse.success(FatRankingResponse.from(rankingService.fatRanking(userDetails.getId(), regionCode, code, size)));
     }
 
     /**

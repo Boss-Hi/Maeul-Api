@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,15 @@ public interface FatRepository extends JpaRepository<Fat, Long> {
             Long userId, LocalDateTime from, LocalDateTime to);
 
     long countByUserIdAndGraduatedAtIsNull(Long userId);
+
+    /** 사용자들의 모든 병아리 (키우는 중, 졸업) */
+    List<Fat> findByUserIdIn(Collection<Long> userIds);
+
+    /** 시군구들에서 키우는 중인 병아리 */
+    List<Fat> findByGraduatedAtIsNullAndRegionSubdivisionIdIn(Collection<Long> regionSubdivisionIds);
+
+    /** 시군구들에서 키우는 중이거나 졸업한 병아리 */
+    List<Fat> findByRegionSubdivisionIdIn(Collection<Long> regionSubdivisionIds);
 
     Optional<Fat> findByIdAndUserId(Long id, Long userId);
 
