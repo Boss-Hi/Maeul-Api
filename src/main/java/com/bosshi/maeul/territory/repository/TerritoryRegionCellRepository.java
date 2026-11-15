@@ -15,4 +15,9 @@ public interface TerritoryRegionCellRepository extends JpaRepository<TerritoryRe
     /** 시군구별 이름 1건씩 (캐시된 카카오 이름) */
     @Query("select c from TerritoryRegionCell c where c.regionId in :regionIds")
     List<TerritoryRegionCell> findByRegionIdIn(@Param("regionIds") Collection<String> regionIds);
+
+    /** 카카오가 이 시도·시군구 이름으로 판정한 시군구 코드 (점령의 regionId) */
+    @Query("select distinct c.regionId from TerritoryRegionCell c " +
+            "where c.regionId is not null and c.parentName = :sidoName and c.regionName = :sigunguName")
+    List<String> findRegionIdsByNames(@Param("sidoName") String sidoName, @Param("sigunguName") String sigunguName);
 }

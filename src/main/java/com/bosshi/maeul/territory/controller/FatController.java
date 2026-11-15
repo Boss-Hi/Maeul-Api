@@ -36,7 +36,7 @@ public class FatController {
     }
 
     /**
-     * 병아리를 분양받을 수 있는 시군구 전체 (카카오 법정동 코드 순)
+     * 병아리를 분양받을 수 있는 시군구 전체 (region_subdivisions 중 점령 시간이 쌓이는 곳)
      */
     @GetMapping("/regions")
     @PreAuthorize("isAuthenticated()")
@@ -62,7 +62,7 @@ public class FatController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody AdoptFatRequest request
     ) {
-        return ApiResponse.success(FatResponse.from(fatService.adopt(userDetails.getId(), request.legalDongCodeId())));
+        return ApiResponse.success(FatResponse.from(fatService.adopt(userDetails.getId(), request.regionCode(), request.code())));
     }
 
     /**

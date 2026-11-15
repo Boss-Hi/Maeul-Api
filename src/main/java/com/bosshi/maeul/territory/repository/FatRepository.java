@@ -25,6 +25,6 @@ public interface FatRepository extends JpaRepository<Fat, Long> {
 
     Optional<Fat> findByIdAndUserId(Long id, Long userId);
 
-    boolean existsByUserIdAndLegalDongCodeIdAndGraduatedAtIsNull(Long userId, Long legalDongCodeId);
+    boolean existsByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(Long userId, Long regionSubdivisionId);
 
 }

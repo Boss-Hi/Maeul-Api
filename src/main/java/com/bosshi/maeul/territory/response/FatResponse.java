@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 /**
  * 키우는 중인 병아리
  *
- * @param legalDongCodeId 시군구 ID (kakao_legal_dong_codes)
- * @param legalDongCode   시군구 법정동 코드 (점령 API 의 regionId 와 같은 값)
- * @param sigunguName     세종특별자치시처럼 시군구가 없으면 null
+ * @param regionSubdivisionId 시군구 ID (region_subdivisions.id)
+ * @param regionCode          시도 코드 (region_subdivisions.region_code)
+ * @param code                시군구 코드 (region_subdivisions.code)
  * @param exp             분양 이후 이 시군구의 점령 시간(분)
  * @param levelExp        지금 레벨에서 쌓은 경험치
  * @param nextLevelExp    지금 레벨에서 다음 레벨까지 필요한 경험치 (최대 레벨이면 null)
@@ -19,8 +19,9 @@ import java.time.LocalDateTime;
  */
 public record FatResponse(
         Long fatId,
-        Long legalDongCodeId,
-        String legalDongCode,
+        Long regionSubdivisionId,
+        String regionCode,
+        String code,
         String sidoName,
         String sigunguName,
         LocalDateTime adoptedAt,
@@ -35,7 +36,7 @@ public record FatResponse(
 ) {
     public static FatResponse from(FatStatus fat) {
         FatLevelTable.Progress progress = fat.progress();
-        return new FatResponse(fat.fatId(), fat.region().legalDongCodeId(), fat.region().legalDongCode(),
+        return new FatResponse(fat.fatId(), fat.region().regionSubdivisionId(), fat.region().regionCode(), fat.region().code(),
                 fat.region().sidoName(), fat.region().sigunguName(), fat.adoptedAt(),
                 progress.level(), progress.stageName(), progress.exp(), progress.levelExp(), progress.nextLevelExp(),
                 progress.maxLevel(), progress.foundingLevel(), progress.founded());

@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
  */
 public record GraduatedFatResponse(
         Long fatId,
-        Long legalDongCodeId,
-        String legalDongCode,
+        Long regionSubdivisionId,
+        String regionCode,
+        String code,
         String sidoName,
         String sigunguName,
         LocalDateTime adoptedAt,
@@ -19,7 +20,7 @@ public record GraduatedFatResponse(
         long exp
 ) {
     public static GraduatedFatResponse from(GraduatedFat fat) {
-        return new GraduatedFatResponse(fat.fatId(), fat.region().legalDongCodeId(), fat.region().legalDongCode(),
+        return new GraduatedFatResponse(fat.fatId(), fat.region().regionSubdivisionId(), fat.region().regionCode(), fat.region().code(),
                 fat.region().sidoName(), fat.region().sigunguName(), fat.adoptedAt(), fat.graduatedAt(), fat.level(), fat.exp());
     }
 }

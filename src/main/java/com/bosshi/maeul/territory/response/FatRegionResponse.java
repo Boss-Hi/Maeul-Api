@@ -3,15 +3,14 @@ package com.bosshi.maeul.territory.response;
 import com.bosshi.maeul.territory.dto.FatRegion;
 
 /**
- * 병아리를 키울 수 있는 시군구
+ * 병아리를 키울 수 있는 시군구 (region_subdivisions)
  *
- * @param legalDongCodeId 분양할 때 보내는 시군구 ID
- * @param legalDongCode   시군구 법정동 코드 (점령 API 의 regionId 와 같은 값)
- * @param sigunguName     세종특별자치시처럼 시군구가 없으면 null
+ * @param regionCode 시도 코드. 분양할 때 code 와 함께 보낸다
+ * @param code       시군구 코드. 분양할 때 regionCode 와 함께 보낸다
  */
-public record FatRegionResponse(Long legalDongCodeId, String legalDongCode, String sidoName, String sigunguName) {
+public record FatRegionResponse(Long regionSubdivisionId, String regionCode, String code, String sidoName, String sigunguName) {
 
     public static FatRegionResponse from(FatRegion region) {
-        return new FatRegionResponse(region.legalDongCodeId(), region.legalDongCode(), region.sidoName(), region.sigunguName());
+        return new FatRegionResponse(region.regionSubdivisionId(), region.regionCode(), region.code(), region.sidoName(), region.sigunguName());
     }
 }

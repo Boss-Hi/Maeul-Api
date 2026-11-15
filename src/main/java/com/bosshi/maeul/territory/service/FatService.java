@@ -1,5 +1,7 @@
 package com.bosshi.maeul.territory.service;
 
+import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
+import com.bosshi.maeul.itineraries.openapi.repository.LDongSigunguRepository;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
 import com.bosshi.maeul.territory.dto.FatOverview;
 import com.bosshi.maeul.territory.dto.FatRegion;
@@ -8,12 +10,12 @@ import com.bosshi.maeul.territory.dto.GraduatedFat;
 import com.bosshi.maeul.territory.entity.Fat;
 import com.bosshi.maeul.territory.entity.FatLevel;
 import com.bosshi.maeul.territory.entity.FatSetting;
-import com.bosshi.maeul.territory.entity.KakaoLegalDongCode;
+import com.bosshi.maeul.territory.entity.TerritoryRegionCell;
 import com.bosshi.maeul.territory.repository.FatLevelRepository;
 import com.bosshi.maeul.territory.repository.FatRepository;
 import com.bosshi.maeul.territory.repository.FatSettingRepository;
 import com.bosshi.maeul.territory.repository.TerritoryDailyStayRepository;
-import com.bosshi.maeul.territory.repository.KakaoLegalDongCodeRepository;
+import com.bosshi.maeul.territory.repository.TerritoryRegionCellRepository;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,11 +26,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 병아리: 전국 어느 시군구에서나 미리 분양받아 그 시군구에서 키운다 (ADR 0011).
- * 시군구는 카카오 법정동 코드 표의 한 행이고, 그 코드가 점령의 regionId 와 같다 (ADR 0012).
+ * 시군구는 region_subdivisions 의 한 행이다. 점령 시간과는 카카오가 위치 판정 때 준 시도·시군구 이름
+ * (territory_region_cells)을 regions.name, region_subdivisions.name 과 맞춰 연결한다 (ADR 0012).
  * 경험치는 지금 분양 이후 그 시군구의 점령 시간(1분 = 1)이고, 레벨은 지금 레벨표로 정한다.
  */
 @Service
@@ -42,39 +44,67 @@ public class FatService {
     private final FatLevelRepository levelRepository;
     private final FatSettingRepository settingRepository;
     private final TerritoryDailyStayRepository dailyStayRepository;
-    private final KakaoLegalDongCodeRepository legalDongCodeRepository;
+    private final TerritoryRegionCellRepository cellRepository;
+    private final LDongSigunguRepository sigunguRepository;
     private final TerritoryProperties properties;
     private final TimelineProperties timelineProperties;
+
+    /** 시도 이름과 시군구 이름 쌍. 카카오 판정 결과와 region_subdivisions 를 이 이름으로 맞춘다 */
+    private record RegionNames(String sidoName, String sigunguName) {
+        static RegionNames of(RegionSubdivisions subdivision) {
+            return new RegionNames(subdivision.getRegion().getName(), subdivision.getName());
+        }
+
+        static RegionNames of(TerritoryRegionCell cell) {
+            return new RegionNames(cell.getParentName(), cell.getRegionName());
+        }
+    }
 
     public FatOverview overview(Long userId) {
         FatLevelTable table = levelTable();
         List<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNullOrderByAdoptedAtAsc(userId);
+        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
         return new FatOverview(
-                fats.stream().map(fat -> status(fat, table)).toList(),
+                fats.stream().map(fat -> status(fat, subdivisions.get(fat.getRegionSubdivisionId()), table)).toList(),
                 maxActiveFats(),
                 suggestedAdoptionRegions(userId, fats));
     }
 
     public List<GraduatedFat> graduated(Long userId) {
         List<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(userId);
-        return fats.stream().map(this::graduated).toList();
+        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
+        return fats.stream().map(fat -> graduated(fat, subdivisions.get(fat.getRegionSubdivisionId()))).toList();
     }
 
-    /** 병아리를 분양받을 수 있는 시군구 전체 */
+    /** 병아리를 분양받을 수 있는 시군구: region_subdivisions 중 아래에 구가 있는 시를 뺀 곳 */
     public List<FatRegion> regions() {
-        return legalDongCodeRepository.findByDeletedAtIsNullOrderByCodeAsc().stream().map(FatRegion::from).toList();
+        List<RegionSubdivisions> all = sigunguRepository.findAllWithRegion();
+        Set<String> parents = all.stream()
+                .flatMap(child -> all.stream()
+                        .filter(parent -> parent.getRegion().getCode().equals(child.getRegion().getCode())
+                                && child.getName().startsWith(parent.getName() + " "))
+                        .map(parent -> parent.getRegion().getCode() + "/" + parent.getCode()))
+                .collect(Collectors.toSet());
+        return all.stream()
+                .filter(subdivision -> !parents.contains(subdivision.getRegion().getCode() + "/" + subdivision.getCode()))
+                .map(FatRegion::from)
+                .sorted(Comparator.comparing(FatRegion::regionCode).thenComparing(FatRegion::code))
+                .toList();
     }
 
     /**
-     * 분양. 가 본 적이 없어도 전국 어느 시군구에서나, 키우는 병아리가 없으면 받을 수 있다.
+     * 분양. region_subdivisions 의 region_code 와 code 를 각각 받는다.
+     * 가 본 적이 없어도 전국 어느 시군구에서나, 키우는 병아리가 없으면 받을 수 있다.
      * 키우는 병아리가 최대 마리 수(fat_settings)에 이르렀으면 받을 수 없다.
      */
     @Transactional
-    public FatStatus adopt(Long userId, Long legalDongCodeId) {
-        KakaoLegalDongCode legalDongCode = legalDongCodeRepository.findById(legalDongCodeId)
-                .filter(code -> !code.isDeleted())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시군구입니다. legalDongCodeId: " + legalDongCodeId));
-        if (fatRepository.existsByUserIdAndLegalDongCodeIdAndGraduatedAtIsNull(userId, legalDongCodeId)) {
+    public FatStatus adopt(Long userId, String regionCode, String code) {
+        RegionSubdivisions subdivision = sigunguRepository.findWithRegionByRegionCodeAndCode(regionCode, code)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시군구입니다. regionCode: " + regionCode + ", code: " + code));
+        if (sigunguRepository.hasDistrictsUnder(regionCode, subdivision.getName())) {
+            throw new IllegalArgumentException(subdivision.getName() + "에서는 병아리를 키울 수 없습니다. 아래 구에서 분양받아 주세요.");
+        }
+        if (fatRepository.existsByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(userId, subdivision.getId())) {
             throw new IllegalArgumentException(ACTIVE_FAT_EXISTS);
         }
         int maxActiveFats = maxActiveFats();
@@ -86,14 +116,15 @@ public class FatService {
         try {
             fat = fatRepository.saveAndFlush(Fat.builder()
                     .userId(userId)
-                    .legalDongCode(legalDongCode)
+                    .regionSubdivisionId(subdivision.getId())
                     .adoptedAt(now())
                     .adoptionDaySeconds(0L)
                     .build());
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException(ACTIVE_FAT_EXISTS, e);
         }
-        return status(fat, levelTable());
+        return new FatStatus(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(),
+                levelTable().progress(exp(fat, occupationCodes(subdivision))));
     }
 
     /**
@@ -106,14 +137,15 @@ public class FatService {
         if (fat.isGraduated()) {
             throw new IllegalArgumentException("이미 졸업한 병아리입니다.");
         }
-        FatLevelTable.Progress progress = levelTable().progress(exp(fat));
+        RegionSubdivisions subdivision = subdivision(fat.getRegionSubdivisionId());
+        FatLevelTable.Progress progress = levelTable().progress(exp(fat, occupationCodes(subdivision)));
         if (!progress.founded()) {
             throw new IllegalArgumentException(progress.foundingLevel() == null
                     ? "레벨표에 건국 레벨이 없어 졸업할 수 없습니다."
                     : "건국(Lv." + progress.foundingLevel() + ")부터 졸업할 수 있습니다.");
         }
         fat.graduate(now(), progress.level(), progress.exp());
-        return graduated(fat);
+        return graduated(fat, subdivision);
     }
 
     /**
@@ -123,51 +155,84 @@ public class FatService {
      */
     @Transactional
     public void recomputeAdoptionDay(Long userId, LocalDate date, List<OccupationCalculator.RegionPoint> points) {
-        for (Fat fat : fatRepository.findByUserIdAndGraduatedAtIsNullAndAdoptedAtGreaterThanEqualAndAdoptedAtLessThan(
-                userId, date.atStartOfDay(), date.plusDays(1).atStartOfDay())) {
+        List<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNullAndAdoptedAtGreaterThanEqualAndAdoptedAtLessThan(
+                userId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
+        for (Fat fat : fats) {
+            Set<String> occupationCodes = occupationCodes(subdivisions.get(fat.getRegionSubdivisionId()));
             List<OccupationCalculator.RegionPoint> afterAdoption = points.stream()
                     .filter(point -> !point.recordedAt().isBefore(fat.getAdoptedAt()))
                     .toList();
-            fat.setAdoptionDaySeconds(OccupationCalculator.staySeconds(afterAdoption, properties.getMaxGap())
-                    .getOrDefault(fat.getLegalDongCode().getCode(), 0L));
+            fat.setAdoptionDaySeconds(OccupationCalculator.staySeconds(afterAdoption, properties.getMaxGap()).entrySet().stream()
+                    .filter(entry -> occupationCodes.contains(entry.getKey()))
+                    .mapToLong(Map.Entry::getValue)
+                    .sum());
         }
     }
 
     /** 추천 분양 지역: 오늘 점령 시간이 있거나 오늘 병아리가 졸업한 시군구 중 병아리가 없는 곳 (분양 조건은 아님) */
     private List<FatRegion> suggestedAdoptionRegions(Long userId, List<Fat> activeFats) {
         LocalDate today = today();
-        Set<String> raising = activeFats.stream().map(fat -> fat.getLegalDongCode().getCode()).collect(Collectors.toSet());
-        Set<String> codes = Stream.concat(
-                        dailyStayRepository.findRegionIdsByUserAndDate(userId, today).stream(),
-                        fatRepository.findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(userId).stream()
-                                .filter(fat -> !fat.getGraduatedAt().isBefore(today.atStartOfDay()))
-                                .map(fat -> fat.getLegalDongCode().getCode()))
-                .filter(code -> !raising.contains(code))
+        List<String> todayCodes = dailyStayRepository.findRegionIdsByUserAndDate(userId, today);
+        Set<RegionNames> visited = todayCodes.isEmpty() ? Set.of() : cellRepository.findByRegionIdIn(new HashSet<>(todayCodes)).stream()
+                .filter(cell -> cell.getRegionName() != null)
+                .map(RegionNames::of)
                 .collect(Collectors.toSet());
-        if (codes.isEmpty()) {
+        Set<Long> graduatedToday = fatRepository.findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(userId).stream()
+                .filter(fat -> !fat.getGraduatedAt().isBefore(today.atStartOfDay()))
+                .map(Fat::getRegionSubdivisionId)
+                .collect(Collectors.toSet());
+        if (visited.isEmpty() && graduatedToday.isEmpty()) {
             return List.of();
         }
-        return legalDongCodeRepository.findByCodeInAndDeletedAtIsNull(codes).stream()
-                .sorted(Comparator.comparing(KakaoLegalDongCode::getCode))
+        Set<Long> raising = activeFats.stream().map(Fat::getRegionSubdivisionId).collect(Collectors.toSet());
+        return sigunguRepository.findAllWithRegion().stream()
+                .filter(subdivision -> visited.contains(RegionNames.of(subdivision)) || graduatedToday.contains(subdivision.getId()))
+                .filter(subdivision -> !raising.contains(subdivision.getId()))
                 .map(FatRegion::from)
+                .sorted(Comparator.comparing(FatRegion::regionCode).thenComparing(FatRegion::code))
                 .toList();
     }
 
-    private FatStatus status(Fat fat, FatLevelTable table) {
-        return new FatStatus(fat.getId(), FatRegion.from(fat.getLegalDongCode()), fat.getAdoptedAt(), table.progress(exp(fat)));
+    private FatStatus status(Fat fat, RegionSubdivisions subdivision, FatLevelTable table) {
+        return new FatStatus(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(),
+                table.progress(exp(fat, occupationCodes(subdivision))));
     }
 
-    private GraduatedFat graduated(Fat fat) {
-        return new GraduatedFat(fat.getId(), FatRegion.from(fat.getLegalDongCode()), fat.getAdoptedAt(),
+    private GraduatedFat graduated(Fat fat, RegionSubdivisions subdivision) {
+        return new GraduatedFat(fat.getId(), FatRegion.from(subdivision), fat.getAdoptedAt(),
                 fat.getGraduatedAt(), fat.getGraduatedLevel(), fat.getGraduatedExp());
     }
 
     /** 분양 이후 그 시군구의 점령 시간(분) */
-    private long exp(Fat fat) {
-        LocalDate adoptionDate = fat.getAdoptedAt().toLocalDate();
-        long seconds = fat.getAdoptionDaySeconds() + dailyStayRepository.sumByUserAndRegionFrom(
-                fat.getUserId(), fat.getLegalDongCode().getCode(), adoptionDate.plusDays(1));
+    private long exp(Fat fat, Set<String> occupationCodes) {
+        LocalDate from = fat.getAdoptedAt().toLocalDate().plusDays(1);
+        long seconds = fat.getAdoptionDaySeconds() + occupationCodes.stream()
+                .mapToLong(code -> dailyStayRepository.sumByUserAndRegionFrom(fat.getUserId(), code, from))
+                .sum();
         return seconds / 60;
+    }
+
+    /** 시군구(region_subdivisions 행)와 시도·시군구 이름이 같은 카카오 판정 결과의 점령 regionId */
+    private Set<String> occupationCodes(RegionSubdivisions subdivision) {
+        return new HashSet<>(cellRepository.findRegionIdsByNames(subdivision.getRegion().getName(), subdivision.getName()));
+    }
+
+    private RegionSubdivisions subdivision(Long id) {
+        return subdivisions(List.of(id)).values().stream().findFirst()
+                .orElseThrow(() -> new IllegalStateException("병아리의 시군구(region_subdivisions)가 없습니다. ID: " + id));
+    }
+
+    private Map<Long, RegionSubdivisions> subdivisions(List<Fat> fats) {
+        return subdivisions(fats.stream().map(Fat::getRegionSubdivisionId).collect(Collectors.toSet()));
+    }
+
+    private Map<Long, RegionSubdivisions> subdivisions(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return sigunguRepository.findWithRegionByIdIn(ids).stream()
+                .collect(Collectors.toMap(RegionSubdivisions::getId, subdivision -> subdivision));
     }
 
     private int maxActiveFats() {

@@ -1,16 +1,17 @@
 package com.bosshi.maeul.territory.dto;
 
-import com.bosshi.maeul.territory.entity.KakaoLegalDongCode;
+import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
 
 /**
- * 병아리를 키우는 시군구 (카카오 법정동 코드 표의 한 행)
+ * 병아리를 키우는 시군구 (region_subdivisions 의 한 행)
  *
- * @param legalDongCode 시군구 법정동 코드 (점령의 regionId 와 같은 값)
- * @param sigunguName   세종특별자치시처럼 시군구가 없으면 null
+ * @param regionCode 시도 코드 (region_subdivisions.region_code)
+ * @param code       시군구 코드 (region_subdivisions.code)
  */
-public record FatRegion(Long legalDongCodeId, String legalDongCode, String sidoName, String sigunguName) {
+public record FatRegion(Long regionSubdivisionId, String regionCode, String code, String sidoName, String sigunguName) {
 
-    public static FatRegion from(KakaoLegalDongCode code) {
-        return new FatRegion(code.getId(), code.getCode(), code.getSidoName(), code.getSigunguName());
+    public static FatRegion from(RegionSubdivisions subdivision) {
+        return new FatRegion(subdivision.getId(), subdivision.getRegion().getCode(), subdivision.getCode(),
+                subdivision.getRegion().getName(), subdivision.getName());
     }
 }
