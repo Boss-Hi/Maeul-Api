@@ -48,10 +48,9 @@ public class FatController {
 
     /**
      * 지역별 펫 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
-     * page(0부터), size(기본 10, 최대 ranking-max-size)로 나눠 조회한다
+     * 그 지역의 상위 100마리(ranking-max-size)를 page(0부터), size(기본 10)로 나눠 조회한다
      */
     @GetMapping("/ranking")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<FatRankingResponse>> ranking(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) String regionCode,

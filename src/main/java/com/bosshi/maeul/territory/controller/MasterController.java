@@ -35,7 +35,7 @@ public class MasterController {
 
     /**
      * 지역별 주인 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
-     * page(0부터), size(기본 50, 최대 ranking-max-size)로 나눠 조회한다
+     * 그 지역의 상위 100명(ranking-max-size)을 page(0부터), size(기본 50)로 나눠 조회한다
      */
     @GetMapping("/ranking")
     @PreAuthorize("isAuthenticated()")

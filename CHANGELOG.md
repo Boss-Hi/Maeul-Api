@@ -19,7 +19,7 @@
   - `POST /api/fats/{fatId}/graduate`: 졸업(상품 교환). 건국 레벨부터 가능, 되돌리지 않음
   - `GET /api/fats/graduated?page=&size=`: 졸업한 펫 (졸업 때 레벨·경험치). 최근 졸업 순 페이지 (기본 size 20)
   - `GET /api/fats/ranking?regionCode=&code=&page=&size=`: 지역별 펫 순위 (키우는 중인 펫의 지금 경험치 순)
-    - `entries` 는 페이지 (기본 size 50, 최대 `TERRITORY_RANKING_MAX_SIZE`)
+    - `entries` 는 그 지역(없으면 전국)의 상위 100마리(`TERRITORY_RANKING_MAX_SIZE`)만 나눈 페이지 (기본 size 10)
     - `regionCode`+`code` 는 시군구, `regionCode` 만 있으면 시도, 둘 다 없으면 전국
     - 같은 경험치는 같은 순위(1, 1, 3), 닉네임만 노출, `mine` 은 내 펫 중 가장 높은 순위
 - 펫 시군구 (ADR 0012)
@@ -35,7 +35,7 @@
   - 사용자마다 1명. 주인 경험치 = 모든 펫 경험치 합(키우는 중은 지금 값, 졸업은 졸업 때 값) x 주인 비율(`fat_settings.master_exp_ratio`, 기본 1.0)
   - `GET /api/master`: 내 주인의 레벨·경험치
   - `GET /api/master/ranking?regionCode=&code=&page=&size=`: 지역별 주인 순위. 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자를 주인 경험치 전체 순으로 줄 세움
-    - `entries` 는 페이지 (기본 size 50, 최대 `TERRITORY_RANKING_MAX_SIZE`)
+    - `entries` 는 그 지역(없으면 전국)의 상위 100명(`TERRITORY_RANKING_MAX_SIZE`)만 나눈 페이지 (기본 size 50)
 - 관리자 설정 (KraftAdmin)
   - `FatLevel`: 펫 레벨표(`fat_levels`)의 레벨별 필요 경험치·단계 이름·건국 여부. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
   - `MasterLevel`: 주인 레벨표(`master_levels`). 기본 Lv.1~100, 레벨마다 1,008
