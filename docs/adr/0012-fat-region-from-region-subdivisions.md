@@ -1,7 +1,7 @@
 # ADR 0012: Fat Region is a region_subdivisions Row, Linked to Occupation by Name
 
 ## Status
-**Accepted** (2026-11-15). 같은 날의 앞선 시도는 V15 에서 되돌렸다. 처음에는 병아리가 카카오 법정동 코드 표의 행을 가리켰고(V14), 다음에는 그 표에 region_subdivisions 대응값을 적었다.
+**Accepted** (2026-11-15). 같은 날 카카오 법정동 코드 표를 쓰는 안을 시도했다가 되돌렸다. 그 마이그레이션은 V12 하나로 정리해 남아 있지 않다.
 
 ## Context
 

@@ -19,7 +19,7 @@
   - 경험치 = 분양 이후 그 시군구의 점령 시간(1분 = 1). 위치 기록을 지우면 함께 줄고, 레벨은 지금 레벨표로 매번 계산
   - 레벨표(`fat_levels`)는 관리자 화면(KraftAdmin `FatLevel`)에서 레벨별 필요 경험치·단계 이름·건국 여부를 수정. 기본 Lv.1~100, 레벨마다 126분, Lv.81 건국(10,080분)
   - 동시에 키울 수 있는 병아리 수는 `fat_settings.max_active_fats`(기본 3, 관리자 화면 KraftAdmin `FatSetting`)에서 관리. 줄여도 이미 키우는 병아리는 그대로
-  - `fat_levels`, `fats` 테이블 추가 (V12), `fat_settings` 테이블 추가 (V13), `kakao_legal_dong_codes` 추가 (V14), `fats` 를 `region_subdivision_id` 로 교체하고 `kakao_legal_dong_codes` 삭제 (V15, 기존 병아리 행 삭제)
+  - `fat_levels`, `fat_settings`, `fats` 테이블 추가 (V12 하나로 정리. 이전 V12~V15 를 적용한 DB 는 병아리 테이블과 `kakao_legal_dong_codes` 를 지우고 `flyway_schema_history` 의 12 이상 기록을 지운 뒤 다시 migrate)
   - 영문 이름을 chick 에서 fat 으로 변경 (API 경로 `/api/chicks` -> `/api/fats`, 응답 필드 `chickId` -> `fatId`)
 
 ## [v0.3.1] - 2026-11-08
