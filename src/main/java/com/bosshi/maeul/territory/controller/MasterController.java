@@ -12,7 +12,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 주인: 펫을 키우는 사용자의 성장 기록 (모든 펫 경험치 합 x 주인 비율, 별도 레벨표)
@@ -35,7 +38,7 @@ public class MasterController {
 
     /**
      * 지역별 주인 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
-     * 그 지역의 상위 100명(ranking-max-size)을 page(0부터), size(기본 50)로 나눠 조회한다
+     * 그 지역의 상위 100명(ranking-max-size)을 page(0부터), size(기본 10)로 나눠 조회한다
      */
     @GetMapping("/ranking")
     @PreAuthorize("isAuthenticated()")
@@ -43,7 +46,7 @@ public class MasterController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) String regionCode,
             @RequestParam(required = false) String code,
-            @PageableDefault(size = 50) Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable
     ) {
         return ApiResponse.success(MasterRankingResponse.from(rankingService.masterRanking(userDetails.getId(), regionCode, code, pageable)));
     }
