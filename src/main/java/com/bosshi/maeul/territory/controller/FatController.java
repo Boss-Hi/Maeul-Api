@@ -3,15 +3,14 @@ package com.bosshi.maeul.territory.controller;
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.territory.request.AdoptFatRequest;
-import com.bosshi.maeul.territory.response.FatOverviewResponse;
-import com.bosshi.maeul.territory.response.FatRankingResponse;
-import com.bosshi.maeul.territory.response.FatRegionResponse;
-import com.bosshi.maeul.territory.response.FatResponse;
-import com.bosshi.maeul.territory.response.GraduatedFatResponse;
+import com.bosshi.maeul.territory.response.*;
 import com.bosshi.maeul.territory.service.FatRankingService;
 import com.bosshi.maeul.territory.service.FatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,6 +48,7 @@ public class FatController {
 
     /**
      * 지역별 펫 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
+     * page(0부터), size(기본 10, 최대 ranking-max-size)로 나눠 조회한다
      */
     @GetMapping("/ranking")
     @PreAuthorize("isAuthenticated()")
@@ -56,18 +56,21 @@ public class FatController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) String regionCode,
             @RequestParam(required = false) String code,
-            @RequestParam(defaultValue = "50") int size
+            @PageableDefault(size = 10) Pageable pageable
     ) {
-        return ApiResponse.success(FatRankingResponse.from(rankingService.fatRanking(userDetails.getId(), regionCode, code, size)));
+        return ApiResponse.success(FatRankingResponse.from(rankingService.fatRanking(userDetails.getId(), regionCode, code, pageable)));
     }
 
     /**
-     * 졸업한 펫 (최근 졸업 순)
+     * 졸업한 펫 (최근 졸업 순). page(0부터), size(기본 20)로 나눠 조회한다
      */
     @GetMapping("/graduated")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<GraduatedFatResponse>>> graduated(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.success(fatService.graduated(userDetails.getId()).stream().map(GraduatedFatResponse::from).toList());
+    public ResponseEntity<ApiResponse<Page<GraduatedFatResponse>>> graduated(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return ApiResponse.success(fatService.graduated(userDetails.getId(), pageable).map(GraduatedFatResponse::from));
     }
 
     /**

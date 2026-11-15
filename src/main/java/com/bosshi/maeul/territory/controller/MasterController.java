@@ -7,6 +7,8 @@ import com.bosshi.maeul.territory.response.MasterResponse;
 import com.bosshi.maeul.territory.service.FatRankingService;
 import com.bosshi.maeul.territory.service.MasterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +35,7 @@ public class MasterController {
 
     /**
      * 지역별 주인 순위. regionCode + code 는 시군구, regionCode 만 있으면 시도, 둘 다 없으면 전국
+     * page(0부터), size(기본 50, 최대 ranking-max-size)로 나눠 조회한다
      */
     @GetMapping("/ranking")
     @PreAuthorize("isAuthenticated()")
@@ -40,8 +43,8 @@ public class MasterController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) String regionCode,
             @RequestParam(required = false) String code,
-            @RequestParam(defaultValue = "50") int size
+            @PageableDefault(size = 50) Pageable pageable
     ) {
-        return ApiResponse.success(MasterRankingResponse.from(rankingService.masterRanking(userDetails.getId(), regionCode, code, size)));
+        return ApiResponse.success(MasterRankingResponse.from(rankingService.masterRanking(userDetails.getId(), regionCode, code, pageable)));
     }
 }

@@ -1,6 +1,8 @@
 package com.bosshi.maeul.territory.repository;
 
 import com.bosshi.maeul.territory.entity.Fat;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,9 @@ public interface FatRepository extends JpaRepository<Fat, Long> {
 
     /** 졸업한 펫 (최근 졸업 순) */
     List<Fat> findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(Long userId);
+
+    /** 졸업한 펫 한 페이지 (최근 졸업 순, 같은 시각이면 나중 펫 먼저) */
+    Page<Fat> findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDescIdDesc(Long userId, Pageable pageable);
 
     /** [from, to) 에 분양받아 아직 키우는 중인 펫 */
     List<Fat> findByUserIdAndGraduatedAtIsNullAndAdoptedAtGreaterThanEqualAndAdoptedAtLessThan(

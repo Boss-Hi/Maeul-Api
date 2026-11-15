@@ -10,6 +10,9 @@ import com.bosshi.maeul.territory.repository.FatRepository;
 import com.bosshi.maeul.user.entity.Profile;
 import com.bosshi.maeul.user.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,15 +41,16 @@ public class FatRankingService {
     private record Scope(String regionCode, String code, String name, Map<Long, RegionSubdivisions> subdivisions) {
     }
 
-    /** 키우는 중인 펫의 지금 경험치 순 */
-    public FatRanking fatRanking(Long userId, String regionCode, String code, int size) {
+    /** 키우는 중인 펫의 지금 경험치 순. 페이지 크기는 ranking-max-size 를 넘지 않고, pageable 의 sort 는 쓰지 않는다 */
+    public FatRanking fatRanking(Long userId, String regionCode, String code, Pageable pageable) {
+        Pageable page = PageRequest.of(pageable.getPageNumber(), limit(pageable.getPageSize()));
         Scope scope = scope(regionCode, code);
         List<Fat> fats = fatRepository.findByGraduatedAtIsNullAndRegionSubdivisionIdIn(scope.subdivisions().keySet());
         Map<Long, Long> exps = fatService.currentExps(fats);
         FatLevelTable table = fatService.levelTable();
         List<ScoreRanking.Ranked<Fat>> ranking = ScoreRanking.rank(fats, fat -> exps.get(fat.getId()), Comparator.comparing(Fat::getAdoptedAt));
 
-        List<ScoreRanking.Ranked<Fat>> top = ranking.stream().limit(limit(size)).toList();
+        List<ScoreRanking.Ranked<Fat>> top = ranking.stream().skip(page.getOffset()).limit(page.getPageSize()).toList();
         Optional<ScoreRanking.Ranked<Fat>> mine = ranking.stream().filter(r -> r.item().getUserId().equals(userId)).findFirst();
         Map<Long, String> nicknames = nicknames(top, mine, r -> r.item().getUserId());
         java.util.function.Function<ScoreRanking.Ranked<Fat>, FatRanking.Entry> entry = r -> {
@@ -57,11 +61,12 @@ public class FatRankingService {
                     r.item().getUserId().equals(userId));
         };
         return new FatRanking(scope.regionCode(), scope.code(), scope.name(), ranking.size(),
-                top.stream().map(entry).toList(), mine.map(entry).orElse(null));
+                new PageImpl<>(top.stream().map(entry).toList(), page, ranking.size()), mine.map(entry).orElse(null));
     }
 
-    /** 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자의 주인 경험치 전체 순 */
-    public MasterRanking masterRanking(Long userId, String regionCode, String code, int size) {
+    /** 그 지역에서 펫을 키우는 중이거나 졸업시킨 사용자의 주인 경험치 전체 순. 페이지 크기는 ranking-max-size 를 넘지 않고, pageable 의 sort 는 쓰지 않는다 */
+    public MasterRanking masterRanking(Long userId, String regionCode, String code, Pageable pageable) {
+        Pageable page = PageRequest.of(pageable.getPageNumber(), limit(pageable.getPageSize()));
         Scope scope = scope(regionCode, code);
         Set<Long> userIds = fatRepository.findByRegionSubdivisionIdIn(scope.subdivisions().keySet()).stream()
                 .map(Fat::getUserId)
@@ -70,7 +75,7 @@ public class FatRankingService {
         FatLevelTable table = masterService.levelTable();
         List<ScoreRanking.Ranked<Long>> ranking = ScoreRanking.rank(new ArrayList<>(userIds), exps::get, Comparator.naturalOrder());
 
-        List<ScoreRanking.Ranked<Long>> top = ranking.stream().limit(limit(size)).toList();
+        List<ScoreRanking.Ranked<Long>> top = ranking.stream().skip(page.getOffset()).limit(page.getPageSize()).toList();
         Optional<ScoreRanking.Ranked<Long>> mine = ranking.stream().filter(r -> r.item().equals(userId)).findFirst();
         Map<Long, String> nicknames = nicknames(top, mine, ScoreRanking.Ranked::item);
         java.util.function.Function<ScoreRanking.Ranked<Long>, MasterRanking.Entry> entry = r -> {
@@ -78,7 +83,7 @@ public class FatRankingService {
             return new MasterRanking.Entry(r.rank(), nicknames.get(r.item()), table.progress(exp).level(), exp, r.item().equals(userId));
         };
         return new MasterRanking(scope.regionCode(), scope.code(), scope.name(), ranking.size(),
-                top.stream().map(entry).toList(), mine.map(entry).orElse(null));
+                new PageImpl<>(top.stream().map(entry).toList(), page, ranking.size()), mine.map(entry).orElse(null));
     }
 
     private Scope scope(String regionCode, String code) {

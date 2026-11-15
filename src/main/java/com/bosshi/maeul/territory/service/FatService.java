@@ -21,6 +21,9 @@ import com.bosshi.maeul.territory.repository.dto.DateStay;
 import com.bosshi.maeul.timeline.config.TimelineProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,10 +77,12 @@ public class FatService {
                 suggestedAdoptionRegions(userId, fats));
     }
 
-    public List<GraduatedFat> graduated(Long userId) {
-        List<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDesc(userId);
-        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats);
-        return fats.stream().map(fat -> graduated(fat, subdivisions.get(fat.getRegionSubdivisionId()))).toList();
+    /** 졸업한 펫 (최근 졸업 순). 정렬은 고정이라 pageable 의 sort 는 쓰지 않는다 */
+    public Page<GraduatedFat> graduated(Long userId, Pageable pageable) {
+        Page<Fat> fats = fatRepository.findByUserIdAndGraduatedAtIsNotNullOrderByGraduatedAtDescIdDesc(
+                userId, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+        Map<Long, RegionSubdivisions> subdivisions = subdivisions(fats.getContent());
+        return fats.map(fat -> graduated(fat, subdivisions.get(fat.getRegionSubdivisionId())));
     }
 
     /** 펫을 분양받을 수 있는 시군구: region_subdivisions 중 아래에 구가 있는 시를 뺀 곳 */
