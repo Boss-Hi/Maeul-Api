@@ -1,6 +1,7 @@
 package com.bosshi.maeul.user.service;
 
-import com.bosshi.maeul.auth.jwt.JwtTokenProvider;
+import com.bosshi.maeul.auth.service.IssuedTokens;
+import com.bosshi.maeul.auth.service.TokenService;
 import com.bosshi.maeul.auth.type.AuthType;
 import com.bosshi.maeul.user.entity.Profile;
 import com.bosshi.maeul.user.entity.User;
@@ -11,14 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
@@ -38,16 +37,13 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public String login(LoginRequest request) {
+    /** 이메일 로그인. 카카오·Apple 과 같이 액세스 토큰과 리프레시 토큰을 발급한다 (ADR 0015) */
+    public IssuedTokens login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email());
         if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        return jwtTokenProvider.generateToken(user.getEmail(), Map.of(
-                "authType", user.getAuthType(),
-                "authId", user.getAuthId(),
-                "userId", user.getId()
-        ));
+        return tokenService.issue(user);
     }
 }

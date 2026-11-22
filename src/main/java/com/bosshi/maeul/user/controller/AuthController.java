@@ -1,5 +1,6 @@
 package com.bosshi.maeul.user.controller;
 
+import com.bosshi.maeul.auth.response.TokenResponse;
 import com.bosshi.maeul.common.response.ApiResponse;
 import com.bosshi.maeul.user.request.LoginRequest;
 import com.bosshi.maeul.user.request.RegisterRequest;
@@ -24,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody LoginRequest request) {
-        return ApiResponse.success(authService.login(request));
+    public ResponseEntity<ApiResponse<TokenResponse>> login(@RequestBody LoginRequest request) {
+        return ApiResponse.success(TokenResponse.from(authService.login(request)));
     }
 }
