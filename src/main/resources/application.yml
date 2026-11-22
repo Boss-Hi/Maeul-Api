@@ -145,6 +145,8 @@ territory:
   reward-unit: ${TERRITORY_REWARD_UNIT:1h}
   reward-points: ${TERRITORY_REWARD_POINTS:100}
   ranking-max-size: ${TERRITORY_RANKING_MAX_SIZE:100}
+  itinerary-completion-window: ${TERRITORY_ITINERARY_COMPLETION_WINDOW:7d} # 종료일 뒤 일정 완료를 다시 판정하는 기간
+  itinerary-completion-cron: ${TERRITORY_ITINERARY_COMPLETION_CRON:0 10 0 * * *} # 일정 완료 판정 시각 (매일)
 
 kakao:
     rest-api:

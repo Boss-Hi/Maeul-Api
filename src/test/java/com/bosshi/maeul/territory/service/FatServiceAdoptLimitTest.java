@@ -1,5 +1,6 @@
 package com.bosshi.maeul.territory.service;
 
+import com.bosshi.maeul.gacha.GachaDrawer;
 import com.bosshi.maeul.itineraries.openapi.entity.Region;
 import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
 import com.bosshi.maeul.itineraries.openapi.repository.LDongSigunguRepository;
@@ -24,8 +25,8 @@ class FatServiceAdoptLimitTest {
     private final FatSettingRepository settingRepository = mock(FatSettingRepository.class);
     private final LDongSigunguRepository sigunguRepository = mock(LDongSigunguRepository.class);
     private final FatService service = new FatService(fatRepository, mock(FatLevelRepository.class), settingRepository,
-            mock(TerritoryDailyStayRepository.class), mock(TerritoryRegionCellRepository.class), mock(FatItineraryPeriodRepository.class), sigunguRepository,
-            new TerritoryProperties(), new TimelineProperties());
+            mock(TerritoryDailyStayRepository.class), mock(TerritoryRegionCellRepository.class), mock(FatItineraryPeriodRepository.class), mock(FatMissionExpRepository.class),
+            sigunguRepository, mock(GachaDrawer.class), new TerritoryProperties(), new TimelineProperties());
 
     @BeforeEach
     void setUp() {

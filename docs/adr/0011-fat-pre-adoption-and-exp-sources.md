@@ -1,7 +1,7 @@
 # ADR 0011: Fat Pre-adoption and EXP Sources
 
 ## Status
-**Accepted** (2026-11-15). ADR 0010 을 대체한다.
+**Accepted** (2026-11-15). ADR 0010 을 대체한다. 미션 완료 경험치(고정 120)는 ADR 0014 의 미션 가챠로 대체됨.
 
 ## Context
 

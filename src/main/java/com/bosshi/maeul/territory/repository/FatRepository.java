@@ -42,4 +42,6 @@ public interface FatRepository extends JpaRepository<Fat, Long> {
 
     boolean existsByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(Long userId, Long regionSubdivisionId);
 
+    Optional<Fat> findByUserIdAndRegionSubdivisionIdAndGraduatedAtIsNull(Long userId, Long regionSubdivisionId);
+
 }

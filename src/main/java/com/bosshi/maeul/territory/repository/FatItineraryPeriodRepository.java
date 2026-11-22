@@ -17,4 +17,7 @@ public interface FatItineraryPeriodRepository extends JpaRepository<FatItinerary
 
     /** 아직 끝나지 않은(종료일이 date 이후인) 일정 기간 */
     List<FatItineraryPeriod> findByUserIdAndEndDateGreaterThanEqual(Long userId, LocalDate date);
+
+    /** 종료일이 [from, to] 인 일정 기간 */
+    List<FatItineraryPeriod> findByEndDateBetween(LocalDate from, LocalDate to);
 }
