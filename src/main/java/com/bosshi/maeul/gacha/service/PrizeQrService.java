@@ -90,6 +90,10 @@ public class PrizeQrService {
         return prizeQrRepository.findByKindIdAndDeletedAtIsNullOrderByIdAsc(kindId, pageable);
     }
 
+    public List<PrizeQr> allQrs(Long kindId) {
+        return prizeQrRepository.findByKindIdAndDeletedAtIsNullOrderByIdAsc(kindId);
+    }
+
     public PrizeQr qr(Long prizeQrId) {
         return prizeQrRepository.findById(prizeQrId)
                 .filter(qr -> !qr.isDeleted())

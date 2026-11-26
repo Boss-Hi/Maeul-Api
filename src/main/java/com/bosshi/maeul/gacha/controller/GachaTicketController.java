@@ -2,10 +2,10 @@ package com.bosshi.maeul.gacha.controller;
 
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
+import com.bosshi.maeul.qr.QrImageService;
 import com.bosshi.maeul.gacha.entity.GachaTicket;
 import com.bosshi.maeul.gacha.response.TicketResponse;
 import com.bosshi.maeul.gacha.service.GachaTicketService;
-import com.bosshi.maeul.gacha.service.QrImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +41,6 @@ public class GachaTicketController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> qr(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long ticketId) {
         GachaTicket ticket = ticketService.ownTicket(userDetails.getId(), ticketId);
-        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImageService.png(ticket.getCode()));
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImageService.png(ticket.getCode(), QrImageService.DEFAULT_SIZE));
     }
 }

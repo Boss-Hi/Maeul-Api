@@ -19,6 +19,8 @@ public interface PrizeQrRepository extends JpaRepository<PrizeQr, Long> {
 
     org.springframework.data.domain.Page<PrizeQr> findByKindIdAndDeletedAtIsNullOrderByIdAsc(Long kindId, org.springframework.data.domain.Pageable pageable);
 
+    java.util.List<PrizeQr> findByKindIdAndDeletedAtIsNullOrderByIdAsc(Long kindId);
+
     long countByKindIdAndDeletedAtIsNull(Long kindId);
 
     long countByKindIdAndDeliveredAtIsNotNullAndDeletedAtIsNull(Long kindId);

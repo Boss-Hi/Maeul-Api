@@ -2,6 +2,7 @@ package com.bosshi.maeul.gacha.controller;
 
 import com.bosshi.maeul.auth.CustomUserDetails;
 import com.bosshi.maeul.common.response.ApiResponse;
+import com.bosshi.maeul.qr.QrImageService;
 import com.bosshi.maeul.gacha.TicketEventType;
 import com.bosshi.maeul.gacha.dto.PrizeKindStock;
 import com.bosshi.maeul.gacha.request.AddStoreOwnerRequest;
@@ -17,7 +18,6 @@ import com.bosshi.maeul.gacha.response.StoreResponse;
 import com.bosshi.maeul.gacha.response.TicketRuleResponse;
 import com.bosshi.maeul.gacha.service.GachaTicketService;
 import com.bosshi.maeul.gacha.service.PrizeQrService;
-import com.bosshi.maeul.gacha.service.QrImageService;
 import com.bosshi.maeul.gacha.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -92,7 +92,23 @@ public class OfflineGachaAdminController {
     /** 상품 QR 인쇄용 이미지 (PNG) */
     @GetMapping(value = "/prize-qrs/{prizeQrId}/qr.png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> qrImage(@PathVariable Long prizeQrId) {
-        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImageService.png(prizeQrService.qr(prizeQrId).getCode()));
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImageService.png(prizeQrService.qr(prizeQrId).getCode(), QrImageService.DEFAULT_SIZE));
+    }
+
+    /** 상품 종류의 상품 QR 이미지를 ZIP 으로 한꺼번에 받는다 (PNG, 파일명은 상품 QR ID) */
+    @GetMapping(value = "/prize-kinds/{kindId}/qrs.zip", produces = "application/zip")
+    public ResponseEntity<byte[]> qrsZip(@PathVariable Long kindId) throws java.io.IOException {
+        java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+        try (java.util.zip.ZipOutputStream zip = new java.util.zip.ZipOutputStream(bytes)) {
+            for (var qr : prizeQrService.allQrs(kindId)) {
+                zip.putNextEntry(new java.util.zip.ZipEntry(qr.getId() + ".png"));
+                zip.write(qrImageService.png(qr.getCode(), QrImageService.DEFAULT_SIZE));
+                zip.closeEntry();
+            }
+        }
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"prize-qrs-" + kindId + ".zip\"")
+                .body(bytes.toByteArray());
     }
 
     /** 가챠권 사용 취소. 취소된 가챠권은 다시 쓸 수 있다. 상품이 연결돼 있으면 상품 지급을 먼저 취소해야 한다 */
