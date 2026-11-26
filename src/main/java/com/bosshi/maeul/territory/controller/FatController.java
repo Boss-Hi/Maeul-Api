@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 펫: 전국 어느 시군구에서나 미리 분양받아 키우고, 건국 레벨부터 상품을 교환해 졸업한다
+ * 펫: 전국 어느 시군구에서나 미리 분양받아 키우고, 건국 레벨부터 졸업 가챠를 돌려 졸업한다
  */
 @RestController
 @RequestMapping("/api/fats")
@@ -85,14 +85,14 @@ public class FatController {
     }
 
     /**
-     * 졸업 (상품 교환)
+     * 졸업. 졸업 가챠 결과를 함께 돌려준다
      */
     @PostMapping("/{fatId}/graduate")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<GraduatedFatResponse>> graduate(
+    public ResponseEntity<ApiResponse<GraduationResponse>> graduate(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long fatId
     ) {
-        return ApiResponse.success(GraduatedFatResponse.from(fatService.graduate(userDetails.getId(), fatId)));
+        return ApiResponse.success(GraduationResponse.from(fatService.graduate(userDetails.getId(), fatId)));
     }
 }

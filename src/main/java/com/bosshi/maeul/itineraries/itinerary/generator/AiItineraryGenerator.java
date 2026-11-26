@@ -79,12 +79,16 @@ public class AiItineraryGenerator implements ItineraryGeneratorImpl {
 
         AiRequest<ItineraryAiOutput> request = AiRequest.of(buildItineraryPrompt(dto), ItineraryAiOutput.class, JSON_EXAMPLE);
         RuntimeException lastFailure = null;
+        Itinerary repeatedAnchorFallback = null;
         while (true) {
             AiResult<ItineraryAiOutput> result;
             try {
                 result = aiGenerator.generate(request);
             } catch (ServiceUnavailableException e) {
-                // 남은 제공자가 없다. 앞서 결과를 못 쓴 이유가 있으면 그것이 원인이다
+                // 남은 제공자가 없다. 앵커 반복만 문제였다면 그 일정을 쓰고, 아니면 앞서 결과를 못 쓴 이유가 원인이다
+                if (repeatedAnchorFallback != null) {
+                    return repeatedAnchorFallback;
+                }
                 throw lastFailure != null ? lastFailure : e;
             }
             try {
@@ -92,7 +96,14 @@ public class AiItineraryGenerator implements ItineraryGeneratorImpl {
                 if (days == null || days.isEmpty()) {
                     throw new IllegalStateException(result.provider() + " 응답에 일정이 없습니다.");
                 }
-                return buildItinerary(days, dto);
+                Itinerary itinerary = buildItinerary(days, dto);
+                if (AnchorPlaces.isHwaseong(dto.getTour()) && AnchorPlaces.hasRepeatedAnchorInDay(itinerary)) {
+                    log.warn("[{}] 같은 날 같은 앵커 장소가 반복되어 다음 제공자로 다시 요청합니다.", result.provider());
+                    repeatedAnchorFallback = itinerary;
+                    request = request.excluding(result.provider());
+                    continue;
+                }
+                return itinerary;
             } catch (RuntimeException e) {
                 log.warn("[{}] 응답으로 일정을 만들 수 없어 다음 제공자로 넘어갑니다: {}", result.provider(), e.getMessage(), e);
                 lastFailure = e;
@@ -145,8 +156,11 @@ public class AiItineraryGenerator implements ItineraryGeneratorImpl {
         prompt.append("하루 시간대: ").append(dayStart).append(" ~ ").append(dayEnd).append("\n");
 
         // 추천 관광지 목록
+        boolean anchor = AnchorPlaces.isHwaseong(dto.getTour());
         prompt.append("\n[추천 가능한 관광지]\n");
-        List<Tour> filteredVenues = dto.getRecommendableTours();
+        List<Tour> filteredVenues = anchor
+                ? dto.getRecommendableTours().stream().filter(AnchorPlaces::isAuxiliaryCandidate).toList()
+                : dto.getRecommendableTours();
         for (int i = 0; i < filteredVenues.size() && i < 20; i++) {
             Tour tour = filteredVenues.get(i);
             prompt.append("- ")
@@ -158,9 +172,25 @@ public class AiItineraryGenerator implements ItineraryGeneratorImpl {
             prompt.append("\n");
         }
 
+        if (anchor) {
+            appendAnchorSection(prompt, dto.getTour());
+        }
+
         prompt.append("\n");
         prompt.append("[지시사항]\n");
-        prompt.append("1. 주축제를 중심으로 일정을 짜세요.\n");
+        if (anchor) {
+            prompt.append("1. 위 [화성 앵커 장소]의 순서를 뼈대로 일정을 짜고, 주축제는 그 사이에 녹이세요.\n");
+            prompt.append("   - 여행 기간(하루든 여러 날이든)에 맞게 앵커 장소를 늘리거나 줄여 배치하되, 페이스와 하루 시간대는 지키세요.\n");
+            prompt.append("   - 앵커 장소는 contentId 를 비우고 title 에 장소명, description 에 그 장소의 역할을 담으세요.\n");
+            prompt.append("   - 주축제는 개최 기간 안의 날짜에 정확히 1회, 위치가 가까운 앵커 장소 사이에 넣고 contentId 를 그대로 넣으세요.\n");
+            prompt.append("   - 숙박 거점은 마지막 날을 뺀 매일 밤 하나씩, 그날의 마지막 일정(저녁 체크인)으로 배치하세요. 2박 이상이면 서로 다른 숙박 거점을 번갈아 쓰고, 마지막 날과 당일치기에는 숙박 거점을 넣지 마세요.\n");
+            prompt.append("   - 앵커 장소가 여행 일수에 비해 모자라면 같은 장소를 다른 날에 한 번 더 쓰지 말고 보조 후보나 휴식으로 채우세요.\n");
+            prompt.append("   - 같은 앵커 장소를 같은 날에 두 번 넣지 마세요.\n");
+            prompt.append("   - 낙조, 아침 식사, 야간 미션처럼 시간대가 있는 역할은 그 시간대(낙조는 해 질 무렵인 저녁)에 배치하세요.\n");
+            prompt.append("   - [추천 가능한 관광지]는 앵커 장소로 채워지지 않는 시간(식사, 휴식 등)에만 보조로 쓰세요.\n");
+        } else {
+            prompt.append("1. 주축제를 중심으로 일정을 짜세요.\n");
+        }
         prompt.append("2. 각 날짜별로 ").append(pace.venueRange()).append("의 일정을 추천하세요.\n");
         prompt.append("   - 모든 일정의 방문 시간(startTime, endTime)은 ").append(dayStart).append(" ~ ").append(dayEnd)
                 .append(" 안에서 HH:mm 형식으로 정하고, 같은 날 일정끼리 시간이 겹치지 않게 하세요.\n");
@@ -172,6 +202,22 @@ public class AiItineraryGenerator implements ItineraryGeneratorImpl {
         prompt.append("   모든 항목에 startTime, endTime 을 HH:mm 형식으로 채우세요.\n");
 
         return prompt.toString();
+    }
+
+    private static void appendAnchorSection(StringBuilder prompt, Tour festival) {
+        prompt.append("\n[화성 앵커 장소 (이동 순서대로, 일정의 뼈대)]\n");
+        List<AnchorPlaces.AnchorPlace> places = AnchorPlaces.HWASEONG;
+        for (int i = 0; i < places.size(); i++) {
+            AnchorPlaces.AnchorPlace place = places.get(i);
+            prompt.append(i + 1).append(". ").append(place.name())
+                    .append(" [").append(place.category()).append("] ").append(place.role()).append("\n");
+        }
+        prompt.append("\n[녹여야 할 주축제]\n");
+        prompt.append("축제명: ").append(festival.getTitle())
+                .append(" (contentId: ").append(festival.getContentId()).append(")\n");
+        if (festival.getEventStartDate() != null || festival.getEventEndDate() != null) {
+            prompt.append("개최 기간: ").append(festival.getEventStartDate()).append(" ~ ").append(festival.getEventEndDate()).append("\n");
+        }
     }
 
     /**

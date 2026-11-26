@@ -1,5 +1,7 @@
 package com.bosshi.maeul.territory.service;
 
+import com.bosshi.maeul.gacha.GachaDrawer;
+import com.bosshi.maeul.gacha.GachaType;
 import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
 import com.bosshi.maeul.itineraries.openapi.repository.LDongSigunguRepository;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
@@ -7,12 +9,14 @@ import com.bosshi.maeul.territory.dto.FatOverview;
 import com.bosshi.maeul.territory.dto.FatRegion;
 import com.bosshi.maeul.territory.dto.FatStatus;
 import com.bosshi.maeul.territory.dto.GraduatedFat;
+import com.bosshi.maeul.territory.dto.Graduation;
 import com.bosshi.maeul.territory.entity.Fat;
 import com.bosshi.maeul.territory.entity.FatLevel;
 import com.bosshi.maeul.territory.entity.FatSetting;
 import com.bosshi.maeul.territory.entity.TerritoryRegionCell;
 import com.bosshi.maeul.territory.repository.FatItineraryPeriodRepository;
 import com.bosshi.maeul.territory.repository.FatLevelRepository;
+import com.bosshi.maeul.territory.repository.FatMissionExpRepository;
 import com.bosshi.maeul.territory.repository.FatRepository;
 import com.bosshi.maeul.territory.repository.FatSettingRepository;
 import com.bosshi.maeul.territory.repository.TerritoryDailyStayRepository;
@@ -36,7 +40,8 @@ import java.util.stream.Collectors;
  * 펫: 전국 어느 시군구에서나 미리 분양받아 그 시군구에서 키운다 (ADR 0011).
  * 시군구는 region_subdivisions 의 한 행이다. 점령 시간과는 카카오가 위치 판정 때 준 시도·시군구 이름
  * (territory_region_cells)을 regions.name, region_subdivisions.name 과 맞춰 연결한다 (ADR 0012).
- * 경험치는 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1)과 방문일이고 (ADR 0013), 레벨은 지금 레벨표로 정한다.
+ * 경험치는 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(1분 = 1)과 방문일(ADR 0013), 미션 가챠로 얻은 값(ADR 0014)의 합이고,
+ * 레벨은 지금 레벨표로 정한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -51,7 +56,9 @@ public class FatService {
     private final TerritoryDailyStayRepository dailyStayRepository;
     private final TerritoryRegionCellRepository cellRepository;
     private final FatItineraryPeriodRepository periodRepository;
+    private final FatMissionExpRepository missionExpRepository;
     private final LDongSigunguRepository sigunguRepository;
+    private final GachaDrawer gachaDrawer;
     private final TerritoryProperties properties;
     private final TimelineProperties timelineProperties;
 
@@ -137,10 +144,11 @@ public class FatService {
     }
 
     /**
-     * 졸업 (상품 교환). 건국 레벨 이상인 펫만 할 수 있고, 어디서나 할 수 있으며 되돌리지 않는다.
+     * 졸업. 건국 레벨 이상인 펫만 할 수 있고, 어디서나 할 수 있으며 되돌리지 않는다.
+     * 같은 트랜잭션에서 졸업 가챠를 뽑는다. 가챠를 뽑지 못하면 졸업도 하지 않는다 (ADR 0014).
      */
     @Transactional
-    public GraduatedFat graduate(Long userId, Long fatId) {
+    public Graduation graduate(Long userId, Long fatId) {
         Fat fat = fatRepository.findByIdAndUserId(fatId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("펫을 찾을 수 없습니다. ID: " + fatId));
         if (fat.isGraduated()) {
@@ -154,7 +162,7 @@ public class FatService {
                     : "건국(Lv." + progress.foundingLevel() + ")부터 졸업할 수 있습니다.");
         }
         fat.graduate(now(), progress.level(), progress.exp());
-        return graduated(fat, subdivision);
+        return new Graduation(graduated(fat, subdivision), gachaDrawer.draw(userId, GachaType.GRADUATION, "fat:" + fat.getId()));
     }
 
     /**
@@ -216,8 +224,12 @@ public class FatService {
                 fat.getGraduatedAt(), fat.getGraduatedLevel(), fat.getGraduatedExp());
     }
 
-    /** 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(분)과 방문일 경험치 */
+    /** 분양 이후이면서 그 시군구 일정 기간 안의 머문 시간(분)과 방문일 경험치, 미션 가챠 경험치 */
     private long exp(Fat fat, RegionSubdivisions subdivision, FatSetting setting) {
+        return occupationExp(fat, subdivision, setting) + missionExpRepository.sumExpByFatId(fat.getId());
+    }
+
+    private long occupationExp(Fat fat, RegionSubdivisions subdivision, FatSetting setting) {
         List<FatExpCalculator.Period> periods = periodRepository.findByUserIdAndRegionCodeAndSubdivisionCode(
                         fat.getUserId(), subdivision.getRegion().getCode(), subdivision.getCode()).stream()
                 .map(period -> new FatExpCalculator.Period(period.getStartDate(), period.getEndDate()))

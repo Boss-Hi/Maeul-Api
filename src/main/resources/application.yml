@@ -91,7 +91,17 @@ server:
 
 jwt:
   secret: ${JWT_SECRET_KEY}
-  expiration: ${JWT_EXPIRATION_MS:3600000}
+
+auth: # 로그인 유지와 앱 로그인 (ADR 0015)
+  token:
+    access-ttl: ${AUTH_ACCESS_TOKEN_TTL:1h}
+    refresh-ttl: ${AUTH_REFRESH_TOKEN_TTL:60d}
+    login-code-ttl: ${AUTH_LOGIN_CODE_TTL:1m}
+  kakao:
+    audiences: ${KAKAO_NATIVE_APP_KEY:},${KAKAO_REST_API_KEY:} # ID 토큰 aud 로 받아들이는 앱 키
+  apple:
+    audiences: ${APPLE_BUNDLE_ID:},${APPLE_SERVICES_ID:} # ID 토큰 aud 로 받아들이는 번들 ID, Services ID
+  kakao-admin-key: ${KAKAO_ADMIN_KEY:} # 연결 끊기 콜백 확인용
 
 open-api:
   korea-tourism:
@@ -140,11 +150,17 @@ timeline:
   zone: ${TZ:Asia/Seoul}
 
 # 점령 (위치 기록 기반 시군구별 누적 시간, 월간 순위, 포인트)
+app-install:
+  android-url: ${APP_STORE_ANDROID_URL:} # 비어 있으면 그 플랫폼은 "준비 중"
+  ios-url: ${APP_STORE_IOS_URL:}
+
 territory:
   max-gap: ${TERRITORY_MAX_GAP:3m} # 기록이 이보다 오래 끊기면 그 사이 시간은 점령 시간에서 뺌
   reward-unit: ${TERRITORY_REWARD_UNIT:1h}
   reward-points: ${TERRITORY_REWARD_POINTS:100}
   ranking-max-size: ${TERRITORY_RANKING_MAX_SIZE:100}
+  itinerary-completion-window: ${TERRITORY_ITINERARY_COMPLETION_WINDOW:7d} # 종료일 뒤 일정 완료를 다시 판정하는 기간
+  itinerary-completion-cron: ${TERRITORY_ITINERARY_COMPLETION_CRON:0 10 0 * * *} # 일정 완료 판정 시각 (매일)
 
 kakao:
     rest-api:

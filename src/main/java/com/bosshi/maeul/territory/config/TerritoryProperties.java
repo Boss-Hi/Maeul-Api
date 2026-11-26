@@ -26,4 +26,7 @@ public class TerritoryProperties {
 
     /** 랭킹 목록 최대 크기 */
     private int rankingMaxSize = 100;
+
+    /** 일정 완료 판정 기간. 종료일 다음 날부터 이 기간 동안 늦게 올라온 위치 기록까지 보고 다시 판정한다. */
+    private Duration itineraryCompletionWindow = Duration.ofDays(7);
 }
