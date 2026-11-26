@@ -95,6 +95,80 @@ class AiItineraryGeneratorTest {
         org.mockito.Mockito.verifyNoInteractions(aiGenerator);
     }
 
+    @Test
+    @DisplayName("주축제가 화성이면 앵커 장소와 주축제를 프롬프트에 넣고, 아니면 넣지 않는다")
+    void anchorPlacesOnlyForHwaseongFestival() {
+        ItineraryGenerateDTO hwaseong = dto();
+        hwaseong.setTour(festival("41", "590"));
+        ItineraryGenerateDTO hwaseongDistrict = dto();
+        hwaseongDistrict.setTour(festival("41", "597"));
+        hwaseong.setRecommendableTours(List.of(
+                Tour.builder().contentId("A1").title("화성 식당").addr1("경기도 화성시 동탄구").build(),
+                Tour.builder().contentId("A3").title("화성 호텔").contentTypeId("32").addr1("경기도 화성시 향남읍").build(),
+                Tour.builder().contentId("A2").title("수원 공연장").addr1("경기도 수원시 팔달구").build()));
+        ItineraryGenerateDTO other = dto();
+        other.setTour(festival("41", "111"));
+
+        String hwaseongPrompt = generator.buildItineraryPrompt(hwaseong);
+        String districtPrompt = generator.buildItineraryPrompt(hwaseongDistrict);
+        String otherPrompt = generator.buildItineraryPrompt(other);
+
+        AnchorPlaces.HWASEONG.forEach(place -> {
+            assertThat(hwaseongPrompt).contains(place.name());
+            assertThat(districtPrompt).contains(place.name());
+            assertThat(otherPrompt).doesNotContain(place.name());
+        });
+        assertThat(hwaseongPrompt).contains("contentId: FEST1").contains("화성 식당").doesNotContain("수원 공연장").doesNotContain("화성 호텔");
+    }
+
+    @Test
+    @DisplayName("화성 일정의 앵커 장소는 NORMAL 로, 주축제는 TOUR 로 조립한다")
+    void assemblesAnchorAsNormalAndFestivalAsTour() {
+        ItineraryGenerateDTO dto = dto();
+        dto.setTour(festival("41", "590"));
+        when(aiGenerator.generate(any())).thenReturn(new AiResult<>("claude", output(
+                new ItineraryTourJson("", 1, "정조효공원·융건릉", "짧은 역사 미션", "10:00", "11:00"),
+                new ItineraryTourJson("FEST1", 2, "", "", "13:00", "15:00"))));
+
+        Itinerary itinerary = generator.generateItinerary(dto);
+
+        assertThat(itinerary.getItineraryDays().get(0).getItinerarySchedules())
+                .extracting("type")
+                .containsExactly("NORMAL", "TOUR");
+    }
+
+    @Test
+    @DisplayName("화성 일정에서 같은 날 같은 앵커가 반복되면 다음 제공자로 다시 요청하고, 남은 제공자가 없으면 그 일정을 쓴다")
+    void retriesOnRepeatedAnchorAndFallsBack() {
+        ItineraryGenerateDTO dto = dto();
+        dto.setTour(festival("41", "590"));
+        ItineraryAiOutput repeated = output(
+                new ItineraryTourJson("", 1, "황금해안길 산책", "걷기", "10:00", "11:00"),
+                new ItineraryTourJson("", 2, "황금해안길 낙조 걷기", "낙조", "17:00", "18:00"));
+        ItineraryAiOutput clean = output(
+                new ItineraryTourJson("", 1, "황금해안길 낙조 걷기", "낙조", "17:00", "18:00"));
+        when(aiGenerator.generate(any()))
+                .thenReturn(new AiResult<>("claude", repeated))
+                .thenReturn(new AiResult<>("gemini", clean));
+
+        Itinerary retried = generator.generateItinerary(dto);
+
+        assertThat(retried.getItineraryDays().get(0).getItinerarySchedules()).hasSize(1);
+
+        when(aiGenerator.generate(any()))
+                .thenReturn(new AiResult<>("claude", repeated))
+                .thenThrow(new ServiceUnavailableException("none"));
+
+        Itinerary fallback = generator.generateItinerary(dto);
+
+        assertThat(fallback.getItineraryDays().get(0).getItinerarySchedules()).hasSize(2);
+    }
+
+    private static Tour festival(String regionCode, String code) {
+        return Tour.builder().contentId("FEST1").title("화성 축제")
+                .lDongRegnCd(regionCode).lDongSignguCd(code).build();
+    }
+
     private static ItineraryAiOutput output(ItineraryTourJson... items) {
         return new ItineraryAiOutput(List.of(new ItineraryDayJson("2026-11-10", 1, List.of(items))));
     }
