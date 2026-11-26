@@ -2,7 +2,9 @@ package com.bosshi.maeul.territory.service;
 
 import com.bosshi.maeul.gacha.GachaDraw;
 import com.bosshi.maeul.gacha.GachaDrawer;
+import com.bosshi.maeul.gacha.GachaTicketIssuer;
 import com.bosshi.maeul.gacha.GachaType;
+import com.bosshi.maeul.gacha.TicketEventType;
 import com.bosshi.maeul.itineraries.openapi.entity.RegionSubdivisions;
 import com.bosshi.maeul.itineraries.openapi.repository.LDongSigunguRepository;
 import com.bosshi.maeul.territory.config.TerritoryProperties;
@@ -39,6 +41,7 @@ public class ItineraryCompletionJudge {
     private final TerritoryRegionCellRepository cellRepository;
     private final LDongSigunguRepository sigunguRepository;
     private final GachaDrawer gachaDrawer;
+    private final GachaTicketIssuer gachaTicketIssuer;
     private final TerritoryProperties properties;
     private final TimelineProperties timelineProperties;
     private final TransactionTemplate transactionTemplate;
@@ -104,6 +107,7 @@ public class ItineraryCompletionJudge {
         }
         Long firstItineraryId = group.itineraryIds().stream().min(Long::compare).orElseThrow();
         GachaDraw draw = gachaDrawer.draw(group.userId(), GachaType.ITINERARY_COMPLETION, "itinerary:" + firstItineraryId);
+        gachaTicketIssuer.issue(group.userId(), TicketEventType.ITINERARY_COMPLETION, "itinerary:" + firstItineraryId);
         completionRepository.saveAll(group.itineraryIds().stream()
                 .map(itineraryId -> ItineraryCompletion.builder()
                         .userId(group.userId())

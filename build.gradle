@@ -72,6 +72,8 @@ dependencies {
 
     // Database
     // Flyway Core
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.zxing:javase:3.5.3'
     implementation 'org.flywaydb:flyway-core'
 
     // MySQL / MariaDB를 사용하는 경우 필수 추가 (Flyway 8.x 이상)
