@@ -150,6 +150,10 @@ timeline:
   zone: ${TZ:Asia/Seoul}
 
 # 점령 (위치 기록 기반 시군구별 누적 시간, 월간 순위, 포인트)
+app-install:
+  android-url: ${APP_STORE_ANDROID_URL:} # 비어 있으면 그 플랫폼은 "준비 중"
+  ios-url: ${APP_STORE_IOS_URL:}
+
 territory:
   max-gap: ${TERRITORY_MAX_GAP:3m} # 기록이 이보다 오래 끊기면 그 사이 시간은 점령 시간에서 뺌
   reward-unit: ${TERRITORY_REWARD_UNIT:1h}
