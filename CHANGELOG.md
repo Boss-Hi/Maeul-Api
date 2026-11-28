@@ -9,6 +9,32 @@
 
 ### In Progress
 
+## [v0.6.0] - 2026-11-28
+
+> 화성 정조효공원·융건릉 사진 미션 추가, 웹 OAuth 로그인은 네이티브 앱이 아니면 기존 액세스 토큰 방식으로 복원
+
+- 사진 미션 (ADR 0017)
+  - 화성 앵커 일정에 정조효공원·융건릉이 있으면 사진 미션이 일정에 자동으로 붙음. 퀴즈로 기준 사진 3장을 보여 주고, 사용자가 같은 곳 중 하나를 찍어 올려 3장 중 하나라도 맞으면 성공, 성공하면 가챠권 1장(`PHOTO_MISSION`)과 미션 완료(펫이 있으면 미션 가챠)를 받음
+  - `GET /api/photo-missions/current`: 진행 중인 일정의 사진 미션(`referencePhotos` 기준 사진 목록, 상태, 오늘 남은 시도 횟수). 없으면 빈 목록
+  - `POST /api/photo-missions/{id}/submit`: 사진(`photo`, JPEG/PNG/WebP 5MB 이하)과 현재 위치(`lat`, `lng`)를 올림. 같은 장소로 판정되지 않으면 오류가 아니라 `success: false`
+  - `GET /api/photo-missions/reference-photos/{id}/image`: 서버가 서빙하는 기준 사진 이미지(인증 없음)
+  - 제출 규칙: 일정 기간 안, 장소 반경 150m 안, 사진 미션당 하루 5회, 같은 사진 해시 거절, EXIF 촬영 시각이 있으면 30분 이내, AI 확신도 0.7 이상. AI가 답하지 못하면 시도로 세지 않고 503
+  - 같은 시군구에 기간이 겹치는 일정은 가챠권을 한 번만 줌. 올린 사진은 저장하지 않고 시도 기록에는 위치, 사진 해시, 판정만 남김
+  - 기준 사진은 이미지 코드(base64)로 DB에 두고 `PhotoMissionSeeder`가 만듦(코드 `YUNGNEUNG-1~3`). 장소와 기준 사진은 KraftAdmin에서 관리(`PhotoMissionPlace`, `PhotoMissionReferencePhoto`)
+  - 가챠권 발급 설정에 이벤트 종류 `PHOTO_MISSION` 추가(켜기·끄기, 유효기간은 관리자가 정함)
+- AI 이미지 입력
+  - `AiRequest`가 이미지 목록을 받음. Claude(이미지 블록)와 Gemini(inlineData) 모두 지원하고 기존 제공자 순서와 장애 조치를 그대로 씀
+- 웹 OAuth 로그인 (ADR 0015 8번 변경)
+  - `/oauth2/authorization/kakao` 로그인 성공 후, 네이티브 앱(WebView User-Agent 에 `MaeulApp` 표식)이 아니면 기존 방식대로 액세스 토큰을 `token` 쿼리로 바로 줌(수명 `AUTH_WEB_ACCESS_TOKEN_TTL`, 기본 10시간, 리프레시 토큰 없음)
+  - 네이티브 앱 표식이 있을 때만 1회용 `code`를 주고 `POST /api/auth/code/exchange`로 교환. 표식은 `AUTH_NATIVE_APP_USER_AGENT`(기본 `MaeulApp`)로 바꾸며 비우면 모두 `token` 방식
+- DB
+  - `V18`: 사진 미션 테이블(`photo_mission_places`, `photo_mission_reference_photos`, `photo_missions`, `photo_mission_attempts`), 융건릉 장소 시드, `PHOTO_MISSION` 가챠권 발급 설정
+  - `V19`: 기준 사진을 base64 코드로 저장하는 컬럼(`code`, `mime_type`, `image_base64`)과 `photo_missions.reference_photo_id` NULL 허용
+  - 앱은 부팅할 때 Flyway를 실행하지 않으므로 V18~V19는 직접 적용해야 함. 서버 DB에는 2026-11-28에 적용 완료
+- 설정과 의존성
+  - 업로드 상한 `spring.servlet.multipart` 5MB, `photo-mission.*`(확신도, 하루 시도 횟수, EXIF 허용 분, 기준 사진 URL 허용 호스트)
+  - EXIF 읽기용 `metadata-extractor` 의존성 추가
+
 ## [v0.5.0] - 2026-11-26
 
 > 가챠 시스템(서버 가챠, 오프라인 가챠), 앱 네이티브 로그인, 화성 앵커 일정, 앱 설치 페이지 추가
