@@ -1,5 +1,6 @@
 package com.bosshi.maeul.gacha.service;
 
+import com.bosshi.maeul.gacha.GachaTicketIssuedEvent;
 import com.bosshi.maeul.gacha.GachaTicketIssuer;
 import com.bosshi.maeul.gacha.TicketEventType;
 import com.bosshi.maeul.gacha.dto.TicketView;
@@ -17,6 +18,7 @@ import com.bosshi.maeul.gacha.repository.PrizeQrRepository;
 import com.bosshi.maeul.gacha.type.OfflineGachaAction;
 import com.bosshi.maeul.gacha.type.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -42,24 +44,28 @@ public class GachaTicketService implements GachaTicketIssuer {
     private final OfflinePrizeKindRepository kindRepository;
     private final OfflineGachaLogRepository logRepository;
     private final StoreService storeService;
+    private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
 
     @Autowired
     public GachaTicketService(GachaTicketRepository ticketRepository, GachaTicketRuleRepository ruleRepository,
                               PrizeQrRepository prizeQrRepository, OfflinePrizeKindRepository kindRepository,
-                              OfflineGachaLogRepository logRepository, StoreService storeService) {
-        this(ticketRepository, ruleRepository, prizeQrRepository, kindRepository, logRepository, storeService, Clock.systemDefaultZone());
+                              OfflineGachaLogRepository logRepository, StoreService storeService,
+                              ApplicationEventPublisher eventPublisher) {
+        this(ticketRepository, ruleRepository, prizeQrRepository, kindRepository, logRepository, storeService, eventPublisher, Clock.systemDefaultZone());
     }
 
     GachaTicketService(GachaTicketRepository ticketRepository, GachaTicketRuleRepository ruleRepository,
                        PrizeQrRepository prizeQrRepository, OfflinePrizeKindRepository kindRepository,
-                       OfflineGachaLogRepository logRepository, StoreService storeService, Clock clock) {
+                       OfflineGachaLogRepository logRepository, StoreService storeService,
+                       ApplicationEventPublisher eventPublisher, Clock clock) {
         this.ticketRepository = ticketRepository;
         this.ruleRepository = ruleRepository;
         this.prizeQrRepository = prizeQrRepository;
         this.kindRepository = kindRepository;
         this.logRepository = logRepository;
         this.storeService = storeService;
+        this.eventPublisher = eventPublisher;
         this.clock = clock;
     }
 
@@ -70,13 +76,15 @@ public class GachaTicketService implements GachaTicketIssuer {
         if (rule == null || !rule.isEnabled() || ticketRepository.existsByUserIdAndEventTypeAndRefKey(userId, eventType, refKey)) {
             return;
         }
-        ticketRepository.save(GachaTicket.builder()
+        GachaTicket ticket = GachaTicket.builder()
                 .userId(userId)
                 .code(QrCodes.newCode(QrCodes.TICKET_PREFIX))
                 .eventType(eventType)
                 .refKey(refKey)
                 .expiresAt(LocalDateTime.now(clock).plusDays(rule.getValidityDays()))
-                .build());
+                .build();
+        ticketRepository.save(ticket);
+        eventPublisher.publishEvent(new GachaTicketIssuedEvent(userId, ticket.getId(), eventType, ticket.getExpiresAt()));
     }
 
     /** 내 가챠권 (최근 순). 상품이 연결된 권에는 상품 이름이 붙는다 */

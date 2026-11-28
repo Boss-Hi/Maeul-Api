@@ -1,5 +1,6 @@
 package com.bosshi.maeul.gacha.service;
 
+import com.bosshi.maeul.gacha.GachaTicketIssuedEvent;
 import com.bosshi.maeul.gacha.TicketEventType;
 import com.bosshi.maeul.gacha.dto.TicketView;
 import com.bosshi.maeul.gacha.entity.GachaTicket;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -34,8 +36,9 @@ class GachaTicketServiceTest {
     private final GachaTicketRuleRepository ruleRepository = mock(GachaTicketRuleRepository.class);
     private final PrizeQrRepository prizeQrRepository = mock(PrizeQrRepository.class);
     private final StoreService storeService = mock(StoreService.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final GachaTicketService service = new GachaTicketService(ticketRepository, ruleRepository, prizeQrRepository,
-            mock(OfflinePrizeKindRepository.class), mock(OfflineGachaLogRepository.class), storeService,
+            mock(OfflinePrizeKindRepository.class), mock(OfflineGachaLogRepository.class), storeService, eventPublisher,
             Clock.fixed(NOW.toInstant(ZoneOffset.UTC), ZoneOffset.UTC));
 
     @BeforeEach
@@ -60,6 +63,7 @@ class GachaTicketServiceTest {
         verify(ticketRepository).save(saved.capture());
         assertThat(saved.getValue().getExpiresAt()).isEqualTo(NOW.plusDays(30));
         assertThat(saved.getValue().getCode()).startsWith("GT-");
+        verify(eventPublisher).publishEvent(new GachaTicketIssuedEvent(3L, null, TicketEventType.ITINERARY_COMPLETION, NOW.plusDays(30)));
     }
 
     @Test
@@ -75,6 +79,7 @@ class GachaTicketServiceTest {
         service.issue(3L, TicketEventType.ITINERARY_COMPLETION, "itinerary:1");
 
         verify(ticketRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test
