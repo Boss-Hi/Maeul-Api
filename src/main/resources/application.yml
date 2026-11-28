@@ -97,11 +97,13 @@ auth: # 로그인 유지와 앱 로그인 (ADR 0015)
     access-ttl: ${AUTH_ACCESS_TOKEN_TTL:1h}
     refresh-ttl: ${AUTH_REFRESH_TOKEN_TTL:60d}
     login-code-ttl: ${AUTH_LOGIN_CODE_TTL:1m}
+    web-access-ttl: ${AUTH_WEB_ACCESS_TOKEN_TTL:10h} # 웹 브라우저 OAuth 로그인이 URL 로 바로 주는 액세스 토큰
   kakao:
     audiences: ${KAKAO_NATIVE_APP_KEY:},${KAKAO_REST_API_KEY:} # ID 토큰 aud 로 받아들이는 앱 키
   apple:
     audiences: ${APPLE_BUNDLE_ID:},${APPLE_SERVICES_ID:} # ID 토큰 aud 로 받아들이는 번들 ID, Services ID
   kakao-admin-key: ${KAKAO_ADMIN_KEY:} # 연결 끊기 콜백 확인용
+  native-app-user-agent: ${AUTH_NATIVE_APP_USER_AGENT:MaeulApp} # 네이티브 앱 WebView 의 User-Agent 표식
 
 open-api:
   korea-tourism:
