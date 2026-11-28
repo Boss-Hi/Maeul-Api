@@ -9,6 +9,9 @@
 
 ### In Progress
 
+- 수정: 가챠권 발급 알림(v0.6.1) 이후 사진 미션 성공과 일정 완료 때 500
+  - Spring Modulith 2.x 가 `@TransactionalEventListener` 의 발행 기록을 `event_publication` 에 저장하는데, 테이블이 옛 모양이라 `Unknown column 'completion_attempts'` 로 실패하고 가챠권 발급과 미션 완료가 함께 롤백됨. v0.6.1 의 "DB 변경 없음" 기록은 틀렸음
+  - `V21`: `event_publication` 에 `status`, `completion_attempts`, `last_resubmission_date` 추가. 서버 DB 에는 2026-11-28 에 적용 완료
 - 첫 오프라인 매장과 상품 종류 등록
   - `FirstStoreSeeder`가 부팅 때 매장 "더온전히 정조효공원점"(경기도 화성시 병점구, `region_code=41`, `subdivision_code=595`)과 상품 종류 5개(아메리카노 1잔, 물고기 친구 분양, Maeul 병아리 스티커, 디저트 1개: 쌀 휘낭시에, 디저트 1개: 쌀 소금빵)를 등록. 같은 이름의 행이 지워진 것까지 포함해 있으면 만들지 않아 운영자가 바꾸거나 지운 것을 되살리지 않음
   - 상품 QR 과 사장님 계정은 만들지 않음. 운영자가 `Prize QR Issue`로 발급하고, 사장님이 가입하면 `Store Owner Add`로 연결
