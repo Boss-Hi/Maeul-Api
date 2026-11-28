@@ -1,6 +1,7 @@
 package com.bosshi.maeul.ai;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,12 +10,23 @@ import java.util.Set;
  * @param prompt            프롬프트 (제공자와 무관한 내용)
  * @param responseType      응답을 받을 타입. 스키마를 강제할 수 있는 제공자는 이 타입으로 강제한다
  * @param jsonExample       응답 JSON 예시. 스키마를 강제할 수 없는 제공자에게 출력 형식으로 보여준다 (없으면 null)
+ * @param images            함께 보낼 이미지 (없으면 빈 목록). 이미지를 이해하지 못하는 제공자는 없다고 가정한다
  * @param excludedProviders 시도하지 않을 제공자 이름. 받은 결과를 호출 측이 쓸 수 없을 때 다른 제공자로 다시 요청하는 데 쓴다
  */
-public record AiRequest<T>(String prompt, Class<T> responseType, String jsonExample, Set<String> excludedProviders) {
+public record AiRequest<T>(String prompt, Class<T> responseType, String jsonExample, Set<String> excludedProviders, List<AiImage> images) {
 
     public AiRequest {
         excludedProviders = excludedProviders == null ? Set.of() : Set.copyOf(excludedProviders);
+        images = images == null ? List.of() : List.copyOf(images);
+    }
+
+    public AiRequest(String prompt, Class<T> responseType, String jsonExample, Set<String> excludedProviders) {
+        this(prompt, responseType, jsonExample, excludedProviders, List.of());
+    }
+
+    /** 이미지와 함께 보내는 요청 */
+    public static <T> AiRequest<T> withImages(String prompt, List<AiImage> images, Class<T> responseType, String jsonExample) {
+        return new AiRequest<>(prompt, responseType, jsonExample, Set.of(), images);
     }
 
     public static <T> AiRequest<T> of(String prompt, Class<T> responseType, String jsonExample) {
@@ -25,6 +37,6 @@ public record AiRequest<T>(String prompt, Class<T> responseType, String jsonExam
     public AiRequest<T> excluding(String provider) {
         Set<String> excluded = new HashSet<>(excludedProviders);
         excluded.add(provider);
-        return new AiRequest<>(prompt, responseType, jsonExample, excluded);
+        return new AiRequest<>(prompt, responseType, jsonExample, excluded, images);
     }
 }

@@ -1,5 +1,6 @@
 package com.bosshi.maeul.ai.service;
 
+import com.bosshi.maeul.ai.AiImage;
 import com.bosshi.maeul.ai.config.GeminiConfig;
 import com.bosshi.maeul.ai.request.GeminiGenerateRequest;
 import com.bosshi.maeul.ai.response.GeminiGenerateResponse;
@@ -49,11 +50,16 @@ public class GeminiService {
      * @throws ServiceUnavailableException 사용 가능한 키가 없거나, 일시적 오류 재시도가 모두 실패했을 때
      */
     public GeminiGenerateResponse generate(String prompt) {
+        return generate(prompt, List.of());
+    }
+
+    public GeminiGenerateResponse generate(String prompt, List<AiImage> images) {
         if (!StringUtils.hasText(prompt)) {
             throw new IllegalArgumentException("Prompt must not be blank.");
         }
         GeminiGenerateRequest request = buildPrompt(
                 prompt,
+                images,
                 config.getTemperature(),
                 config.getMaxOutputTokens()
         );
@@ -176,9 +182,14 @@ public class GeminiService {
                 .toUri();
     }
 
-    private GeminiGenerateRequest buildPrompt(String prompt, Double temperature, Integer maxOutputTokens) {
-        GeminiGenerateRequest.Part part = new GeminiGenerateRequest.Part(prompt);
-        GeminiGenerateRequest.Content content = new GeminiGenerateRequest.Content("user", List.of(part));
+    private GeminiGenerateRequest buildPrompt(String prompt, List<AiImage> images, Double temperature, Integer maxOutputTokens) {
+        List<GeminiGenerateRequest.Part> parts = new java.util.ArrayList<>();
+        for (AiImage image : images) {
+            parts.add(new GeminiGenerateRequest.Part(null, new GeminiGenerateRequest.InlineData(image.mimeType(),
+                    java.util.Base64.getEncoder().encodeToString(image.data()))));
+        }
+        parts.add(new GeminiGenerateRequest.Part(prompt));
+        GeminiGenerateRequest.Content content = new GeminiGenerateRequest.Content("user", parts);
         GeminiGenerateRequest.GenerationConfig config = new GeminiGenerateRequest.GenerationConfig(temperature, maxOutputTokens, "application/json");
         return new GeminiGenerateRequest(List.of(content), config);
     }

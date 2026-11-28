@@ -72,6 +72,7 @@ dependencies {
 
     // Database
     // Flyway Core
+    implementation 'com.drewnoakes:metadata-extractor:2.19.0'
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.google.zxing:javase:3.5.3'
     implementation 'org.flywaydb:flyway-core'

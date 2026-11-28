@@ -3,6 +3,10 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: Maeul-Api
+  servlet:
+    multipart:
+      max-file-size: 5MB # 사진 미션 업로드 상한
+      max-request-size: 6MB
   logging:
     level:
       org.hibernate.SQL: DEBUG
@@ -152,6 +156,13 @@ timeline:
   zone: ${TZ:Asia/Seoul}
 
 # 점령 (위치 기록 기반 시군구별 누적 시간, 월간 순위, 포인트)
+photo-mission:
+  allowed-image-hosts: ${PHOTO_MISSION_ALLOWED_IMAGE_HOSTS:} # 기준 사진을 내려받을 수 있는 호스트(쉼표 구분). 비어 있으면 사진 미션을 제출할 수 없음
+  min-confidence: ${PHOTO_MISSION_MIN_CONFIDENCE:0.7}
+  max-attempts-per-day: ${PHOTO_MISSION_MAX_ATTEMPTS_PER_DAY:5}
+  exif-max-minutes: ${PHOTO_MISSION_EXIF_MAX_MINUTES:30}
+  max-image-bytes: 5242880
+
 app-install:
   android-url: ${APP_STORE_ANDROID_URL:} # 비어 있으면 그 플랫폼은 "준비 중"
   ios-url: ${APP_STORE_IOS_URL:}

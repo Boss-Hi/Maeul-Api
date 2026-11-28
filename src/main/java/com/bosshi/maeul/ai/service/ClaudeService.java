@@ -1,5 +1,11 @@
 package com.bosshi.maeul.ai.service;
 
+import com.anthropic.models.messages.Base64ImageSource;
+import com.anthropic.models.messages.ContentBlockParam;
+import com.bosshi.maeul.ai.AiImage;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.core.JsonValue;
@@ -59,10 +65,14 @@ public class ClaudeService {
      * @throws ClaudeRefusalException      안전 분류기가 요청을 거절했을 때
      */
     public <T> T generate(String prompt, Class<T> type) {
+        return generate(prompt, List.of(), type);
+    }
+
+    public <T> T generate(String prompt, List<AiImage> images, Class<T> type) {
         if (!StringUtils.hasText(prompt)) {
             throw new IllegalArgumentException("Prompt must not be blank.");
         }
-        StructuredMessageCreateParams<T> params = buildParams(prompt, type);
+        StructuredMessageCreateParams<T> params = buildParams(prompt, images, type);
 
         Set<Long> triedKeyIds = new HashSet<>();
         while (true) {
@@ -87,14 +97,30 @@ public class ClaudeService {
     }
 
     <T> StructuredMessageCreateParams<T> buildParams(String prompt, Class<T> type) {
+        return buildParams(prompt, List.of(), type);
+    }
+
+    <T> StructuredMessageCreateParams<T> buildParams(String prompt, List<AiImage> images, Class<T> type) {
         StructuredMessageCreateParams.Builder<T> builder = MessageCreateParams.builder()
                 .model(config.getModel())
                 .maxTokens(config.getMaxTokens())
                 .outputConfig(StructuredOutputConfig.<T>builder()
                         .format(type)
                         .effort(OutputConfig.Effort.of(config.getEffort()))
-                        .build())
-                .addUserMessage(prompt);
+                        .build());
+        if (images.isEmpty()) {
+            builder.addUserMessage(prompt);
+        } else {
+            List<ContentBlockParam> blocks = new ArrayList<>();
+            for (AiImage image : images) {
+                blocks.add(ContentBlockParam.ofImage(Base64ImageSource.builder()
+                        .data(Base64.getEncoder().encodeToString(image.data()))
+                        .mediaType(Base64ImageSource.MediaType.of(image.mimeType()))
+                        .build()));
+            }
+            blocks.add(ContentBlockParam.ofText(prompt));
+            builder.addUserMessageOfContentBlockParams(blocks);
+        }
 
         if (config.isRefusalFallbackEnabled()) {
             builder.putAdditionalHeader("anthropic-beta", REFUSAL_FALLBACK_BETA)

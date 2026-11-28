@@ -34,6 +34,21 @@ public class GeminiGenerateRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Part {
         private String text;
+        private InlineData inlineData;
+
+        public Part(String text) {
+            this.text = text;
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class InlineData {
+        private String mimeType;
+        private String data;
     }
 
     @Getter

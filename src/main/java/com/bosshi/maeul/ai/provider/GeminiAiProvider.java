@@ -58,7 +58,9 @@ public class GeminiAiProvider implements AiProvider {
      */
     private GeminiGenerateResponse callGemini(AiRequest<?> request) {
         try {
-            return geminiService.generate(withOutputInstruction(request));
+            return request.images().isEmpty()
+                    ? geminiService.generate(withOutputInstruction(request))
+                    : geminiService.generate(withOutputInstruction(request), request.images());
         } catch (RestClientResponseException e) {
             if (e.getStatusCode().value() == HttpStatus.TOO_MANY_REQUESTS.value()) {
                 throw new ServiceUnavailableException(ServiceUnavailableException.OVERLOADED_MESSAGE, e);
