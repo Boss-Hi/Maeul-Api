@@ -7,4 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
     java.util.List<Store> findByDeletedAtIsNullOrderByIdAsc();
+
+    /** 지워진 행도 센다 */
+    boolean existsByName(String name);
+
+    java.util.Optional<Store> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(String name);
 }

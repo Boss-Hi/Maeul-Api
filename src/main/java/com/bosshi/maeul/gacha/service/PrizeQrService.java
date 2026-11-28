@@ -117,6 +117,11 @@ public class PrizeQrService {
         }
         PrizeQr qr = prizeQrRepository.findByCodeAndDeletedAtIsNull(code)
                 .orElseThrow(() -> new IllegalArgumentException("상품 QR 을 찾을 수 없습니다."));
+        kindRepository.findById(qr.getKindId()).map(OfflinePrizeKind::getStoreId)
+                .filter(kindStoreId -> !kindStoreId.equals(store.getId()))
+                .ifPresent(kindStoreId -> {
+                    throw new IllegalArgumentException("이 매장에서 지급할 수 없는 상품 QR 입니다.");
+                });
         if (prizeQrRepository.markDelivered(qr.getId(), store.getId(), ownerUserId, ticketId, LocalDateTime.now(clock)) == 0) {
             throw new IllegalArgumentException("이미 지급된 상품 QR 입니다.");
         }

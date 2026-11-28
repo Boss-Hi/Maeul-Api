@@ -22,4 +22,8 @@ public class OfflinePrizeKind extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String name;
+
+    /** 이 매장에서만 지급할 수 있는 상품이면 매장 id. 비어 있으면 어느 매장에서나 지급한다 */
+    @Column(name = "store_id")
+    private Long storeId;
 }

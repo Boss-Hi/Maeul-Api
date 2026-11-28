@@ -8,5 +8,8 @@ import org.springframework.stereotype.Repository;
 public interface OfflinePrizeKindRepository extends JpaRepository<OfflinePrizeKind, Long> {
     java.util.List<OfflinePrizeKind> findByDeletedAtIsNullOrderByIdAsc();
 
+    /** 지워진 행도 센다 */
+    boolean existsByName(String name);
+
     java.util.List<OfflinePrizeKind> findByIdIn(java.util.Collection<Long> ids);
 }

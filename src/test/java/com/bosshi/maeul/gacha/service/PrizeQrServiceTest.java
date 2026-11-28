@@ -1,6 +1,7 @@
 package com.bosshi.maeul.gacha.service;
 
 import com.bosshi.maeul.gacha.entity.GachaTicket;
+import com.bosshi.maeul.gacha.entity.OfflinePrizeKind;
 import com.bosshi.maeul.gacha.entity.PrizeQr;
 import com.bosshi.maeul.gacha.entity.Store;
 import com.bosshi.maeul.gacha.repository.*;
@@ -61,6 +62,19 @@ class PrizeQrServiceTest {
         assertThatThrownBy(() -> service.deliver(7L, 10L, "GP-x")).hasMessageContaining("이미 상품이 연결");
         assertThatThrownBy(() -> service.deliver(7L, 10L, "GT-x")).hasMessageContaining("상품 QR 이 아닙니다");
         verify(prizeQrRepository, never()).markDelivered(anyLong(), anyLong(), anyLong(), anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("다른 매장 전용 상품 QR 은 지급할 수 없고, 이 매장 전용이거나 전용이 없으면 지급한다")
+    void deliverRejectsPrizeKindOfAnotherStore() {
+        when(kindRepository.findById(5L)).thenReturn(Optional.of(OfflinePrizeKind.builder().id(5L).name("아메리카노 1잔").storeId(2L).build()));
+
+        assertThatThrownBy(() -> service.deliver(7L, 10L, "GP-x")).hasMessageContaining("지급할 수 없는 상품 QR");
+        verify(prizeQrRepository, never()).markDelivered(anyLong(), anyLong(), anyLong(), anyLong(), any());
+
+        when(prizeQrRepository.markDelivered(20L, 1L, 7L, 10L, NOW)).thenReturn(1);
+        when(kindRepository.findById(5L)).thenReturn(Optional.of(OfflinePrizeKind.builder().id(5L).name("아메리카노 1잔").storeId(1L).build()));
+        assertThat(service.deliver(7L, 10L, "GP-x").getTicketId()).isEqualTo(10L);
     }
 
     @Test
